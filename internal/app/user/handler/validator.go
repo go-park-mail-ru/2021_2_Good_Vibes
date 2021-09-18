@@ -7,9 +7,8 @@ import (
 )
 
 type CustomValidator struct {
-		Validator *validator.Validate
+	Validator *validator.Validate
 }
-
 
 func (cv *CustomValidator) Validate(i interface{}) error {
 	if err := cv.Validator.Struct(i); err != nil {
@@ -17,4 +16,3 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	}
 	return nil
 }
-

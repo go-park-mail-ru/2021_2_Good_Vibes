@@ -18,9 +18,9 @@ var (
 
 func main() {
 	storage = impl.NewStorageUserMemory()
-	storage.AddUser(storage_user.User{"Misha","qwerty@gmail.com","1234"})
-	storage.AddUser(storage_user.User{"Glasha","qwerty@gmail.com","1234"})
-	storage.AddUser(storage_user.User{"Vova","qwerty@gmail.com","1234"})
+	storage.AddUser(storage_user.User{"Misha", "qwerty@gmail.com", "1234"})
+	storage.AddUser(storage_user.User{"Glasha", "qwerty@gmail.com", "1234"})
+	storage.AddUser(storage_user.User{"Vova", "qwerty@gmail.com", "1234"})
 
 	userHandler := handler.NewLoginHandler(&storage)
 	router.Validator = &handler.CustomValidator{Validator: validator.New()}

@@ -6,7 +6,7 @@ import (
 )
 
 type StorageUserMemory struct {
-	mx sync.RWMutex
+	mx      sync.RWMutex
 	storage map[int]storage_user.User
 }
 
@@ -16,7 +16,7 @@ func NewStorageUserMemory() *StorageUserMemory {
 	}
 }
 
-func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, error)  {
+func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, error) {
 	for key, val := range su.storage {
 		if val.Name == user.Name && val.Password == user.Password {
 			return key, nil

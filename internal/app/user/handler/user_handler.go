@@ -11,13 +11,13 @@ type UserHandler struct {
 	storage storage_user.UserUseCase
 }
 
-func NewLoginHandler(storageUser *storage_user.UserUseCase)*UserHandler {
+func NewLoginHandler(storageUser *storage_user.UserUseCase) *UserHandler {
 	return &UserHandler{
 		storage: *storageUser,
 	}
 }
 
-func (handler *UserHandler)Login(ctx echo.Context) error {
+func (handler *UserHandler) Login(ctx echo.Context) error {
 	newUserInput := new(storage_user.UserInput)
 	if err := ctx.Bind(newUserInput); err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
@@ -34,7 +34,7 @@ func (handler *UserHandler)Login(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newUserInput)
 }
 
-func (handler *UserHandler)SignUp(ctx echo.Context) error {
+func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	newUser := new(storage_user.User)
 	if err := ctx.Bind(newUser); err != nil {
 		fmt.Println(err)
