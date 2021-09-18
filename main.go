@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/handler"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user/impl"
 	"github.com/go-playground/validator"
@@ -28,9 +29,15 @@ func main() {
 	router.Static("/", "static")
 	router.POST("/login", userHandler.Login)
 	router.POST("/signup", userHandler.SignUp)
+	router.GET("/profile", profile, middleware.IsLogin)
 
 	if err := router.Start(":8080"); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 	fmt.Println("Hello world")
+}
+
+//пока просто для проверки middleware
+func profile(ctx echo.Context) error {
+	return ctx.String(http.StatusOK, "hello world")
 }
