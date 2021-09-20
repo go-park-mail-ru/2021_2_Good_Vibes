@@ -17,6 +17,9 @@ func NewStorageUserMemory() *StorageUserMemory {
 }
 
 func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, error) {
+	su.mx.RLock()
+	defer su.mx.RUnlock()
+
 	for key, val := range su.storage {
 		if val.Name == user.Name && val.Password == user.Password {
 			return key, nil
@@ -26,7 +29,9 @@ func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, err
 }
 
 func (su *StorageUserMemory) AddUser(newUser storage_user.User) (int, error) {
-	su.mx.RLock()
+	su.mx.Lock()
+	defer su.mx.Unlock()
+
 	for _, val := range su.storage {
 		if val == newUser {
 			return -1, nil
@@ -34,6 +39,5 @@ func (su *StorageUserMemory) AddUser(newUser storage_user.User) (int, error) {
 	}
 	newId := len(su.storage) + 1
 	su.storage[newId] = newUser
-	su.mx.RUnlock()
 	return newId, nil
 }
