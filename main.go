@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/handler"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
@@ -18,6 +18,11 @@ var (
 )
 
 func main() {
+	err := configApp.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config", err)
+	}
+
 	storage = impl.NewStorageUserMemory()
 	storage.AddUser(storage_user.User{"Misha", "qwerty@gmail.com", "1234"})
 	storage.AddUser(storage_user.User{"Glasha", "qwerty@gmail.com", "1234"})
@@ -31,10 +36,9 @@ func main() {
 	router.POST("/signup", userHandler.SignUp)
 	router.GET("/profile", profile, middleware.IsLogin)
 
-	if err := router.Start(":8080"); err != http.ErrServerClosed {
+	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
-	fmt.Println("Hello world")
 }
 
 //пока просто для проверки middleware

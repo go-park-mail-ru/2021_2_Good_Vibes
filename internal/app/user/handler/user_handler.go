@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"time"
 )
 
 type UserHandler struct {
@@ -46,11 +47,9 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	newUser := new(storage_user.User)
 	if err := ctx.Bind(newUser); err != nil {
-		fmt.Println(err)
 		return ctx.NoContent(http.StatusUnauthorized)
 	}
 	if err := ctx.Validate(newUser); err != nil {
-		fmt.Println(err)
 		return ctx.NoContent(http.StatusUnauthorized)
 	}
 	fmt.Println(handler.storage)
@@ -77,6 +76,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		Name:     "session_id",
 		Value:    value,
 		HttpOnly: true,
+		Expires:  time.Now().Add(time.Hour * 72),
 	}
 
 	ctx.SetCookie(cookie)
