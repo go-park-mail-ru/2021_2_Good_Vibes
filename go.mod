@@ -1,6 +1,6 @@
 module github.com/go-park-mail-ru/2021_2_Good_Vibes
-
-go 1.14
+// +heroku goVersion go1.17
+go 1.17
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
