@@ -35,7 +35,7 @@ func main() {
 	router.POST("/login", userHandler.Login)
 	router.POST("/signup", userHandler.SignUp)
 	router.GET("/profile", profile, middleware.IsLogin)
-
+	router.GET("/logout", userHandler.Logout, middleware.IsLogin)
 	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}

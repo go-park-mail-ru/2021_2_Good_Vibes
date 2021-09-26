@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"net/http"
 	"time"
 )
@@ -28,7 +29,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusBadRequest)
 	}
 	fmt.Println(handler.storage)
-
+	log.Debug("dsgnjfsjgbdfg")
 	id, err := handler.storage.IsUserExists(*newUserInput)
 	if id == -1 || err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
@@ -71,12 +72,26 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newUser)
 }
 
+func (handler *UserHandler) Logout(ctx echo.Context) error {
+	cookie := &http.Cookie{
+		Name: "session_id",
+		HttpOnly: true,
+		MaxAge: -1,
+		SameSite: http.SameSiteNoneMode,
+		Secure: true,
+	}
+	ctx.SetCookie(cookie)
+	return ctx.NoContent(http.StatusOK)
+}
+
 func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    value,
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
+		SameSite: http.SameSiteNoneMode,
+		Secure: true,
 	}
 
 	ctx.SetCookie(cookie)
