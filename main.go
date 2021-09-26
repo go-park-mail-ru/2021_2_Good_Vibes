@@ -19,7 +19,7 @@ var (
 )
 
 func main() {
-	os.Setenv("DATABASE_URL", "postgres://lida:sergeykust000@localhost:5432/mydb")
+	os.Setenv("DATABASE_URL", "postgres://lida:123@localhost:5432/mydb")
 
 	err := configApp.LoadConfig(".")
 	if err != nil {
