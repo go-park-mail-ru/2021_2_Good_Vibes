@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/labstack/echo/v4"
@@ -21,7 +22,7 @@ func NewLoginHandler(storageUser *storage_user.UserUseCase) *UserHandler {
 }
 
 func (handler *UserHandler) Login(ctx echo.Context) error {
-	newUserInput := new(storage_user.UserInput)
+	newUserInput := new(user_model.UserInput)
 	if err := ctx.Bind(newUserInput); err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
 	}
@@ -46,7 +47,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
-	newUser := new(storage_user.User)
+	newUser := new(user_model.User)
 	if err := ctx.Bind(newUser); err != nil {
 		return ctx.NoContent(http.StatusUnauthorized)
 	}

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
+	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -14,16 +14,16 @@ import (
 
 type StorageUserMemory struct {
 	mx      sync.RWMutex
-	storage map[int]storage_user.User
+	storage map[int]user_model.User
 }
 
 func NewStorageUserMemory() *StorageUserMemory {
 	return &StorageUserMemory{
-		storage: make(map[int]storage_user.User),
+		storage: make(map[int]user_model.User),
 	}
 }
 
-func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, error) {
+func (su *StorageUserMemory) IsUserExists(user user_model.UserInput) (int, error) {
 	su.mx.RLock()
 	defer su.mx.RUnlock()
 
@@ -35,7 +35,7 @@ func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, err
 	return -1, nil
 }
 
-func (su *StorageUserMemory) AddUser(newUser storage_user.User) (int, error) {
+func (su *StorageUserMemory) AddUser(newUser user_model.User) (int, error) {
 	su.mx.Lock()
 	defer su.mx.Unlock()
 
@@ -89,7 +89,7 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 
 func TestCreateUserFailUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
-	mockStorage.AddUser(storage_user.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
+	mockStorage.AddUser(user_model.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
 
 	type args struct {
 		str string
@@ -140,9 +140,9 @@ func TestCreateUserFailUnit(t *testing.T) {
 
 func TestLoginUserSuccessUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
-	mockStorage.AddUser(storage_user.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
-	mockStorage.AddUser(storage_user.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
-	mockStorage.AddUser(storage_user.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin228"})
+	mockStorage.AddUser(user_model.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
+	mockStorage.AddUser(user_model.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
+	mockStorage.AddUser(user_model.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin228"})
 
 	type args struct {
 		str string
@@ -182,9 +182,9 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 func TestLoginUserFailUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
 
-	mockStorage.AddUser(storage_user.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
-	mockStorage.AddUser(storage_user.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
-	mockStorage.AddUser(storage_user.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin"})
+	mockStorage.AddUser(user_model.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
+	mockStorage.AddUser(user_model.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
+	mockStorage.AddUser(user_model.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin"})
 
 	type args struct {
 		str string
