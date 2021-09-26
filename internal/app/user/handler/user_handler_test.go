@@ -57,10 +57,10 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name       string
+		args       args
 		statusCode int
-	} {
+	}{
 		{
 			"signup",
 			args{`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n"}, http.StatusOK},
@@ -96,11 +96,11 @@ func TestCreateUserFailUnit(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name       string
+		args       args
 		wantedJson string
 		statusCode int
-	} {
+	}{
 		{
 			"signup",
 			args{`{"username":"","email":"Misha@gmail.com","password":"1234"}` + "\n"},
@@ -149,10 +149,10 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name       string
+		args       args
 		statusCode int
-	} {
+	}{
 		{
 			"auth",
 			args{`{"username":"Misha","password":"1234"}` + "\n"}, http.StatusOK},
@@ -191,11 +191,11 @@ func TestLoginUserFailUnit(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name       string
+		args       args
 		wantedJson string
 		statusCode int
-	} {
+	}{
 		{
 			"auth",
 			args{`{"username":"Misha","password":"134"}` + "\n"},
@@ -238,27 +238,26 @@ func TestLoginUserFailUnit(t *testing.T) {
 	}
 }
 
-
 func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
 
 	type args struct {
 		signUp string
-		login string
+		login  string
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name             string
+		args             args
 		wantedSignupJson string
-		wantedLoginJson string
+		wantedLoginJson  string
 		signUpStatusCode int
-		loginStatusCode int
-	} {
+		loginStatusCode  int
+	}{
 		{
 			"signup_login_integration",
 			args{`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
-			`{"username":"Misha","password":"1234"}` + "\n"},
+				`{"username":"Misha","password":"1234"}` + "\n"},
 			`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
 			`{"username":"Misha","password":"1234"}` + "\n",
 			http.StatusOK,
@@ -292,17 +291,17 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 
 	type args struct {
 		signUp string
-		login string
+		login  string
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name             string
+		args             args
 		wantedSignupJson string
-		wantedLoginJson string
+		wantedLoginJson  string
 		signUpStatusCode int
-		loginStatusCode int
-	} {
+		loginStatusCode  int
+	}{
 		{
 			"signup_login_integration",
 			args{`{"username":"Gosha","email":"Misha@gmail.com","password":"1234"}` + "\n",
@@ -315,8 +314,8 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 			"signup_login_integration",
 			args{`{"username":"Misha","email":"","password":"1234"}` + "\n",
 				`{"username":"Misha","password":"1234"}` + "\n"},
-				"",
-				"",
+			"",
+			"",
 			http.StatusUnauthorized,
 			http.StatusBadRequest},
 	}
@@ -342,7 +341,6 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 		})
 	}
 }
-
 
 func constructRequest(target string, login string, router *echo.Echo, mockStorage *StorageUserMemory) (*httptest.ResponseRecorder, echo.Context, *UserHandler) {
 	req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(login))

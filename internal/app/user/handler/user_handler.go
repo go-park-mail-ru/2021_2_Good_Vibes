@@ -75,11 +75,11 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 
 func (handler *UserHandler) Logout(ctx echo.Context) error {
 	cookie := &http.Cookie{
-		Name: "session_id",
+		Name:     "session_id",
 		HttpOnly: true,
-		MaxAge: -1,
+		MaxAge:   -1,
 		SameSite: http.SameSiteNoneMode,
-		Secure: true,
+		Secure:   true,
 	}
 	ctx.SetCookie(cookie)
 	return ctx.NoContent(http.StatusOK)
@@ -92,7 +92,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
 		SameSite: http.SameSiteNoneMode,
-		Secure: true,
+		Secure:   true,
 	}
 
 	ctx.SetCookie(cookie)

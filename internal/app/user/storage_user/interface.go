@@ -1,17 +1,8 @@
 package storage_user
 
-type UserInput struct {
-	Name     string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
-
-type User struct {
-	Name     string `json:"username" validate:"required"`
-	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
+import "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 
 type UserUseCase interface {
-	IsUserExists(user UserInput) (int, error)
-	AddUser(newUser User) (int, error)
+	IsUserExists(user user.UserInput) (int, error)
+	AddUser(newUser user.User) (int, error)
 }

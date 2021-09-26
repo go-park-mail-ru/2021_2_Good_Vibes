@@ -1,22 +1,22 @@
 package impl
 
 import (
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
+	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"sync"
 )
 
 type StorageUserMemory struct {
 	mx      sync.RWMutex
-	storage map[int]storage_user.User
+	storage map[int]user_model.User
 }
 
 func NewStorageUserMemory() *StorageUserMemory {
 	return &StorageUserMemory{
-		storage: make(map[int]storage_user.User),
+		storage: make(map[int]user_model.User),
 	}
 }
 
-func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, error) {
+func (su *StorageUserMemory) IsUserExists(user user_model.UserInput) (int, error) {
 	su.mx.RLock()
 	defer su.mx.RUnlock()
 
@@ -28,7 +28,7 @@ func (su *StorageUserMemory) IsUserExists(user storage_user.UserInput) (int, err
 	return -1, nil
 }
 
-func (su *StorageUserMemory) AddUser(newUser storage_user.User) (int, error) {
+func (su *StorageUserMemory) AddUser(newUser user_model.User) (int, error) {
 	su.mx.Lock()
 	defer su.mx.Unlock()
 

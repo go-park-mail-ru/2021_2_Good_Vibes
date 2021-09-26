@@ -3,7 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
+	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 	"os"
@@ -20,12 +20,12 @@ func NewStorageUserDB() (*StorageUserDB, error) {
 		return nil, err
 	}
 	return &StorageUserDB{
-		conn: conn,
-	},
-	nil
+			conn: conn,
+		},
+		nil
 }
 
-func (su *StorageUserDB) IsUserExists(user storage_user.UserInput) (int, error) {
+func (su *StorageUserDB) IsUserExists(user user_model.UserInput) (int, error) {
 	rows, err := su.conn.Query(context.Background(), "SELECT * FROM customers WHERE name=$1", user.Name)
 
 	if err != nil {
@@ -38,7 +38,7 @@ func (su *StorageUserDB) IsUserExists(user storage_user.UserInput) (int, error) 
 		return -1, nil
 	}
 
-	var tmp storage_user.User
+	var tmp user_model.User
 	var id int
 
 	err = rows.Scan(&id, &tmp.Name, &tmp.Email, &tmp.Password)
@@ -58,8 +58,8 @@ func (su *StorageUserDB) IsUserExists(user storage_user.UserInput) (int, error) 
 	return id, nil
 }
 
-func (su *StorageUserDB) AddUser(newUser storage_user.User) (int, error) {
-	user := storage_user.UserInput{
+func (su *StorageUserDB) AddUser(newUser user_model.User) (int, error) {
+	user := user_model.UserInput{
 		Name:     newUser.Name,
 		Password: newUser.Password,
 	}
@@ -70,7 +70,7 @@ func (su *StorageUserDB) AddUser(newUser storage_user.User) (int, error) {
 		return -1, err
 	}
 
-	if id != -1  {
+	if id != -1 {
 		err := errors.New("user exists")
 		return -1, err
 	}

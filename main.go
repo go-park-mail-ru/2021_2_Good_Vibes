@@ -24,7 +24,6 @@ var (
 	storageProd storage_prod_useCase.UseCase
 )
 
-
 func main() {
 	os.Setenv("DATABASE_URL", "postgres://lida:123@localhost:5432/mydb")
 
