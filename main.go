@@ -13,7 +13,6 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user/impl"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -57,7 +56,7 @@ func main() {
 	router.POST("/signup", userHandler.SignUp)
 	router.GET("/profile", profile, middleware_user.IsLogin)
 	router.GET("/homepage", productHandler.GetAllProducts)
-	router.GET("/logout", userHandler.Logout, middleware.IsLogin)
+	router.GET("/logout", userHandler.Logout, middleware_user.IsLogin)
 
 	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
