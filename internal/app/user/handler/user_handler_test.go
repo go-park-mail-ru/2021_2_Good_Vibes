@@ -74,22 +74,18 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := echo.New()
-			e.Validator = &CustomValidator{Validator: validator.New()}
-			req := httptest.NewRequest(http.MethodPost, "/signup", strings.NewReader(tt.args.str))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			h := &UserHandler{mockStorage}
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
 
-			if assert.NoError(t, h.SignUp(c)) {
+			rec, ctx, h := constructRequest("/signup", tt.args.str, router, mockStorage)
+
+			if assert.NoError(t, h.SignUp(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
 				assert.Equal(t, tt.args.str, rec.Body.String())
 			}
 		})
 	}
 }
-
 
 func TestCreateUserFailUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
@@ -129,22 +125,18 @@ func TestCreateUserFailUnit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := echo.New()
-			e.Validator = &CustomValidator{Validator: validator.New()}
-			req := httptest.NewRequest(http.MethodPost, "/signup", strings.NewReader(tt.args.str))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			h := &UserHandler{mockStorage}
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
 
-			if assert.NoError(t, h.SignUp(c)) {
+			rec, ctx, h := constructRequest("/signup", tt.args.str, router, mockStorage)
+
+			if assert.NoError(t, h.SignUp(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
 				assert.Equal(t, tt.wantedJson, rec.Body.String())
 			}
 		})
 	}
 }
-
 
 func TestLoginUserSuccessUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
@@ -174,23 +166,18 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := echo.New()
-			e.Validator = &CustomValidator{Validator: validator.New()}
-			req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(tt.args.str))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			h := &UserHandler{mockStorage}
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
 
-			if assert.NoError(t, h.Login(c)) {
+			rec, ctx, h := constructRequest("/login", tt.args.str, router, mockStorage)
+
+			if assert.NoError(t, h.Login(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
 				assert.Equal(t, tt.args.str, rec.Body.String())
 			}
 		})
 	}
 }
-
-
 
 func TestLoginUserFailUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
@@ -206,39 +193,162 @@ func TestLoginUserFailUnit(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
+		wantedJson string
 		statusCode int
 	} {
 		{
 			"auth",
-			args{`{"username":"Misha","password":"134"}` + "\n"}, http.StatusBadRequest},
+			args{`{"username":"Misha","password":"134"}` + "\n"},
+			"",
+			http.StatusBadRequest},
 		{
 			"auth",
-			args{`{"username":"MishaX","password":"1234"}` + "\n"}, http.StatusBadRequest},
+			args{`{"username":"MishaX","password":"1234"}` + "\n"},
+			"",
+			http.StatusBadRequest},
 		{
 			"auth",
-			args{`{"username":"","password":"1234"}` + "\n"}, http.StatusBadRequest},
+			args{`{"username":"","password":"1234"}` + "\n"},
+			"",
+			http.StatusBadRequest},
 		{
 			"auth",
-			args{`{"username":"","password":""}` + "\n"}, http.StatusBadRequest},
+			args{`{"username":"","password":""}` + "\n"},
+			"",
+			http.StatusBadRequest},
 		{
 			"auth",
-			args{`{"":" ","":""}` + "\n"}, http.StatusBadRequest},
+			args{`{"":" ","":""}` + "\n"},
+			"",
+			http.StatusBadRequest},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := echo.New()
-			e.Validator = &CustomValidator{Validator: validator.New()}
-			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.args.str))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			h := &UserHandler{mockStorage}
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
 
-			if assert.NoError(t, h.Login(c)) {
+			rec, ctx, h := constructRequest("/login", tt.args.str, router, mockStorage)
+
+			if assert.NoError(t, h.Login(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
-				assert.NotEqual(t, tt.args.str, rec.Body.String())
+				assert.Equal(t, tt.wantedJson, rec.Body.String())
 			}
 		})
 	}
+}
+
+
+func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
+	var mockStorage = NewStorageUserMemory()
+
+	type args struct {
+		signUp string
+		login string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		wantedSignupJson string
+		wantedLoginJson string
+		signUpStatusCode int
+		loginStatusCode int
+	} {
+		{
+			"signup_login_integration",
+			args{`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
+			`{"username":"Misha","password":"1234"}` + "\n"},
+			`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
+			`{"username":"Misha","password":"1234"}` + "\n",
+			http.StatusOK,
+			http.StatusOK},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
+
+			rec, ctx, h := constructRequest("/signup", tt.args.signUp, router, mockStorage)
+
+			if assert.NoError(t, h.SignUp(ctx)) {
+				assert.Equal(t, tt.signUpStatusCode, rec.Code)
+				assert.Equal(t, tt.wantedSignupJson, rec.Body.String())
+			}
+
+			rec, ctx, h = constructRequest("/login", tt.args.login, router, mockStorage)
+
+			if assert.NoError(t, h.Login(ctx)) {
+				assert.Equal(t, tt.loginStatusCode, rec.Code)
+				assert.Equal(t, tt.wantedLoginJson, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestCreateUserLoginIntegrationFail(t *testing.T) {
+	var mockStorage = NewStorageUserMemory()
+
+	type args struct {
+		signUp string
+		login string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		wantedSignupJson string
+		wantedLoginJson string
+		signUpStatusCode int
+		loginStatusCode int
+	} {
+		{
+			"signup_login_integration",
+			args{`{"username":"Gosha","email":"Misha@gmail.com","password":"1234"}` + "\n",
+				`{"username":"Misha","password":"1234"}` + "\n"},
+			`{"username":"Gosha","email":"Misha@gmail.com","password":"1234"}` + "\n",
+			"",
+			http.StatusOK,
+			http.StatusBadRequest},
+		{
+			"signup_login_integration",
+			args{`{"username":"Misha","email":"","password":"1234"}` + "\n",
+				`{"username":"Misha","password":"1234"}` + "\n"},
+				"",
+				"",
+			http.StatusUnauthorized,
+			http.StatusBadRequest},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			router := echo.New()
+			router.Validator = &CustomValidator{Validator: validator.New()}
+
+			rec, ctx, h := constructRequest("/signup", tt.args.signUp, router, mockStorage)
+
+			if assert.NoError(t, h.SignUp(ctx)) {
+				assert.Equal(t, tt.signUpStatusCode, rec.Code)
+				assert.Equal(t, tt.wantedSignupJson, rec.Body.String())
+			}
+
+			rec, ctx, h = constructRequest("/login", tt.args.login, router, mockStorage)
+
+			if assert.NoError(t, h.Login(ctx)) {
+				assert.Equal(t, tt.loginStatusCode, rec.Code)
+				assert.Equal(t, tt.wantedLoginJson, rec.Body.String())
+			}
+		})
+	}
+}
+
+
+func constructRequest(target string, login string, router *echo.Echo, mockStorage *StorageUserMemory) (*httptest.ResponseRecorder, echo.Context, *UserHandler) {
+	req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(login))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	ctx := router.NewContext(req, rec)
+	h := &UserHandler{mockStorage}
+	return rec, ctx, h
 }
