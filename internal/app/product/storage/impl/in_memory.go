@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	"sync"
 )
@@ -20,7 +21,7 @@ func (sp *StorageProductsMemory) AddProduct(prod product.Product) error {
 	sp.mx.Lock()
 	defer sp.mx.Unlock()
 
-	newId := len(sp.storage) + 1
+	newId := prod.Id
 	sp.storage[newId] = prod
 	return nil
 }
@@ -40,7 +41,12 @@ func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error)
 	sp.mx.RLock()
 	defer sp.mx.RUnlock()
 
-	return sp.storage[id], nil
+	result, ok := sp.storage[id]
+	if !ok {
+		err := errors.New("product does not exist")
+		return result, err
+	}
+	return result, nil
 }
 
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
