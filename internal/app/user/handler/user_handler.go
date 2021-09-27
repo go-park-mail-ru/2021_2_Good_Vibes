@@ -1,12 +1,10 @@
 package handler
 
 import (
-	"fmt"
 	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"net/http"
 	"time"
 )
@@ -24,22 +22,28 @@ func NewLoginHandler(storageUser *storage_user.UserUseCase) *UserHandler {
 func (handler *UserHandler) Login(ctx echo.Context) error {
 	newUserInput := new(user_model.UserInput)
 	if err := ctx.Bind(newUserInput); err != nil {
-		return ctx.NoContent(http.StatusBadRequest)
+		newLoginError := user_model.NewError(20, "cannot bind data")
+		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 	if err := ctx.Validate(newUserInput); err != nil {
-		return ctx.NoContent(http.StatusBadRequest)
+		newLoginError := user_model.NewError(21, "validation error")
+		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
-	fmt.Println(handler.storage)
-	log.Debug("dsgnjfsjgbdfg")
+
 	id, err := handler.storage.IsUserExists(*newUserInput)
-	if id == -1 || err != nil {
-		return ctx.NoContent(http.StatusBadRequest)
+	if id == -1 {
+		if err != nil {
+			newLoginError := user_model.NewError(31, err.Error())
+			return ctx.JSON(http.StatusBadRequest, newLoginError)
+		}
+		newLoginError := user_model.NewError(30, "user exists")
+		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
-	fmt.Println(id)
 
 	claimsString, err := middleware.GetToken(id, newUserInput.Name)
 	if err != nil {
-		return ctx.NoContent(http.StatusBadRequest)
+		newLoginError := user_model.NewError(22, "cannot get token")
+		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 
 	handler.setCookieValue(ctx, claimsString)
@@ -49,24 +53,29 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	newUser := new(user_model.User)
 	if err := ctx.Bind(newUser); err != nil {
-		return ctx.NoContent(http.StatusUnauthorized)
+		newSignupError := user_model.NewError(20, "cannot bind data")
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 	if err := ctx.Validate(newUser); err != nil {
-		return ctx.NoContent(http.StatusUnauthorized)
+		newSignupError := user_model.NewError(21, "validation error")
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
-	fmt.Println(handler.storage)
+
 	newId, err := handler.storage.AddUser(*newUser)
 	if err != nil {
-		return ctx.NoContent(http.StatusUnauthorized)
+		newSignupError := user_model.NewError(40, err.Error())
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
-	fmt.Println(newId)
+
 	if newId == -1 {
-		return ctx.JSON(http.StatusUnauthorized, newUser)
+		newSignupError := user_model.NewError(30, "user exists")
+		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
 	claimsString, err := middleware.GetToken(newId, newUser.Name)
 	if err != nil {
-		return ctx.NoContent(http.StatusBadRequest)
+		newSignupError := user_model.NewError(20, "cannot get token")
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 
 	handler.setCookieValue(ctx, claimsString)
