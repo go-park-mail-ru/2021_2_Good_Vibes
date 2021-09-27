@@ -71,8 +71,7 @@ func (su *StorageUserDB) AddUser(newUser user_model.User) (int, error) {
 	}
 
 	if id != -1 {
-		err := errors.New("user exists")
-		return -1, err
+		return -1, nil
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
