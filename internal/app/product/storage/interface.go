@@ -7,4 +7,5 @@ type UseCase interface {
 	// это наверно в будущем не нужно
 	GetAllProducts() ([]product.Product, error)
 	GetProductsOnPage(page int) ([]product.Product, error)
+	GetProductById(id int) (product.Product, error)
 }

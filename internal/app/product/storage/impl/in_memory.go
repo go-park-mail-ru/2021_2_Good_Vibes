@@ -36,6 +36,13 @@ func (sp *StorageProductsMemory) GetAllProducts() ([]product.Product, error) {
 	return result, nil
 }
 
+func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error) {
+	sp.mx.RLock()
+	defer sp.mx.RUnlock()
+
+	return sp.storage[id], nil
+}
+
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
 	sp.mx.RLock()
 	defer sp.mx.RUnlock()

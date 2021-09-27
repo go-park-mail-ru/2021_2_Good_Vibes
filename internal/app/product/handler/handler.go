@@ -29,3 +29,11 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, answer)
 }
+
+func (ph *ProductHandler) GetProductById(ctx echo.Context, id int) error {
+	answer, err := ph.storageProd.GetProductById(id)
+	if err != nil {
+		ctx.NoContent(http.StatusBadRequest)
+	}
+	return ctx.JSON(http.StatusOK, answer)
+}

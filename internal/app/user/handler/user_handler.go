@@ -34,9 +34,9 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	if id == -1 {
 		if err != nil {
 			newLoginError := user_model.NewError(31, err.Error())
-			return ctx.JSON(http.StatusBadRequest, newLoginError)
+			return ctx.JSON(http.StatusUnauthorized, newLoginError)
 		}
-		newLoginError := user_model.NewError(30, "user exists")
+		newLoginError := user_model.NewError(30, "user does not exist")
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
@@ -68,7 +68,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	}
 
 	if newId == -1 {
-		newSignupError := user_model.NewError(30, "user exists")
+		newSignupError := user_model.NewError(32, "user exists")
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
