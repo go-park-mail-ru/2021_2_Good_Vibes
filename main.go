@@ -41,12 +41,15 @@ func main() {
 	router.Validator = &handler.CustomValidator{Validator: validator.New()}
 
 	storageProd = storage_prod_impl.NewStorageProductsMemory()
-	storageProd.AddProduct(product.Product{"1.jpg", "cat1", 10000})
-	storageProd.AddProduct(product.Product{"2.jpg", "cat2", 10000})
-	storageProd.AddProduct(product.Product{"3.jpg", "cat3", 10000})
-	storageProd.AddProduct(product.Product{"4.jpg", "cat4", 10000})
-	storageProd.AddProduct(product.Product{"5.jpg", "cat5", 10000})
-	storageProd.AddProduct(product.Product{"6.jpg", "dog", 100001})
+	storageProd.AddProduct(product.Product{1,"images/shoe2.png", "Кроссовки adidas голубые", 250, 4})
+	storageProd.AddProduct(product.Product{2,"images/phone2.png", "Смартфон", 10000, 2.5})
+	storageProd.AddProduct(product.Product{3,"images/shirt1.png", "Кофта мужская", 10000, 2.5})
+	storageProd.AddProduct(product.Product{4,"images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5})
+	storageProd.AddProduct(product.Product{5,"images/shirt4.png", "Кофта мужская", 10000, 2.5})
+	storageProd.AddProduct(product.Product{6,"images/shoe5.png", "Кеды adidas желтые", 10000, 2.5})
+	storageProd.AddProduct(product.Product{7,"images/phone3.png", "Смартфон поддержанный", 10000, 2.5})
+	storageProd.AddProduct(product.Product{8,"images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5})
+	storageProd.AddProduct(product.Product{9,"images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5})
 
 	productHandler := storage_prod_handler.NewProductHandler(storageProd)
 	//для этого инит какой то надо придумать
