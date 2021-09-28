@@ -30,3 +30,4 @@ func LoadConfig(path string) (err error) {
 	}
 	return nil
 }
+
