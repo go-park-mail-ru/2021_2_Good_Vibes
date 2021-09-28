@@ -1,49 +1,68 @@
 package impl
 
 import (
-	"errors"
-	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	userModel "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	"golang.org/x/crypto/bcrypt"
 	"sync"
 )
 
 type StorageUserMemory struct {
-	mx      sync.RWMutex
-	storage map[int]user_model.User
+	mx1      sync.RWMutex
+	mx2      sync.RWMutex
+	storage map[string]userModel.UserStorage
 }
 
 func NewStorageUserMemory() (*StorageUserMemory, error) {
 	return &StorageUserMemory{
-		storage: make(map[int]user_model.User),
+		storage: make(map[string]userModel.UserStorage),
 	}, nil
 }
 
-func (su *StorageUserMemory) IsUserExists(user user_model.UserInput) (int, error) {
-	su.mx.RLock()
-	defer su.mx.RUnlock()
+func (su *StorageUserMemory) IsUserExists(user userModel.UserInput) (int, error) {
+	su.mx2.RLock()
+	defer su.mx2.RUnlock()
 
-	for key, val := range su.storage {
-		if val.Name == user.Name {
-			if val.Password == user.Password {
-				return key, nil
-			}
-			err := errors.New("wrong password")
-			return -1, err
+	if val, ok := su.storage[user.Name]; ok {
+		if err := bcrypt.CompareHashAndPassword([]byte(val.Password), []byte(user.Password)); err != nil {
+			return customErrors.WRONG_PASSWORD_ERROR, nil
 		}
+		return val.Id, nil
 	}
-	return -1, nil
+
+	return customErrors.NO_USER_ERROR, nil
 }
 
-func (su *StorageUserMemory) AddUser(newUser user_model.User) (int, error) {
-	su.mx.Lock()
-	defer su.mx.Unlock()
+func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
+	su.mx1.Lock()
+	defer su.mx1.Unlock()
 
-	for _, val := range su.storage {
-		if val == newUser {
-			return -1, nil
-		}
+	id, err := su.IsUserExists(userModel.UserInput{Name: newUser.Name, Password: newUser.Password})
+
+	if err != nil {
+		return customErrors.SERVER_ERROR, err
 	}
 
+	if id != customErrors.NO_USER_ERROR {
+		return customErrors.USER_EXISTS_ERROR, nil
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return customErrors.SERVER_ERROR, err
+	}
+
+	newUser.Password = string(passwordHash)
+
 	newId := len(su.storage) + 1
-	su.storage[newId] = newUser
+
+	su.storage[newUser.Name] = userModel.UserStorage{
+		Id:       newId,
+		Name:     newUser.Name,
+		Email:    newUser.Email,
+		Password: newUser.Password,
+	}
+
 	return newId, nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
@@ -23,7 +24,7 @@ func NewLoginHandler(storageUser *storage_user.UserUseCase) *UserHandler {
 func (handler *UserHandler) Login(ctx echo.Context) error {
 	var newUserInput user_model.UserInput
 	if err := ctx.Bind(&newUserInput); err != nil {
-		newLoginError := user_model.NewError(20, "cannot bind data")
+		newLoginError := user_model.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 	fmt.Println(newUserInput)
@@ -33,18 +34,25 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	}
 
 	id, err := handler.storage.IsUserExists(newUserInput)
-	if id == -1 {
-		if err != nil {
-			newLoginError := user_model.NewError(31, err.Error())
-			return ctx.JSON(http.StatusUnauthorized, newLoginError)
-		}
-		newLoginError := user_model.NewError(30, "user does not exist")
+
+	if err != nil {
+		newLoginError := user_model.NewError(id, err.Error())
+		return ctx.JSON(http.StatusBadRequest, newLoginError)
+	}
+
+	if id == errors.NO_USER_ERROR {
+		newLoginError := user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR)
+		return ctx.JSON(http.StatusUnauthorized, newLoginError)
+	}
+
+	if id == errors.WRONG_PASSWORD_ERROR {
+		newLoginError := user_model.NewError(errors.WRONG_PASSWORD_ERROR, errors.WRONG_PASSWORD_DESCR)
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
 	claimsString, err := middleware.GetToken(id, newUserInput.Name)
 	if err != nil {
-		newLoginError := user_model.NewError(22, "cannot get token")
+		newLoginError := user_model.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 
@@ -55,28 +63,29 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	var newUser user_model.User
 	if err := ctx.Bind(&newUser); err != nil {
-		newSignupError := user_model.NewError(20, "cannot bind data")
+		newSignupError := user_model.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
+
 	if err := ctx.Validate(&newUser); err != nil {
-		newSignupError := user_model.NewError(21, "validation error")
+		newSignupError := user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 
 	newId, err := handler.storage.AddUser(newUser)
 	if err != nil {
-		newSignupError := user_model.NewError(40, err.Error())
+		newSignupError := user_model.NewError(newId, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 
-	if newId == -1 {
-		newSignupError := user_model.NewError(32, "user exists")
+	if newId == errors.USER_EXISTS_ERROR {
+		newSignupError := user_model.NewError(errors.USER_EXISTS_ERROR, errors.USER_EXISTS_DESCR)
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
 	claimsString, err := middleware.GetToken(newId, newUser.Name)
 	if err != nil {
-		newSignupError := user_model.NewError(20, "cannot get token")
+		newSignupError := user_model.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 

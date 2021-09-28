@@ -8,6 +8,16 @@ type Product struct {
 	Rating float32 `json:"rating"`
 }
 
+func NewProduct(id int, image string, name string, price int, rating float32) Product {
+	return Product{
+		Id: id,
+		Image: image,
+		Name: name,
+		Price: price,
+		Rating: rating,
+	}
+}
+
 type Error struct {
 	ErrorCode int `json:"error code" validate:"required"`
 	ErrorDescription string `json:"error description" validate:"required"`
