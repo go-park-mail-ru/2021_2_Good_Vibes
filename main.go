@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
+	"os"
 )
 
 var (
@@ -24,17 +25,18 @@ var (
 )
 
 func main() {
-	// os.Setenv("DATABASE_URL", "postgres://lida:123@localhost:5432/mydb")
+
 
 	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
+	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
 
-	storage = impl.NewStorageUserMemory()
-	/*if err != nil {
+	storage, err = impl.NewStorageUserMemory()
+	if err != nil {
 		log.Fatal("cannot connect data base", err)
-	}*/
+	}
 
 	userHandler := handler.NewLoginHandler(&storage)
 	router.Validator = &handler.CustomValidator{Validator: validator.New()}

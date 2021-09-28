@@ -7,6 +7,7 @@ import (
 type Config struct {
 	SecretKey     string `mapstructure:"SECRET_KEY"`
 	ServerAddress string `mapstructure:"ADDRESS_SERVER"`
+	DataBaseURL string `mapstructure:"DATABASE_URL"`
 }
 
 var ConfigApp Config
@@ -14,7 +15,7 @@ var ConfigApp Config
 func LoadConfig(path string) (err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
-	viper.SetConfigType("env")
+	viper.SetConfigType("json")
 
 	viper.AutomaticEnv()
 

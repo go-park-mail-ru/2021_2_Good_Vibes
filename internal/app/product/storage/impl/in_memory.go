@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+const countProductsOnPage = 10
+
 type StorageProductsMemory struct {
 	mx      sync.RWMutex
 	storage map[int]product.Product
@@ -52,10 +54,9 @@ func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error)
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
 	sp.mx.RLock()
 	defer sp.mx.RUnlock()
-	//это в конфиг, или вообще решить откуда оно браться будет
-	countProductsOnPage := 10
 
-	var result []product.Product
+	result := make([]product.Product, 0,countProductsOnPage)
+
 	startGettingProductsId := countProductsOnPage*page + 1
 	for i := startGettingProductsId; i < startGettingProductsId+countProductsOnPage; i++ {
 		result = append(result, sp.storage[i])

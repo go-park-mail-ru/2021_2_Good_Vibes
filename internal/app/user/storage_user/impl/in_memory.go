@@ -11,10 +11,10 @@ type StorageUserMemory struct {
 	storage map[int]user_model.User
 }
 
-func NewStorageUserMemory() *StorageUserMemory {
+func NewStorageUserMemory() (*StorageUserMemory, error) {
 	return &StorageUserMemory{
 		storage: make(map[int]user_model.User),
-	}
+	}, nil
 }
 
 func (su *StorageUserMemory) IsUserExists(user user_model.UserInput) (int, error) {
@@ -42,6 +42,7 @@ func (su *StorageUserMemory) AddUser(newUser user_model.User) (int, error) {
 			return -1, nil
 		}
 	}
+
 	newId := len(su.storage) + 1
 	su.storage[newId] = newUser
 	return newId, nil

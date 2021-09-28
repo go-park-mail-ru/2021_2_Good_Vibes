@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/middleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
@@ -20,17 +21,18 @@ func NewLoginHandler(storageUser *storage_user.UserUseCase) *UserHandler {
 }
 
 func (handler *UserHandler) Login(ctx echo.Context) error {
-	newUserInput := new(user_model.UserInput)
-	if err := ctx.Bind(newUserInput); err != nil {
+	var newUserInput user_model.UserInput
+	if err := ctx.Bind(&newUserInput); err != nil {
 		newLoginError := user_model.NewError(20, "cannot bind data")
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
-	if err := ctx.Validate(newUserInput); err != nil {
-		newLoginError := user_model.NewError(21, "validation error")
-		return ctx.JSON(http.StatusBadRequest, newLoginError)
-	}
+	fmt.Println(newUserInput)
+	//if err := ctx.Validate(&newUserInput); err != nil {
+	//	newLoginError := user_model.NewError(21, "validation error")
+	//	return ctx.JSON(http.StatusBadRequest, newLoginError)
+	//}
 
-	id, err := handler.storage.IsUserExists(*newUserInput)
+	id, err := handler.storage.IsUserExists(newUserInput)
 	if id == -1 {
 		if err != nil {
 			newLoginError := user_model.NewError(31, err.Error())
@@ -51,17 +53,17 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
-	newUser := new(user_model.User)
-	if err := ctx.Bind(newUser); err != nil {
+	var newUser user_model.User
+	if err := ctx.Bind(&newUser); err != nil {
 		newSignupError := user_model.NewError(20, "cannot bind data")
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
-	if err := ctx.Validate(newUser); err != nil {
+	if err := ctx.Validate(&newUser); err != nil {
 		newSignupError := user_model.NewError(21, "validation error")
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 
-	newId, err := handler.storage.AddUser(*newUser)
+	newId, err := handler.storage.AddUser(newUser)
 	if err != nil {
 		newSignupError := user_model.NewError(40, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
