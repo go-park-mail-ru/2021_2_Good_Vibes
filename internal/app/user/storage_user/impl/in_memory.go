@@ -10,12 +10,12 @@ import (
 type StorageUserMemory struct {
 	mx1      sync.RWMutex
 	mx2      sync.RWMutex
-	storage map[string]userModel.User
+	storage map[string]userModel.UserStorage
 }
 
 func NewStorageUserMemory() (*StorageUserMemory, error) {
 	return &StorageUserMemory{
-		storage: make(map[string]userModel.User),
+		storage: make(map[string]userModel.UserStorage),
 	}, nil
 }
 
@@ -37,12 +37,7 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 	su.mx1.Lock()
 	defer su.mx1.Unlock()
 
-	newUserInput := userModel.UserInput{
-		Name: newUser.Name,
-		Password: newUser.Password,
-	}
-
-	id, err := su.IsUserExists(newUserInput)
+	id, err := su.IsUserExists(userModel.UserInput{Name: newUser.Name, Password: newUser.Password})
 
 	if err != nil {
 		return customErrors.SERVER_ERROR, err
@@ -61,6 +56,13 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 	newUser.Password = string(passwordHash)
 
 	newId := len(su.storage) + 1
-	su.storage[newUser.Name] = newUser
+
+	su.storage[newUser.Name] = userModel.UserStorage{
+		Id:       newId,
+		Name:     newUser.Name,
+		Email:    newUser.Email,
+		Password: newUser.Password,
+	}
+
 	return newId, nil
 }
