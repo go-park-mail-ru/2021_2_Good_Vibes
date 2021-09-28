@@ -6,6 +6,7 @@ type UserInput struct {
 }
 
 type User struct {
+	Id int `json:"id"`
 	Name     string `json:"username" validate:"required"`
 	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password" validate:"required"`
