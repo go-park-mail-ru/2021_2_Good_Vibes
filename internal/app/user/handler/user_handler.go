@@ -27,10 +27,10 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 	fmt.Println(newUserInput)
-	//if err := ctx.Validate(&newUserInput); err != nil {
-	//	newLoginError := user_model.NewError(21, "validation error")
-	//	return ctx.JSON(http.StatusBadRequest, newLoginError)
-	//}
+	if err := ctx.Validate(&newUserInput); err != nil {
+		newLoginError := user_model.NewError(21, "validation error")
+		return ctx.JSON(http.StatusBadRequest, newLoginError)
+	}
 
 	id, err := handler.storage.IsUserExists(newUserInput)
 	if id == -1 {

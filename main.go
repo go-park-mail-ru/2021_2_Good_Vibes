@@ -39,7 +39,9 @@ func main() {
 	}
 
 	userHandler := handler.NewLoginHandler(&storage)
-	router.Validator = &handler.CustomValidator{Validator: validator.New()}
+	val := validator.New()
+	val.RegisterValidation("customPassword", handler.Password)
+	router.Validator = &handler.CustomValidator{Validator: val}
 
 	storageProd = storage_prod_impl.NewStorageProductsMemory()
 	storageProd.AddProduct(product.Product{1,"images/shoe2.png", "Кроссовки adidas голубые", 250, 4})
