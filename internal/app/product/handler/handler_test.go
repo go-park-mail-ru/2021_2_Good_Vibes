@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/storage/impl"
 	"github.com/labstack/echo/v4"
@@ -13,8 +14,17 @@ import (
 func TestGetAllProductsSuccessUnit(t *testing.T) {
 	var mockStorage = impl.NewStorageProductsMemory()
 
-	mockStorage.AddProduct(product.Product{"1.jpg", "cat1", 10000})
-	mockStorage.AddProduct(product.Product{"2.jpg", "cat2", 10000})
+	mockStorage.AddProduct(product.Product{Id: 1, Image: "images/cat1.jpeg", Name: "cat1", Price: 1000, Rating: 100})
+	mockStorage.AddProduct(product.Product{Id: 2, Image: "images/cat2.jpeg", Name: "cat2", Price: 1000, Rating: 100})
+
+	product1 := product.NewProduct(1, "images/cat1.jpeg", "cat1", 1000, 100)
+	product2 := product.NewProduct(2, "images/cat2.jpeg", "cat2", 1000, 100)
+
+	var products []product.Product
+	products = append(products, product1)
+	products = append(products, product2)
+
+	wantedProductResp, _ := json.Marshal(products)
 
 	tests := []struct {
 		name string
@@ -23,7 +33,7 @@ func TestGetAllProductsSuccessUnit(t *testing.T) {
 	} {
 		{
 			"products",
-			`[{"image":"1.jpg","name":"cat1","price":10000},{"image":"2.jpg","name":"cat2","price":10000}]` + "\n",
+			string(wantedProductResp) + "\n",
 			http.StatusOK,
 		},
 	}

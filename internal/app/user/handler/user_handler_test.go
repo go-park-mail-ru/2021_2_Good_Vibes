@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	user_model "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -49,8 +51,27 @@ func (su *StorageUserMemory) AddUser(newUser user_model.User) (int, error) {
 	return newId, nil
 }
 
+func NewUser (name string, email string, password string) user_model.User {
+	return user_model.User{
+		Name: name,
+		Email: email,
+		Password: password,
+	}
+}
+
+func NewUserInput (name string, password string) user_model.UserInput {
+	return user_model.UserInput{
+		Name: name,
+		Password: password,
+	}
+}
+
 func TestCreateUserSuccessUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
+
+	user1, _ := json.Marshal(NewUser("Misha", "Misha@gmail.com", "1234"))
+	user2, _ := json.Marshal(NewUser("Glasha", "Glasha@gmail.com", "Glasha1234"))
+	user3, _ := json.Marshal(NewUser("Vova", "Putin@gmail.com", "Putin228"))
 
 	type args struct {
 		str string
@@ -63,13 +84,16 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 	}{
 		{
 			"signup",
-			args{`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n"}, http.StatusOK},
+			args{string(user1) + "\n"},
+			http.StatusOK},
 		{
 			"signup",
-			args{`{"username":"Glasha","email":"Glasha@gmail.com","password":"Glasha1234"}` + "\n"}, http.StatusOK},
+			args{string(user2) + "\n"},
+			http.StatusOK},
 		{
 			"signup",
-			args{`{"username":"Vova","email":"Putin@gmail.com","password":"Putin228"}` + "\n"}, http.StatusOK},
+			args{string(user3) + "\n"},
+			http.StatusOK},
 	}
 
 	for _, tt := range tests {
@@ -91,6 +115,16 @@ func TestCreateUserFailUnit(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
 	mockStorage.AddUser(user_model.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "1234"})
 
+	user1, _ := json.Marshal(NewUser("", "Misha@gmail.com", "1234"))
+	user2, _ := json.Marshal(NewUser("Glasha", "", "Glasha1234"))
+	user3, _ := json.Marshal(NewUser("Vova", "Putin@gmail.com", ""))
+	user4, _ := json.Marshal(NewUser("Misha", "qwerty@gmail.com", "1234"))
+
+	wantedUserResp1, _ := json.Marshal(user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR))
+	wantedUserResp2, _ := json.Marshal(user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR))
+	wantedUserResp3, _ := json.Marshal(user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR))
+	wantedUserResp4, _ := json.Marshal(user_model.NewError(errors.USER_EXISTS_ERROR, errors.USER_EXISTS_DESCR))
+
 	type args struct {
 		str string
 	}
@@ -103,23 +137,23 @@ func TestCreateUserFailUnit(t *testing.T) {
 	}{
 		{
 			"signup",
-			args{`{"username":"","email":"Misha@gmail.com","password":"1234"}` + "\n"},
-			"",
-			http.StatusUnauthorized},
+			args{string(user1) + "\n"},
+			string(wantedUserResp1)+ "\n",
+			http.StatusBadRequest},
 		{
 			"signup",
-			args{`{"username":"Glasha","email":"","password":"Glasha1234"}` + "\n"},
-			"",
-			http.StatusUnauthorized},
+			args{string(user2) + "\n"},
+			string(wantedUserResp2)+ "\n",
+			http.StatusBadRequest},
 		{
 			"signup",
-			args{`{"username":"Vova","email":"Putin@gmail.com","password":""}` + "\n"},
-			"",
-			http.StatusUnauthorized},
+			args{string(user3) + "\n"},
+			string(wantedUserResp3)+ "\n",
+			http.StatusBadRequest},
 		{
 			"signup",
-			args{`{"username":"Misha","email":"qwerty@gmail.com","password":"1234"}` + "\n"},
-			`{"username":"Misha","email":"qwerty@gmail.com","password":"1234"}` + "\n",
+			args{string(user4) + "\n"},
+			string(wantedUserResp4)+ "\n",
 			http.StatusUnauthorized},
 	}
 
@@ -144,6 +178,10 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	mockStorage.AddUser(user_model.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
 	mockStorage.AddUser(user_model.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin228"})
 
+	user1, _ := json.Marshal(NewUserInput("Misha", "1234"))
+	user2, _ := json.Marshal(NewUserInput("Glasha", "Glasha123"))
+	user3, _ := json.Marshal(NewUserInput("Vova", "Putin228"))
+
 	type args struct {
 		str string
 	}
@@ -155,13 +193,13 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	}{
 		{
 			"auth",
-			args{`{"username":"Misha","password":"1234"}` + "\n"}, http.StatusOK},
+			args{string(user1) + "\n"}, http.StatusOK},
 		{
 			"auth",
-			args{`{"username":"Glasha","password":"Glasha123"}` + "\n"}, http.StatusOK},
+			args{string(user2) + "\n"}, http.StatusOK},
 		{
 			"auth",
-			args{`{"username":"Vova","password":"Putin228"}` + "\n"}, http.StatusOK},
+			args{string(user3) + "\n"}, http.StatusOK},
 	}
 
 	for _, tt := range tests {
@@ -186,6 +224,18 @@ func TestLoginUserFailUnit(t *testing.T) {
 	mockStorage.AddUser(user_model.User{Name: "Glasha", Email: "qwerty@gmail.com", Password: "Glasha123"})
 	mockStorage.AddUser(user_model.User{Name: "Vova", Email: "qwerty@gmail.com", Password: "Putin"})
 
+	user1, _ := json.Marshal(NewUserInput("Misha", "134"))
+	user2, _ := json.Marshal(NewUserInput("MishaX", "1234"))
+	user3, _ := json.Marshal(NewUserInput("", "1234"))
+	user4, _ := json.Marshal(NewUserInput("Misha", ""))
+	user5, _ := json.Marshal(NewUserInput("", ""))
+
+	wantedUserResp1, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+	wantedUserResp2, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+	wantedUserResp3, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+	wantedUserResp4, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+	wantedUserResp5, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+
 	type args struct {
 		str string
 	}
@@ -198,29 +248,29 @@ func TestLoginUserFailUnit(t *testing.T) {
 	}{
 		{
 			"auth",
-			args{`{"username":"Misha","password":"134"}` + "\n"},
-			"",
-			http.StatusBadRequest},
+			args{string(user1)+ "\n"},
+			string(wantedUserResp1) + "\n",
+			http.StatusUnauthorized},
 		{
 			"auth",
-			args{`{"username":"MishaX","password":"1234"}` + "\n"},
-			"",
-			http.StatusBadRequest},
+			args{string(user2)+ "\n"},
+			string(wantedUserResp2) + "\n",
+			http.StatusUnauthorized},
 		{
 			"auth",
-			args{`{"username":"","password":"1234"}` + "\n"},
-			"",
-			http.StatusBadRequest},
+			args{string(user3)+ "\n"},
+			string(wantedUserResp3) + "\n",
+			http.StatusUnauthorized},
 		{
 			"auth",
-			args{`{"username":"","password":""}` + "\n"},
-			"",
-			http.StatusBadRequest},
+			args{string(user4)+ "\n"},
+			string(wantedUserResp4) + "\n",
+			http.StatusUnauthorized},
 		{
 			"auth",
-			args{`{"":" ","":""}` + "\n"},
-			"",
-			http.StatusBadRequest},
+			args{string(user5)+ "\n"},
+			string(wantedUserResp5) + "\n",
+			http.StatusUnauthorized},
 	}
 
 	for _, tt := range tests {
@@ -241,6 +291,12 @@ func TestLoginUserFailUnit(t *testing.T) {
 func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
 
+	userSignUp, _ := json.Marshal(NewUser("Misha", "Misha@gmail.com", "1234"))
+	userLogin, _ := json.Marshal(NewUserInput("Misha", "1234"))
+
+	wantedUserSignUpResp, _ := json.Marshal(NewUser("Misha", "Misha@gmail.com", "1234"))
+	wantedUserLoginResp, _ := json.Marshal(NewUserInput("Misha", "1234"))
+
 	type args struct {
 		signUp string
 		login  string
@@ -256,10 +312,10 @@ func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
 	}{
 		{
 			"signup_login_integration",
-			args{`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
-				`{"username":"Misha","password":"1234"}` + "\n"},
-			`{"username":"Misha","email":"Misha@gmail.com","password":"1234"}` + "\n",
-			`{"username":"Misha","password":"1234"}` + "\n",
+			args{string(userSignUp) + "\n",
+				string(userLogin) + "\n"},
+			string(wantedUserSignUpResp) + "\n",
+			string(wantedUserLoginResp) + "\n",
 			http.StatusOK,
 			http.StatusOK},
 	}
@@ -289,6 +345,18 @@ func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
 func TestCreateUserLoginIntegrationFail(t *testing.T) {
 	var mockStorage = NewStorageUserMemory()
 
+	userSignUp1, _ := json.Marshal(NewUser("Gosha", "Misha@gmail.com", "1234"))
+	userLogin1, _ := json.Marshal(NewUserInput("Misha", "1234"))
+
+	wantedUserSignUpResp1, _ := json.Marshal(NewUser("Gosha", "Misha@gmail.com", "1234"))
+	wantedUserLoginResp1, _ := json.Marshal(user_model.NewError(30, "user does not exist"))
+
+	userSignUp2, _ := json.Marshal(NewUser("Misha", ":", "1234"))
+	userLogin2, _ := json.Marshal(NewUserInput("Misha", "1234"))
+
+	wantedUserSignUpResp2, _ := json.Marshal(user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR))
+	wantedUserLoginResp2, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
+
 	type args struct {
 		signUp string
 		login  string
@@ -304,20 +372,20 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 	}{
 		{
 			"signup_login_integration",
-			args{`{"username":"Gosha","email":"Misha@gmail.com","password":"1234"}` + "\n",
-				`{"username":"Misha","password":"1234"}` + "\n"},
-			`{"username":"Gosha","email":"Misha@gmail.com","password":"1234"}` + "\n",
-			"",
+			args{string(userSignUp1) + "\n",
+				string(userLogin1) + "\n"},
+			string(wantedUserSignUpResp1) + "\n",
+			string(wantedUserLoginResp1) + "\n",
 			http.StatusOK,
-			http.StatusBadRequest},
+			http.StatusUnauthorized},
 		{
 			"signup_login_integration",
-			args{`{"username":"Misha","email":"","password":"1234"}` + "\n",
-				`{"username":"Misha","password":"1234"}` + "\n"},
-			"",
-			"",
-			http.StatusUnauthorized,
-			http.StatusBadRequest},
+			args{string(userSignUp2) + "\n",
+				string(userLogin2) + "\n"},
+			string(wantedUserSignUpResp2) + "\n",
+			string(wantedUserLoginResp2) + "\n",
+			http.StatusBadRequest,
+			http.StatusUnauthorized},
 	}
 
 	for _, tt := range tests {
