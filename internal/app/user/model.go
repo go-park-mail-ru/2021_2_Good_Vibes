@@ -29,3 +29,14 @@ func NewError(errorCode int, errorDesc string) *Error {
 		ErrorDescription: errorDesc,
 	}
 }
+
+func NewUserStorage(id int, name string, email string, password string) UserStorage {
+	return UserStorage{
+		Id:       id,
+		Name:     name,
+		Email:    email,
+		Password: password,
+	}
+}
+
+

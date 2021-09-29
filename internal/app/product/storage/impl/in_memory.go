@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-const countProductsOnPage = 10
+const countProductsOnPage = 2
 
 type StorageProductsMemory struct {
 	mx      sync.RWMutex
@@ -33,8 +33,8 @@ func (sp *StorageProductsMemory) GetAllProducts() ([]product.Product, error) {
 	defer sp.mx.RUnlock()
 
 	var result []product.Product
-	for _, value := range sp.storage {
-		result = append(result, value)
+	for i := 1; i < len(sp.storage) + 1; i++ {
+		result = append(result, sp.storage[i])
 	}
 	return result, nil
 }
@@ -50,6 +50,7 @@ func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error)
 	}
 	return result, nil
 }
+
 
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
 	sp.mx.RLock()

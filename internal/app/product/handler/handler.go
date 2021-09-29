@@ -20,9 +20,10 @@ func NewProductHandler(useCase *storage.UseCase) *ProductHandler {
 }
 
 //это должно быть, пока не нужно
+/*
 func addProduct(ctx echo.Context) error {
 	return nil
-}
+}*/
 
 //пока решаем вопросы с пагинацией - так
 func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
@@ -46,14 +47,14 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	id, err := strconv.Atoi(idString)
 	if err != nil {
 		newProductError := product.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadGateway, newProductError)
+		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
 	answer, err := ph.storageProd.GetProductById(id)
 
 	if  err != nil {
 		newProductError := product.NewError(errors.DB_ERROR, err.Error())
-		return ctx.JSON(http.StatusOK, newProductError)
+		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
 	return ctx.JSON(http.StatusOK, answer)
