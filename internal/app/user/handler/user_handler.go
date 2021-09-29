@@ -29,7 +29,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	}
 	fmt.Println(newUserInput)
 	if err := ctx.Validate(&newUserInput); err != nil {
-		newLoginError := user_model.NewError(21, "validation error")
+		newLoginError := user_model.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 

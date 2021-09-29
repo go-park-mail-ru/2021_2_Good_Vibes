@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-const countProductsOnPage = 10
+const countProductsOnPage = 2
 
 type StorageProductsMemory struct {
 	mx      sync.RWMutex
@@ -50,6 +50,7 @@ func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error)
 	}
 	return result, nil
 }
+
 
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
 	sp.mx.RLock()
