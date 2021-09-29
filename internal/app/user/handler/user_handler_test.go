@@ -73,8 +73,13 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 	user2, _ := json.Marshal(user_model.User{"Glasha", "Glasha@gmail.com", "Glasha_1234"})
 	user3, _ := json.Marshal(user_model.User{"Vova", "Vova@gmail.com", "Vova_1234"})
 
+	user1Respond, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", ""})
+	user2Respond, _ := json.Marshal(user_model.User{"Glasha", "Glasha@gmail.com", ""})
+	user3Respond, _ := json.Marshal(user_model.User{"Vova", "Vova@gmail.com", ""})
+
 	type args struct {
 		str string
+		wanted string
 	}
 
 	tests := []struct {
@@ -84,15 +89,15 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 	}{
 		{
 			"signup",
-			args{string(user1) + "\n"},
+			args{string(user1), string(user1Respond) + "\n"},
 			http.StatusOK},
 		{
 			"signup",
-			args{string(user2) + "\n"},
+			args{string(user2), string(user2Respond) + "\n"},
 			http.StatusOK},
 		{
 			"signup",
-			args{string(user3) + "\n"},
+			args{string(user3), string(user3Respond) + "\n"},
 			http.StatusOK},
 	}
 
@@ -108,7 +113,7 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 
 			if assert.NoError(t, h.SignUp(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
-				assert.Equal(t, tt.args.str, rec.Body.String())
+				assert.Equal(t, tt.args.wanted, rec.Body.String())
 			}
 		})
 	}
@@ -209,8 +214,13 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	user2, _ := json.Marshal(user_model.UserInput{"Glasha", "Glasha123"})
 	user3, _ := json.Marshal(user_model.UserInput{"Vova", "Putin228"})
 
+	user1Response, _ := json.Marshal(user_model.UserInput{"Misha", ""})
+	user2Response, _ := json.Marshal(user_model.UserInput{"Glasha", ""})
+	user3Response, _ := json.Marshal(user_model.UserInput{"Vova", ""})
+
 	type args struct {
 		str string
+		wanted string
 	}
 
 	tests := []struct {
@@ -220,13 +230,13 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	}{
 		{
 			"auth",
-			args{string(user1) + "\n"}, http.StatusOK},
+			args{string(user1), string(user1Response)+ "\n"}, http.StatusOK},
 		{
 			"auth",
-			args{string(user2) + "\n"}, http.StatusOK},
+			args{string(user2), string(user2Response) + "\n"}, http.StatusOK},
 		{
 			"auth",
-			args{string(user3) + "\n"}, http.StatusOK},
+			args{string(user3), string(user3Response)+ "\n"}, http.StatusOK},
 	}
 
 	for _, tt := range tests {
@@ -240,7 +250,7 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 
 			if assert.NoError(t, h.Login(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
-				assert.Equal(t, tt.args.str, rec.Body.String())
+				assert.Equal(t, tt.args.wanted, rec.Body.String())
 			}
 		})
 	}
@@ -322,8 +332,8 @@ func TestCreateUserLoginIntegrationSuccess(t *testing.T) {
 	userSignUp, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", "Misha_1234"})
 	userLogin, _ := json.Marshal(user_model.UserInput{"Misha", "Misha_1234"})
 
-	wantedUserSignUpResp, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", "Misha_1234"})
-	wantedUserLoginResp, _ := json.Marshal(user_model.UserInput{"Misha", "Misha_1234"})
+	wantedUserSignUpResp, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", ""})
+	wantedUserLoginResp, _ := json.Marshal(user_model.UserInput{"Misha", ""})
 
 	type args struct {
 		signUp string
@@ -379,7 +389,7 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 	userSignUp1, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", "Misha_1234"})
 	userLogin1, _ := json.Marshal(user_model.UserInput{"Gosha", "Misha_1234"})
 
-	wantedUserSignUpResp1, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", "Misha_1234"})
+	wantedUserSignUpResp1, _ := json.Marshal(user_model.User{"Misha", "Misha@gmail.com", ""})
 	wantedUserLoginResp1, _ := json.Marshal(user_model.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR))
 
 	userSignUp2, _ := json.Marshal(user_model.User{"Gosha", ":", "1234"})
@@ -391,7 +401,7 @@ func TestCreateUserLoginIntegrationFail(t *testing.T) {
 	userSignUp3, _ := json.Marshal(user_model.User{"Sasha", "Sasha@mail.ru", "Sasha_1234"})
 	userLogin3, _ := json.Marshal(user_model.UserInput{"Sasha", "Sasha_234"})
 
-	wantedUserSignUpResp3, _ := json.Marshal(user_model.User{"Sasha", "Sasha@mail.ru", "Sasha_1234"})
+	wantedUserSignUpResp3, _ := json.Marshal(user_model.User{"Sasha", "Sasha@mail.ru", ""})
 	wantedUserLoginResp3, _ := json.Marshal(user_model.NewError(errors.WRONG_PASSWORD_ERROR, errors.WRONG_PASSWORD_DESCR))
 
 	type args struct {
