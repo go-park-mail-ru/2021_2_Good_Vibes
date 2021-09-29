@@ -33,8 +33,8 @@ func (sp *StorageProductsMemory) GetAllProducts() ([]product.Product, error) {
 	defer sp.mx.RUnlock()
 
 	var result []product.Product
-	for _, value := range sp.storage {
-		result = append(result, value)
+	for i := 1; i < len(sp.storage) + 1; i++ {
+		result = append(result, sp.storage[i])
 	}
 	return result, nil
 }
