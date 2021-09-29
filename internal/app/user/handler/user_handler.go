@@ -57,6 +57,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	}
 
 	handler.setCookieValue(ctx, claimsString)
+	newUserInput.Password = ""
 	return ctx.JSON(http.StatusOK, newUserInput)
 }
 
@@ -90,6 +91,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	}
 
 	handler.setCookieValue(ctx, claimsString)
+	newUser.Password = ""
 	return ctx.JSON(http.StatusOK, newUser)
 }
 
