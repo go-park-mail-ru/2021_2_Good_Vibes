@@ -3,6 +3,7 @@ package impl
 import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	userModel "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	guuid "github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"sync"
 )
@@ -52,7 +53,7 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 	newUser.Password = string(passwordHash)
 
 	su.mx.Lock()
-	newId := len(su.storage) + 1
+    newId  :=  int(guuid.New().ID())
 
 	su.storage[newUser.Name] = userModel.UserStorage{
 		Id:       newId,
