@@ -48,8 +48,7 @@ func TestStorageUserMemory_IsUserExistsSuccess(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			su := &StorageUserMemory{
-				mx1:     sync.RWMutex{},
-				mx2:     sync.RWMutex{},
+				mx:     sync.RWMutex{},
 				storage: storage,
 			}
 			got, err := su.IsUserExists(tt.args.user)
@@ -92,8 +91,7 @@ func TestStorageUserMemory_IsUserExistsFail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			su := &StorageUserMemory{
-				mx1:     sync.RWMutex{},
-				mx2:     sync.RWMutex{},
+				mx:     sync.RWMutex{},
 				storage: storage,
 			}
 			got, err := su.IsUserExists(tt.args.user)
@@ -130,17 +128,13 @@ func TestStorageUserMemory_AddUserSuccess(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			su := &StorageUserMemory{
-				mx1:     sync.RWMutex{},
-				mx2:     sync.RWMutex{},
+				mx:     sync.RWMutex{},
 				storage: storage,
 			}
-			got, err := su.AddUser(tt.args.user)
+			_, err := su.AddUser(tt.args.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsUserExists() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("IsUserExists() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -169,8 +163,7 @@ func TestStorageUserMemory_AddUserFail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			su := &StorageUserMemory{
-				mx1:     sync.RWMutex{},
-				mx2:     sync.RWMutex{},
+				mx:     sync.RWMutex{},
 				storage: storage,
 			}
 			got, err := su.AddUser(tt.args.user)
