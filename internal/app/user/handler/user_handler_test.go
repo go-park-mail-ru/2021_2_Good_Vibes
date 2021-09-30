@@ -78,7 +78,7 @@ func TestCreateUserSuccessUnit(t *testing.T) {
 	user3Respond, _ := json.Marshal(user_model.User{"Vova", "Vova@gmail.com", ""})
 
 	type args struct {
-		str string
+		str    string
 		wanted string
 	}
 
@@ -124,7 +124,7 @@ func TestCreateUserFailUnit(t *testing.T) {
 	mockStorage.AddUser(user_model.User{Name: "Misha", Email: "qwerty@gmail.com", Password: "Misha_1234"})
 
 	user1, _ := json.Marshal(user_model.User{"", "Misha@gmail.com", "Misha_1234"})
-	user2, _ := json.Marshal(user_model.User{"Glasha","", "Glasha_1234"})
+	user2, _ := json.Marshal(user_model.User{"Glasha", "", "Glasha_1234"})
 	user3, _ := json.Marshal(user_model.User{"Vova", "Putin@gmail.com", ""})
 	user4, _ := json.Marshal(user_model.User{"Vova", "Putin@gmail.com", "Vova1234"})
 	user5, _ := json.Marshal(user_model.User{"Vova", "Putin@gmail.com", "Vova_"})
@@ -152,37 +152,37 @@ func TestCreateUserFailUnit(t *testing.T) {
 		{
 			"signup",
 			args{string(user1) + "\n"},
-			string(wantedUserResp1)+ "\n",
+			string(wantedUserResp1) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user2) + "\n"},
-			string(wantedUserResp2)+ "\n",
+			string(wantedUserResp2) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user3) + "\n"},
-			string(wantedUserResp3)+ "\n",
+			string(wantedUserResp3) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user4) + "\n"},
-			string(wantedUserResp4)+ "\n",
+			string(wantedUserResp4) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user5) + "\n"},
-			string(wantedUserResp5)+ "\n",
+			string(wantedUserResp5) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user6) + "\n"},
-			string(wantedUserResp6)+ "\n",
+			string(wantedUserResp6) + "\n",
 			http.StatusBadRequest},
 		{
 			"signup",
 			args{string(user7) + "\n"},
-			string(wantedUserResp7)+ "\n",
+			string(wantedUserResp7) + "\n",
 			http.StatusUnauthorized},
 	}
 
@@ -219,7 +219,7 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	user3Response, _ := json.Marshal(user_model.UserInput{"Vova", ""})
 
 	type args struct {
-		str string
+		str    string
 		wanted string
 	}
 
@@ -230,13 +230,13 @@ func TestLoginUserSuccessUnit(t *testing.T) {
 	}{
 		{
 			"auth",
-			args{string(user1), string(user1Response)+ "\n"}, http.StatusOK},
+			args{string(user1), string(user1Response) + "\n"}, http.StatusOK},
 		{
 			"auth",
 			args{string(user2), string(user2Response) + "\n"}, http.StatusOK},
 		{
 			"auth",
-			args{string(user3), string(user3Response)+ "\n"}, http.StatusOK},
+			args{string(user3), string(user3Response) + "\n"}, http.StatusOK},
 	}
 
 	for _, tt := range tests {
@@ -285,27 +285,27 @@ func TestLoginUserFailUnit(t *testing.T) {
 	}{
 		{
 			"auth",
-			args{string(user1)+ "\n"},
+			args{string(user1) + "\n"},
 			string(wantedUserResp1) + "\n",
 			http.StatusUnauthorized},
 		{
 			"auth",
-			args{string(user2)+ "\n"},
+			args{string(user2) + "\n"},
 			string(wantedUserResp2) + "\n",
 			http.StatusUnauthorized},
 		{
 			"auth",
-			args{string(user3)+ "\n"},
+			args{string(user3) + "\n"},
 			string(wantedUserResp3) + "\n",
 			http.StatusBadRequest},
 		{
 			"auth",
-			args{string(user4)+ "\n"},
+			args{string(user4) + "\n"},
 			string(wantedUserResp4) + "\n",
 			http.StatusBadRequest},
 		{
 			"auth",
-			args{string(user5)+ "\n"},
+			args{string(user5) + "\n"},
 			string(wantedUserResp5) + "\n",
 			http.StatusBadRequest},
 	}

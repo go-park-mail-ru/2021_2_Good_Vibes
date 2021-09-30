@@ -8,8 +8,7 @@ import (
 )
 
 type StorageUserMemory struct {
-	mx1      sync.RWMutex
-	mx2      sync.RWMutex
+	mx      sync.RWMutex
 	storage map[string]userModel.UserStorage
 }
 
@@ -20,8 +19,8 @@ func NewStorageUserMemory() (*StorageUserMemory, error) {
 }
 
 func (su *StorageUserMemory) IsUserExists(user userModel.UserInput) (int, error) {
-	su.mx2.RLock()
-	defer su.mx2.RUnlock()
+	su.mx.RLock()
+	defer su.mx.RUnlock()
 
 	if val, ok := su.storage[user.Name]; ok {
 		if err := bcrypt.CompareHashAndPassword([]byte(val.Password), []byte(user.Password)); err != nil {
@@ -34,9 +33,6 @@ func (su *StorageUserMemory) IsUserExists(user userModel.UserInput) (int, error)
 }
 
 func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
-	su.mx1.Lock()
-	defer su.mx1.Unlock()
-
 	id, err := su.IsUserExists(userModel.UserInput{Name: newUser.Name, Password: newUser.Password})
 
 	if err != nil {
@@ -55,6 +51,7 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 
 	newUser.Password = string(passwordHash)
 
+	su.mx.Lock()
 	newId := len(su.storage) + 1
 
 	su.storage[newUser.Name] = userModel.UserStorage{
@@ -63,6 +60,7 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 		Email:    newUser.Email,
 		Password: newUser.Password,
 	}
+	su.mx.Unlock()
 
 	return newId, nil
 }

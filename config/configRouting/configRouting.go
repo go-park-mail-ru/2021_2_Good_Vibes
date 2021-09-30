@@ -9,12 +9,11 @@ import (
 )
 
 type ServerConfigRouting struct {
-	UserHandler *handler.UserHandler
-	ProductHandler	*handler2.ProductHandler
+	UserHandler    *handler.UserHandler
+	ProductHandler *handler2.ProductHandler
 }
 
-
-func (cr *ServerConfigRouting) ConfigRouting (router *echo.Echo) {
+func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.Static("/", "static")
 	router.POST("/login", cr.UserHandler.Login)
 	router.POST("/signup", cr.UserHandler.SignUp)

@@ -6,7 +6,7 @@ type UserInput struct {
 }
 
 type UserStorage struct {
-	Id int `json:"id"`
+	Id       int    `json:"id"`
 	Name     string `json:"username" validate:"required"`
 	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password" validate:"required"`
@@ -19,13 +19,13 @@ type User struct {
 }
 
 type Error struct {
-	ErrorCode int `json:"error code" validate:"required"`
+	ErrorCode        int    `json:"error code" validate:"required"`
 	ErrorDescription string `json:"error description" validate:"required"`
 }
 
 func NewError(errorCode int, errorDesc string) *Error {
 	return &Error{
-		ErrorCode: errorCode,
+		ErrorCode:        errorCode,
 		ErrorDescription: errorDesc,
 	}
 }
@@ -38,5 +38,3 @@ func NewUserStorage(id int, name string, email string, password string) UserStor
 		Password: password,
 	}
 }
-
-

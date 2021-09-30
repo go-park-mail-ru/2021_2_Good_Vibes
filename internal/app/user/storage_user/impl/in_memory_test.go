@@ -42,7 +42,7 @@ func TestStorageUserMemory_IsUserExistsSuccess(t *testing.T) {
 		{"success",
 			args{userInput1},
 			1,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,6 @@ func TestStorageUserMemory_IsUserExistsSuccess(t *testing.T) {
 	}
 }
 
-
 func TestStorageUserMemory_IsUserExistsFail(t *testing.T) {
 	storage := storageInit()
 
@@ -83,11 +82,11 @@ func TestStorageUserMemory_IsUserExistsFail(t *testing.T) {
 		{"fail",
 			args{userInput1},
 			errors.NO_USER_ERROR,
-			false },
+			false},
 		{"fail",
 			args{userInput2},
 			errors.WRONG_PASSWORD_ERROR,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -125,7 +124,7 @@ func TestStorageUserMemory_AddUserSuccess(t *testing.T) {
 		{"success",
 			args{userInput1},
 			4,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -146,7 +145,6 @@ func TestStorageUserMemory_AddUserSuccess(t *testing.T) {
 		})
 	}
 }
-
 
 func TestStorageUserMemory_AddUserFail(t *testing.T) {
 	storage := storageInit()
@@ -165,7 +163,7 @@ func TestStorageUserMemory_AddUserFail(t *testing.T) {
 		{"fail",
 			args{userInput1},
 			errors.USER_EXISTS_ERROR,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -186,4 +184,3 @@ func TestStorageUserMemory_AddUserFail(t *testing.T) {
 		})
 	}
 }
-

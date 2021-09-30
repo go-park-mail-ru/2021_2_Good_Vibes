@@ -37,4 +37,3 @@ func Password(fl validator.FieldLevel) bool {
 	}
 	return number && upper && special && letter && len(val) >= 7 && len(val) <= 20
 }
-

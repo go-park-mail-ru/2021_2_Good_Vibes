@@ -12,8 +12,7 @@ import (
 	"testing"
 )
 
-
-func InitMockStorage() *impl.StorageProductsMemory{
+func InitMockStorage() *impl.StorageProductsMemory {
 	var mockStorage = impl.NewStorageProductsMemory()
 
 	mockStorage.AddProduct(product.Product{Id: 1, Image: "images/cat1.jpeg", Name: "cat1", Price: 1000, Rating: 100})
@@ -34,10 +33,10 @@ func TestGetAllProductsSuccessUnit(t *testing.T) {
 	wantedProductResp, _ := json.Marshal(products)
 
 	tests := []struct {
-		name string
+		name       string
 		wantedJson string
 		statusCode int
-	} {
+	}{
 		{
 			"products",
 			string(wantedProductResp) + "\n",
@@ -67,11 +66,11 @@ func TestGetProductByIdSuccessUnit(t *testing.T) {
 	wantedProductResp, _ := json.Marshal(product1)
 
 	tests := []struct {
-		name string
-		id string
+		name       string
+		id         string
 		wantedJson string
 		statusCode int
-	} {
+	}{
 		{
 			"success",
 			"1",
@@ -84,7 +83,7 @@ func TestGetProductByIdSuccessUnit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			router := echo.New()
 
-			rec, ctx, h := constructRequest("/product?id=" + tt.id, router, mockStorage)
+			rec, ctx, h := constructRequest("/product?id="+tt.id, router, mockStorage)
 
 			if assert.NoError(t, h.GetProductById(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)
@@ -102,11 +101,11 @@ func TestGetProductByIdSFailUnit(t *testing.T) {
 	wantedProductResp, _ := json.Marshal(err)
 
 	tests := []struct {
-		name string
-		id string
+		name       string
+		id         string
 		wantedJson string
 		statusCode int
-	} {
+	}{
 		{
 			"fail",
 			"",
@@ -119,7 +118,7 @@ func TestGetProductByIdSFailUnit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			router := echo.New()
 
-			rec, ctx, h := constructRequest("/product?id=" + tt.id, router, mockStorage)
+			rec, ctx, h := constructRequest("/product?id="+tt.id, router, mockStorage)
 
 			if assert.NoError(t, h.GetProductById(ctx)) {
 				assert.Equal(t, tt.statusCode, rec.Code)

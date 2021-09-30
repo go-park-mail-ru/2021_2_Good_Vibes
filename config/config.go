@@ -7,7 +7,7 @@ import (
 type Config struct {
 	SecretKey     string `mapstructure:"SECRET_KEY"`
 	ServerAddress string `mapstructure:"ADDRESS_SERVER"`
-	DataBaseURL string `mapstructure:"DATABASE_URL"`
+	DataBaseURL   string `mapstructure:"DATABASE_URL"`
 }
 
 var ConfigApp Config
@@ -30,4 +30,3 @@ func LoadConfig(path string) (err error) {
 	}
 	return nil
 }
-

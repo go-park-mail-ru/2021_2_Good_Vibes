@@ -52,7 +52,7 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 
 	answer, err := ph.storageProd.GetProductById(id)
 
-	if  err != nil {
+	if err != nil {
 		newProductError := product.NewError(errors.DB_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}

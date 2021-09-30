@@ -34,7 +34,7 @@ func TestStorageProductsMemory_AddProduct(t *testing.T) {
 	}{
 		{"success",
 			args{product1},
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -50,7 +50,6 @@ func TestStorageProductsMemory_AddProduct(t *testing.T) {
 	}
 }
 
-
 func TestStorageProductsMemory_GetAllProducts(t *testing.T) {
 	storage := storageInit()
 
@@ -62,14 +61,14 @@ func TestStorageProductsMemory_GetAllProducts(t *testing.T) {
 	products = append(products, product2)
 
 	tests := []struct {
-		name    string
+		name string
 
-		want []product.Product
+		want    []product.Product
 		wantErr bool
 	}{
 		{"success",
 			products,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {
@@ -93,7 +92,6 @@ func TestStorageProductsMemory_GetAllProducts(t *testing.T) {
 	}
 }
 
-
 func TestStorageProductsMemory_GetProductById(t *testing.T) {
 	storage := storageInit()
 
@@ -102,18 +100,18 @@ func TestStorageProductsMemory_GetProductById(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		id int
-		want product.Product
+		id      int
+		want    product.Product
 		wantErr bool
 	}{
 		{"success",
 			1,
 			product1,
-			false },
+			false},
 		{"fail",
 			4,
 			product2,
-			true },
+			true},
 	}
 
 	for _, tt := range tests {
@@ -137,7 +135,6 @@ func TestStorageProductsMemory_GetProductById(t *testing.T) {
 	}
 }
 
-
 func TestStorageProductsMemory_GetProductsOnPage(t *testing.T) {
 	storage := storageInit()
 
@@ -150,14 +147,14 @@ func TestStorageProductsMemory_GetProductsOnPage(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		id int
-		want []product.Product
+		id      int
+		want    []product.Product
 		wantErr bool
 	}{
 		{"success",
 			0,
 			products,
-			false },
+			false},
 	}
 
 	for _, tt := range tests {

@@ -33,7 +33,7 @@ func (sp *StorageProductsMemory) GetAllProducts() ([]product.Product, error) {
 	defer sp.mx.RUnlock()
 
 	var result []product.Product
-	for i := 1; i < len(sp.storage) + 1; i++ {
+	for i := 1; i < len(sp.storage)+1; i++ {
 		result = append(result, sp.storage[i])
 	}
 	return result, nil
@@ -51,12 +51,11 @@ func (sp *StorageProductsMemory) GetProductById(id int) (product.Product, error)
 	return result, nil
 }
 
-
 func (sp *StorageProductsMemory) GetProductsOnPage(page int) ([]product.Product, error) {
 	sp.mx.RLock()
 	defer sp.mx.RUnlock()
 
-	result := make([]product.Product, 0,countProductsOnPage)
+	result := make([]product.Product, 0, countProductsOnPage)
 
 	startGettingProductsId := countProductsOnPage*page + 1
 	for i := startGettingProductsId; i < startGettingProductsId+countProductsOnPage; i++ {
