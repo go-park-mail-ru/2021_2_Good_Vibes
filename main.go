@@ -2,6 +2,7 @@ package main
 
 //тут надо какой-то порядок с неймингами навести
 import (
+	"database/sql"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
@@ -12,6 +13,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/handler"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/storage_user/impl"
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
@@ -32,7 +34,7 @@ func main() {
 	}
 	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
 
-	storage, err = impl.NewStorageUserDB()
+	storage, err = impl.NewStorageUserDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -59,4 +61,18 @@ func main() {
 	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+}
+
+func GetPostgres() (*sql.DB, error) {
+	dsn := "user=bush dbname=ozon password=sergeykust000 host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(10)
+	return db, nil
 }
