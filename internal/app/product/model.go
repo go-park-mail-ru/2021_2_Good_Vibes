@@ -19,8 +19,8 @@ func NewProduct(id int, image string, name string, price int, rating float32) Pr
 }
 
 type Error struct {
-	ErrorCode        int    `json:"error code" validate:"required"`
-	ErrorDescription string `json:"error description" validate:"required"`
+	ErrorCode        int    `json:"error code"`
+	ErrorDescription string `json:"error description"`
 }
 
 func NewError(errorCode int, errorDesc string) *Error {

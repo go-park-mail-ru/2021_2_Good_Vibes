@@ -53,7 +53,7 @@ func (su *StorageUserMemory) AddUser(newUser userModel.User) (int, error) {
 	newUser.Password = string(passwordHash)
 
 	su.mx.Lock()
-    newId  :=  int(guuid.New().ID())
+    newId := int(guuid.New().ID())
 
 	su.storage[newUser.Name] = userModel.UserStorage{
 		Id:       newId,

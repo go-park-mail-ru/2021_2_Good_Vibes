@@ -32,7 +32,7 @@ func main() {
 	}
 	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
 
-	storage, err = impl.NewStorageUserMemory()
+	storage, err = impl.NewStorageUserDB()
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}

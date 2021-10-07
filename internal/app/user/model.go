@@ -2,7 +2,7 @@ package user
 
 type UserInput struct {
 	Name     string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Password string `json:"password,omitempty" validate:"required"`
 }
 
 type UserStorage struct {
@@ -15,12 +15,12 @@ type UserStorage struct {
 type User struct {
 	Name     string `json:"username" validate:"required"`
 	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required,customPassword"`
+	Password string `json:"password,omitempty" validate:"required,customPassword"`
 }
 
 type Error struct {
-	ErrorCode        int    `json:"error code" validate:"required"`
-	ErrorDescription string `json:"error description" validate:"required"`
+	ErrorCode        int    `json:"error code"`
+	ErrorDescription string `json:"error description"`
 }
 
 func NewError(errorCode int, errorDesc string) *Error {

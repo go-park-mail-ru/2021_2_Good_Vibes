@@ -8,9 +8,11 @@ import (
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 	"os"
+	"sync"
 )
 
 type StorageUserDB struct {
+	mx sync.RWMutex
 	conn *pgx.Conn
 }
 
@@ -27,6 +29,8 @@ func NewStorageUserDB() (*StorageUserDB, error) {
 }
 
 func (su *StorageUserDB) IsUserExists(user userModel.UserInput) (int, error) {
+	su.mx.Lock()
+	defer su.mx.Unlock()
 	rows, err := su.conn.Query(context.Background(), "SELECT * FROM customers WHERE name=$1", user.Name)
 
 	if err != nil {
@@ -80,6 +84,9 @@ func (su *StorageUserDB) AddUser(newUser userModel.User) (int, error) {
 	if err != nil {
 		return customErrors.SERVER_ERROR, err
 	}
+
+	su.mx.Lock()
+	defer su.mx.Unlock()
 
 	rows := su.conn.QueryRow(context.Background(), "INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
 		newUser.Name,

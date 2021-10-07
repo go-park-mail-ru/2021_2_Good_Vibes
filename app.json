@@ -1,5 +1,5 @@
 {
   "SECRET_KEY" : "QWEWERTRWEGFDSGDFS",
   "ADDRESS_SERVER" : "127.0.0.1: 8080",
-  "DATABASE_URL" : "postgres://lida:123@localhost:5432/mydb"
+  "DATABASE_URL" : "postgres://bush:sergeykust000@localhost:5432/ozon"
 }
