@@ -96,7 +96,3 @@ func (ph *StorageProductsDB) AddProduct(product productModel.Product) (int, erro
 
 	return int(lastInsertId), nil
 }
-
-
-
-
