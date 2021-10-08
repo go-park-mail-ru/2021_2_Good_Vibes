@@ -2,7 +2,7 @@ package configRouting
 
 import (
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
-	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/handler"
+	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/labstack/echo/v4"
 	"net/http"

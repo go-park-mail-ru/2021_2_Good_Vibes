@@ -12,12 +12,12 @@ import (
 )
 
 type UserHandler struct {
-	userUseCase user.UserUseCase
+	Usecase user.Usecase
 }
 
-func NewLoginHandler(storageUser user.UserUseCase) *UserHandler {
+func NewLoginHandler(storageUser user.Usecase) *UserHandler {
 	return &UserHandler{
-		userUseCase: storageUser,
+		Usecase: storageUser,
 	}
 }
 
@@ -33,7 +33,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
 
-	id, err := handler.userUseCase.CheckPassword(newUserDataForInput)
+	id, err := handler.Usecase.CheckPassword(newUserDataForInput)
 
 	if err != nil {
 		newLoginError := errors.NewError(id, err.Error())
@@ -73,7 +73,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
 
-	newId, err := handler.userUseCase.AddUser(newUser)
+	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
 		newSignupError := errors.NewError(newId, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newSignupError)

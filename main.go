@@ -6,14 +6,15 @@ import (
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-	storage_prod_handler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/handler"
-	storage_prod_useCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/storage"
-	storage_prod_impl "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/storage/impl"
+	storage_prod_handler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
+	storage_prod_impl "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/memory"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/memory"
-	userUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/useCase"
+	userUsecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/usecase"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
 	"log"
@@ -23,8 +24,8 @@ import (
 
 var (
 	router      = echo.New()
-	storage     user.UserRepository
-	storageProd storage_prod_useCase.UseCase
+	storage     user.Repository
+	storageProd product.Repository
 )
 
 func main() {
@@ -40,27 +41,28 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-	UserUC := userUseCase.NewUserUseCase(storage)
+	userUс := userUsecase.NewUsecase(storage)
 
 	//storageProd, err = storage_prod_impl.NewStorageProductsDB(GetPostgres())
 	storageProd, err = storage_prod_impl.NewStorageProductsMemory()
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
+	productUc := usecase.NewProductUsecase(storageProd)
 
-	storageProd.AddProduct(product.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
-	storageProd.AddProduct(product.Product{2, "images/phone2.png", "Смартфон", 10000, 2.5, "PHONES"})
-	storageProd.AddProduct(product.Product{3, "images/shirt1.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
-	storageProd.AddProduct(product.Product{4, "images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5, "PHONES"})
-	storageProd.AddProduct(product.Product{5, "images/shirt4.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
-	storageProd.AddProduct(product.Product{6, "images/shoe5.png", "Кеды adidas желтые", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
-	storageProd.AddProduct(product.Product{7, "images/phone3.png", "Смартфон поддержанный", 10000, 2.5, "PHONES"})
-	storageProd.AddProduct(product.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
-	storageProd.AddProduct(product.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
+	productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
+	productUc.AddProduct(models.Product{2, "images/phone2.png", "Смартфон", 10000, 2.5, "PHONES"})
+	productUc.AddProduct(models.Product{3, "images/shirt1.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
+	productUc.AddProduct(models.Product{4, "images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5, "PHONES"})
+	productUc.AddProduct(models.Product{5, "images/shirt4.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
+	productUc.AddProduct(models.Product{6, "images/shoe5.png", "Кеды adidas желтые", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
+	productUc.AddProduct(models.Product{7, "images/phone3.png", "Смартфон поддержанный", 10000, 2.5, "PHONES"})
+	productUc.AddProduct(models.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
+	productUc.AddProduct(models.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
 
-	productHandler := storage_prod_handler.NewProductHandler(&storageProd)
+	productHandler := storage_prod_handler.NewProductHandler(productUc)
 
-	userHandler := http2.NewLoginHandler(UserUC)
+	userHandler := http2.NewLoginHandler(userUс)
 
 	serverRouting := configRouting.ServerConfigRouting{ProductHandler: productHandler,
 		UserHandler: userHandler}

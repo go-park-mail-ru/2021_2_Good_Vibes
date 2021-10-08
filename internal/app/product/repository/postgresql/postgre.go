@@ -1,8 +1,8 @@
-package impl
+package postgresql
 
 import (
 	"database/sql"
-	productModel "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"sync"
 )
 
@@ -21,15 +21,15 @@ func NewStorageProductsDB(db *sql.DB, err error) (*StorageProductsDB, error) {
 	}, nil
 }
 
-func (ph *StorageProductsDB) GetAllProducts() ([]productModel.Product, error) {
+func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	rows, err := ph.db.Query("select id, name, category_id from products")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var products []productModel.Product
+	var products []models.Product
 	for rows.Next() {
-		product := productModel.Product{}
+		product := models.Product{}
 		err = rows.Scan(&product.Id, &product.Name, &product.Category)
 		if err != nil {
 			return nil, err
@@ -39,14 +39,14 @@ func (ph *StorageProductsDB) GetAllProducts() ([]productModel.Product, error) {
 	return nil, nil
 }
 
-func (ph *StorageProductsDB) GetProductById(id int) (productModel.Product, error) {
-	product := productModel.Product{}
+func (ph *StorageProductsDB) GetProductById(id int) (models.Product, error) {
+	product := models.Product{}
 
 	row := ph.db.QueryRow("select id, name, category_id from products where id=$1", id)
 
 	err := row.Scan(&product.Id, &product.Name, &product.Category)
 	if err == sql.ErrNoRows {
-		return productModel.Product{}, nil
+		return models.Product{}, nil
 	}
 	if err != nil {
 		return product, err
@@ -55,8 +55,8 @@ func (ph *StorageProductsDB) GetProductById(id int) (productModel.Product, error
 	return product, nil
 }
 
-func (ph *StorageProductsDB) GetProductsByCategory(category string) ([]productModel.Product, error) {
-	var products []productModel.Product
+func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, error) {
+	var products []models.Product
 	rows, err := ph.db.Query("select p.id, p.name, nc1.name from products as p "+
 		"join categories as nc1 on p.category = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
@@ -65,7 +65,7 @@ func (ph *StorageProductsDB) GetProductsByCategory(category string) ([]productMo
 		return nil, err
 	}
 	for rows.Next() {
-		product := productModel.Product{}
+		product := models.Product{}
 
 		err := rows.Scan(&product.Id, &product.Name, &product.Category)
 		if err != nil {
@@ -77,7 +77,7 @@ func (ph *StorageProductsDB) GetProductsByCategory(category string) ([]productMo
 	return products, nil
 }
 
-func (ph *StorageProductsDB) AddProduct(product productModel.Product) (int, error) {
+func (ph *StorageProductsDB) Insert(product models.Product) error {
 	var lastInsertId int64
 
 	err := ph.db.QueryRow(
@@ -91,8 +91,8 @@ func (ph *StorageProductsDB) AddProduct(product productModel.Product) (int, erro
 	).Scan(&lastInsertId)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return int(lastInsertId), nil
+	return nil
 }

@@ -1,21 +1,21 @@
-package handler
+package http
 
 import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/storage"
+
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
 )
 
 type ProductHandler struct {
-	storageProd storage.UseCase
+	usecase product.Usecase
 }
 
-func NewProductHandler(useCase *storage.UseCase) *ProductHandler {
+func NewProductHandler(usecase product.Usecase) *ProductHandler {
 	return &ProductHandler{
-		storageProd: *useCase,
+		usecase: usecase,
 	}
 }
 
@@ -27,9 +27,9 @@ func addProduct(ctx echo.Context) error {
 
 //пока решаем вопросы с пагинацией - так
 func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
-	answer, err := ph.storageProd.GetAllProducts()
+	answer, err := ph.usecase.GetAllProducts()
 	if err != nil {
-		newProductError := product.NewError(errors.DB_ERROR, err.Error())
+		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 	return ctx.JSON(http.StatusOK, answer)
@@ -40,20 +40,20 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 
 	idString := val.Get("id")
 	if idString == "" {
-		newProductError := product.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		newProductError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
 	id, err := strconv.Atoi(idString)
 	if err != nil {
-		newProductError := product.NewError(errors.SERVER_ERROR, err.Error())
+		newProductError := errors.NewError(errors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
-	answer, err := ph.storageProd.GetProductById(id)
+	answer, err := ph.usecase.GetProductById(id)
 
 	if err != nil {
-		newProductError := product.NewError(errors.DB_ERROR, err.Error())
+		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
