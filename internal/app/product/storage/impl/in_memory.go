@@ -19,13 +19,13 @@ func NewStorageProductsMemory() *StorageProductsMemory {
 	}
 }
 
-func (sp *StorageProductsMemory) AddProduct(prod product.Product) error {
+func (sp *StorageProductsMemory) AddProduct(prod product.Product) (int, error) {
 	sp.mx.Lock()
 	defer sp.mx.Unlock()
 
 	newId := prod.Id
 	sp.storage[newId] = prod
-	return nil
+	return 0, nil
 }
 
 func (sp *StorageProductsMemory) GetAllProducts() ([]product.Product, error) {

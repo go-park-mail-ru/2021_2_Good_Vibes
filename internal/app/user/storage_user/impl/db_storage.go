@@ -1,52 +1,40 @@
 package impl
 
 import (
-	"context"
+	"database/sql"
 	"errors"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	userModel "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
-	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
-	"os"
 	"sync"
 )
 
 type StorageUserDB struct {
 	mx sync.RWMutex
-	conn *pgx.Conn
+	db *sql.DB
 }
 
-func NewStorageUserDB() (*StorageUserDB, error) {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-
+func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 	if err != nil {
 		return nil, err
 	}
 	return &StorageUserDB{
-			conn: conn,
-		},
-		nil
+		db: db,
+	}, nil
 }
 
 func (su *StorageUserDB) IsUserExists(user userModel.UserInput) (int, error) {
 	su.mx.Lock()
 	defer su.mx.Unlock()
-	rows, err := su.conn.Query(context.Background(), "SELECT * FROM customers WHERE name=$1", user.Name)
 
-	if err != nil {
-		return customErrors.DB_ERROR, err
-	}
+	var tmp userModel.UserStorage
+	row := su.db.QueryRow( "SELECT * FROM customers WHERE name=$1", user.Name)
 
-	defer rows.Close()
-
-	if !rows.Next() {
+	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
+	if err == sql.ErrNoRows {
 		return customErrors.NO_USER_ERROR, nil
 	}
 
-	var tmp userModel.User
-	var id int
-
-	err = rows.Scan(&id, &tmp.Name, &tmp.Email, &tmp.Password)
 	if err != nil {
 		return customErrors.DB_ERROR, err
 	}
@@ -56,11 +44,7 @@ func (su *StorageUserDB) IsUserExists(user userModel.UserInput) (int, error) {
 		return customErrors.WRONG_PASSWORD_ERROR, err
 	}
 
-	if rows.Err() != nil {
-		return customErrors.DB_ERROR, err
-	}
-
-	return id, nil
+	return tmp.Id, nil
 }
 
 func (su *StorageUserDB) AddUser(newUser userModel.User) (int, error) {
@@ -88,7 +72,7 @@ func (su *StorageUserDB) AddUser(newUser userModel.User) (int, error) {
 	su.mx.Lock()
 	defer su.mx.Unlock()
 
-	rows := su.conn.QueryRow(context.Background(), "INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
+	rows := su.db.QueryRow("INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
 		newUser.Name,
 		newUser.Email,
 		passwordHash)

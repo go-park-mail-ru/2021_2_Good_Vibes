@@ -6,6 +6,7 @@ type Product struct {
 	Name   string  `json:"name"`
 	Price  int     `json:"price"`
 	Rating float32 `json:"rating"`
+	Category string `json:"category"`
 }
 
 func NewProduct(id int, image string, name string, price int, rating float32) Product {
