@@ -19,3 +19,15 @@ const (
 	USER_EXISTS_DESCR    = "user already exists"
 	WRONG_PASSWORD_DESCR = "wrong password"
 )
+
+type Error struct {
+	ErrorCode        int    `json:"error code"`
+	ErrorDescription string `json:"error description"`
+}
+
+func NewError(errorCode int, errorDesc string) *Error {
+	return &Error{
+		ErrorCode:        errorCode,
+		ErrorDescription: errorDesc,
+	}
+}

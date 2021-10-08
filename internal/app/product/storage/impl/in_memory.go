@@ -13,10 +13,10 @@ type StorageProductsMemory struct {
 	storage map[int]product.Product
 }
 
-func NewStorageProductsMemory() *StorageProductsMemory {
+func NewStorageProductsMemory() (*StorageProductsMemory, error) {
 	return &StorageProductsMemory{
 		storage: make(map[int]product.Product),
-	}
+	}, nil
 }
 
 func (sp *StorageProductsMemory) AddProduct(prod product.Product) (int, error) {

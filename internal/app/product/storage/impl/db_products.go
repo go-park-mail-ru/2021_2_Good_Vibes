@@ -21,7 +21,7 @@ func NewStorageProductsDB(db *sql.DB, err error) (*StorageProductsDB, error) {
 	}, nil
 }
 
-func (ph *StorageProductsDB) GetAllProducts() ([]productModel.Product, error)  {
+func (ph *StorageProductsDB) GetAllProducts() ([]productModel.Product, error) {
 	rows, err := ph.db.Query("select id, name, category_id from products")
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (ph *StorageProductsDB) GetAllProducts() ([]productModel.Product, error)  {
 	return nil, nil
 }
 
-func (ph *StorageProductsDB) GetProductById(id int) (productModel.Product, error)  {
+func (ph *StorageProductsDB) GetProductById(id int) (productModel.Product, error) {
 	product := productModel.Product{}
 
 	row := ph.db.QueryRow("select id, name, category_id from products where id=$1", id)
@@ -57,9 +57,9 @@ func (ph *StorageProductsDB) GetProductById(id int) (productModel.Product, error
 
 func (ph *StorageProductsDB) GetProductsByCategory(category string) ([]productModel.Product, error) {
 	var products []productModel.Product
-	rows, err := ph.db.Query("select p.id, p.name, nc1.name from products as p " +
-		"join categories as nc1 on p.category = nc1.id " +
-		"join categories as nc2 on nc1.lft >= nc2.lft AND " +
+	rows, err := ph.db.Query("select p.id, p.name, nc1.name from products as p "+
+		"join categories as nc1 on p.category = nc1.id "+
+		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
 		"nc1.rgt <= nc2.rgt where nc2.name = $1 order by nc1.id", category)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (ph *StorageProductsDB) AddProduct(product productModel.Product) (int, erro
 	var lastInsertId int64
 
 	err := ph.db.QueryRow(
-		"with a(id) as (select id from categories where name=$5) " +
+		"with a(id) as (select id from categories where name=$5) "+
 			"insert into products (image, name, price, rating, category_id) values ($1, $2, $3, $4, (select id from a)) returning id",
 		product.Image,
 		product.Name,
@@ -96,7 +96,3 @@ func (ph *StorageProductsDB) AddProduct(product productModel.Product) (int, erro
 
 	return int(lastInsertId), nil
 }
-
-
-
-

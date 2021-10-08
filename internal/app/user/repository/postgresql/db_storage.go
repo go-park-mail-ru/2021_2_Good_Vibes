@@ -1,10 +1,10 @@
-package impl
+package postgresql
 
 import (
 	"database/sql"
 	"errors"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	userModel "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"golang.org/x/crypto/bcrypt"
 	"sync"
 )
@@ -23,12 +23,12 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 	}, nil
 }
 
-func (su *StorageUserDB) IsUserExists(user userModel.UserInput) (int, error) {
+func (su *StorageUserDB) IsUserExists(user models.UserDataForInput) (int, error) {
 	su.mx.Lock()
 	defer su.mx.Unlock()
 
-	var tmp userModel.UserStorage
-	row := su.db.QueryRow( "SELECT * FROM customers WHERE name=$1", user.Name)
+	var tmp models.UserDataStorage
+	row := su.db.QueryRow("SELECT * FROM customers WHERE name=$1", user.Name)
 
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
 	if err == sql.ErrNoRows {
@@ -47,8 +47,8 @@ func (su *StorageUserDB) IsUserExists(user userModel.UserInput) (int, error) {
 	return tmp.Id, nil
 }
 
-func (su *StorageUserDB) AddUser(newUser userModel.User) (int, error) {
-	user := userModel.UserInput{
+func (su *StorageUserDB) AddUser(newUser models.UserDataForReg) (int, error) {
+	user := models.UserDataForInput{
 		Name:     newUser.Name,
 		Password: newUser.Password,
 	}
