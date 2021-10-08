@@ -24,9 +24,6 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 }
 
 func (su *StorageUserDB) IsUserExists(user models.UserDataForInput) (int, error) {
-	su.mx.Lock()
-	defer su.mx.Unlock()
-
 	var tmp models.UserDataStorage
 	row := su.db.QueryRow("SELECT * FROM customers WHERE name=$1", user.Name)
 
@@ -68,9 +65,6 @@ func (su *StorageUserDB) AddUser(newUser models.UserDataForReg) (int, error) {
 	if err != nil {
 		return customErrors.SERVER_ERROR, err
 	}
-
-	su.mx.Lock()
-	defer su.mx.Unlock()
 
 	rows := su.db.QueryRow("INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
 		newUser.Name,

@@ -64,6 +64,9 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		product := models.Product{}
 
