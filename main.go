@@ -9,10 +9,9 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
 	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
-	productRepoMemory "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/memory"
+	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
 
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
@@ -50,13 +49,13 @@ func main() {
 	userUс := userUsecase.NewUsecase(storage)
 
 	//storageProd, err = storage_prod_impl.NewStorageProductsDB(GetPostgres())
-	storageProd, err = productRepoMemory.NewStorageProductsMemory()
+	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
 	productUc := productUseCase.NewProductUsecase(storageProd)
 
-	productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
+	/*productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
 	productUc.AddProduct(models.Product{2, "images/phone2.png", "Смартфон", 10000, 2.5, "PHONES"})
 	productUc.AddProduct(models.Product{3, "images/shirt1.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
 	productUc.AddProduct(models.Product{4, "images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5, "PHONES"})
@@ -65,13 +64,13 @@ func main() {
 	productUc.AddProduct(models.Product{7, "images/phone3.png", "Смартфон поддержанный", 10000, 2.5, "PHONES"})
 	productUc.AddProduct(models.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
 	productUc.AddProduct(models.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
-
+*/
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
 	if err != nil {
 		panic(err)
 	}
 
-	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory)
+	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
 

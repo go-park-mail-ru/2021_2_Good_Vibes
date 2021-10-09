@@ -6,11 +6,9 @@ import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"golang.org/x/crypto/bcrypt"
-	"sync"
 )
 
 type StorageUserDB struct {
-	mx sync.RWMutex
 	db *sql.DB
 }
 

@@ -2,12 +2,11 @@ package postgresql
 
 import (
 	"database/sql"
+	"fmt"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-	"sync"
 )
 
 type StorageProductsDB struct {
-	mx sync.RWMutex
 	db *sql.DB
 }
 
@@ -39,7 +38,7 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	return nil, nil
 }
 
-func (ph *StorageProductsDB) GetProductById(id int) (models.Product, error) {
+func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 	product := models.Product{}
 
 	row := ph.db.QueryRow("select id, name, category_id from products where id=$1", id)
@@ -57,8 +56,8 @@ func (ph *StorageProductsDB) GetProductById(id int) (models.Product, error) {
 
 func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, error) {
 	var products []models.Product
-	rows, err := ph.db.Query("select p.id, p.name, nc1.name from products as p "+
-		"join categories as nc1 on p.category = nc1.id "+
+	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name from products as p "+
+		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
 		"nc1.rgt <= nc2.rgt where nc2.name = $1 order by nc1.id", category)
 	if err != nil {
@@ -70,13 +69,14 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 	for rows.Next() {
 		product := models.Product{}
 
-		err := rows.Scan(&product.Id, &product.Name, &product.Category)
+		err := rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category)
 		if err != nil {
 			return nil, err
 		}
 
 		products = append(products, product)
 	}
+	fmt.Println(products)
 	return products, nil
 }
 

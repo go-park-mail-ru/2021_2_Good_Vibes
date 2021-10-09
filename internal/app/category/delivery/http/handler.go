@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
@@ -22,19 +21,31 @@ func NewCategoryHandler(useCase category.UseCase) *CategoryHandler {
 }
 
 func (ch *CategoryHandler) GetAllCategories(ctx echo.Context) error {
-	if AllCategoriesJson.Name != "" {
-		fmt.Println("OK")
-		return ctx.JSON(http.StatusOK, AllCategoriesJson)
+	val := ctx.QueryParams()
+
+	nameString := val.Get("name")
+	if nameString == "" {
+		if AllCategoriesJson.Name != "" {
+			return ctx.JSON(http.StatusOK, AllCategoriesJson)
+		}
+
+		categories, err := ch.useCase.GetAllCategories()
+		if err != nil {
+			newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
+			return ctx.JSON(http.StatusBadRequest, newCategoryError)
+		}
+		AllCategoriesJson = categories
+
+		return ctx.JSON(http.StatusOK, categories)
 	}
 
-	categories, err := ch.useCase.GetAllCategories()
+	products, err := ch.useCase.GetProductsByCategory(nameString)
 	if err != nil {
-		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
-	AllCategoriesJson = categories
 
-	return ctx.JSON(http.StatusOK, categories)
+	return ctx.JSON(http.StatusOK, products)
 }
 
 

@@ -18,7 +18,6 @@ func NewStorageCategoryDB(db *sql.DB, err error) (*StorageCategoryPostgres, erro
 	}, nil
 }
 
-
 func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCategory, error) {
 	var nestingCategory []models.NestingCategory
 	rows, err := sc.db.Query("select ((count(parent.name) - 1)::int), node.name as name " +
@@ -30,6 +29,9 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		category := models.NestingCategory{}
 
