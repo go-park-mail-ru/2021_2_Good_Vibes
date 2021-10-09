@@ -2,10 +2,8 @@ package postgresql
 
 import (
 	"database/sql"
-	"errors"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-	"golang.org/x/crypto/bcrypt"
 	"sync"
 )
 
@@ -23,56 +21,30 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 	}, nil
 }
 
-func (su *StorageUserDB) IsUserExists(user models.UserDataForInput) (int, error) {
+func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT * FROM customers WHERE name=$1", user.Name)
+	row := su.db.QueryRow("SELECT * FROM customers WHERE name=$1", name)
 
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
 	if err == sql.ErrNoRows {
-		return customErrors.NO_USER_ERROR, nil
+		return nil, nil
 	}
 
 	if err != nil {
-		return customErrors.DB_ERROR, err
+		return nil, err
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(tmp.Password), []byte(user.Password)); err != nil {
-		err = errors.New(customErrors.WRONG_PASSWORD_DESCR)
-		return customErrors.WRONG_PASSWORD_ERROR, err
-	}
-
-	return tmp.Id, nil
+	return &tmp, nil
 }
 
-func (su *StorageUserDB) AddUser(newUser models.UserDataForReg) (int, error) {
-	user := models.UserDataForInput{
-		Name:     newUser.Name,
-		Password: newUser.Password,
-	}
-
-	id, err := su.IsUserExists(user)
-
-	if err != nil {
-		return id, err
-	}
-
-	if id != customErrors.NO_USER_ERROR {
-		return customErrors.USER_EXISTS_ERROR, nil
-	}
-
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
-
-	if err != nil {
-		return customErrors.SERVER_ERROR, err
-	}
-
+func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) {
 	rows := su.db.QueryRow("INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
 		newUser.Name,
 		newUser.Email,
-		passwordHash)
+		newUser.Password)
 
-	err = rows.Scan(&id)
-
+	var id int
+	err := rows.Scan(&id)
 	if err != nil {
 		return customErrors.DB_ERROR, err
 	}

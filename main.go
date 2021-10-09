@@ -13,7 +13,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/memory"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
 	userUsecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/usecase"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
@@ -37,7 +37,7 @@ func main() {
 	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
 
 	//storage, err = impl.NewStorageUserDB(GetPostgres())
-	storage, err = memory.NewStorageUserMemory()
+	storage, err = postgresql.NewStorageUserDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -75,7 +75,7 @@ func main() {
 }
 
 func GetPostgres() (*sql.DB, error) {
-	dsn := "user=bush dbname=ozon password=sergeykust000 host=127.0.0.1 port=5432 sslmode=disable"
+	dsn := "user=lida dbname=mydb password=123 host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
