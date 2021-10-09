@@ -3,7 +3,9 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
 	mock_user "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/mocks"
 	"github.com/go-playground/validator"
@@ -21,9 +23,13 @@ func TestUserHandler_SignUp(t *testing.T) {
 	user1, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "Qwerty123."})
 
+
 	user1get, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: ""})
-
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
+	error3get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	error4get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
+	error5get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
 	testTable := []struct{
 		name string
 		inputBody string
@@ -46,6 +52,61 @@ func TestUserHandler_SignUp(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			expectedRequestBody: string(user1get) + "\n",
 		},
+		{
+			name: "BadJson",
+			inputBody: `"username":"Test2","email":"test@gmail.com","password":"Qwerty123."}`,
+			inputUser: models.UserDataForReg{
+				Name: "",
+				Email: "",
+				Password: "",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
+			name: "BadJsonData",
+			inputBody: `{"usrname":"incorrectNameField","email":"test@gmail.com","password":"Qwerty123."}`,
+			inputUser: models.UserDataForReg{
+				Name: "",
+				Email: "",
+				Password: "",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error3get) + "\n",
+		},
+		{
+			name: "UserAlreadyExist",
+			inputBody: string(user1),
+			inputUser: models.UserDataForReg{
+				Name: "Test1",
+				Email: "test@gmail.com",
+				Password: "Qwerty123.",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+				s.EXPECT().AddUser(userReg).Return(customErrors.USER_EXISTS_ERROR, nil)
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			expectedRequestBody: string(error4get) + "\n",
+		},
+		{
+			name: "BDError",
+			inputBody: string(user1),
+			inputUser: models.UserDataForReg{
+				Name: "Test1",
+				Email: "test@gmail.com",
+				Password: "Qwerty123.",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+				s.EXPECT().AddUser(userReg).Return(customErrors.DB_ERROR,
+													errors.New(customErrors.BD_ERROR_DESCR))
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedRequestBody: string(error5get) + "\n",
+		},
 	}
 
 	for _, testCase := range testTable {
@@ -67,7 +128,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/signup",
-				bytes.NewBufferString(string(user1)))
+				bytes.NewBufferString(string(testCase.inputBody)))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 			router.ServeHTTP(recorder, req)

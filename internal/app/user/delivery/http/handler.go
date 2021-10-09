@@ -77,7 +77,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
 		newSignupError := errors.NewError(newId, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newSignupError)
+		return ctx.JSON(http.StatusInternalServerError, newSignupError)
 	}
 
 	if newId == errors.USER_EXISTS_ERROR {
@@ -88,7 +88,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	claimsString, err := session.GetToken(newId, newUser.Name)
 	if err != nil {
 		newSignupError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newSignupError)
+		return ctx.JSON(http.StatusInternalServerError, newSignupError)
 	}
 
 	handler.setCookieValue(ctx, claimsString)
