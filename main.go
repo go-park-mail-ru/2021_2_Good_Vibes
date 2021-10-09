@@ -6,14 +6,17 @@ import (
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
+	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
+	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
+	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/repository/postgresql"
+	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
-
-	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
@@ -31,6 +34,7 @@ var (
 	storage     user.Repository
 	storageProd product.Repository
 	storageOrder order.Repository
+	storageBasket basket.Repository
 )
 
 func main() {
@@ -72,6 +76,10 @@ func main() {
 
 	orderUc := orderUseCase.NewOrderUseCase(storageOrder)
 
+	storageBasket, err := basketRepoPostgres.NewStorageBasketDB(GetPostgres())
+	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
+	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc)
+
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
 
 	userHandler := http2.NewLoginHandler(userUс)
@@ -82,6 +90,7 @@ func main() {
 		ProductHandler: productHandler,
 		UserHandler: userHandler,
 		OrderHandler: orderHandler,
+		BasketHandler: basketHandler,
 	}
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
