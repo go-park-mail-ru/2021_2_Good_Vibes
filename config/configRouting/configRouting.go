@@ -2,6 +2,7 @@ package configRouting
 
 import (
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
+	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 type ServerConfigRouting struct {
 	UserHandler    *http2.UserHandler
 	ProductHandler *handler2.ProductHandler
+	OrderHandler *orderHttp.OrderHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -21,6 +23,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
+	router.POST("/order/confirm", cr.OrderHandler.PutOrder)
 }
 
 //пока просто для проверки middleware
