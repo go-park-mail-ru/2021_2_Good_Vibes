@@ -1,73 +1,84 @@
 package http
 
-//
-//import (
-//	"encoding/json"
-//	errors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-//	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-//	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
-//	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/memory"
-//	"github.com/go-playground/validator"
-//	"github.com/labstack/echo/v4"
-//	"github.com/stretchr/testify/assert"
-//	"net/http"
-//	"net/http/httptest"
-//	"strings"
-//	"testing"
-//)
-//
-////type StorageUserMemory struct {
-////	mx      sync.RWMutex
-////	storage map[int]models.User
-////}
-////
-////func NewStorageUserMemory() *StorageUserMemory {
-////	return &StorageUserMemory{
-////		storage: make(map[int]models.User),
-////	}
-////}
-////
-////func (su *StorageUserMemory) IsUserExists(user models.UserDataForInput) (int, error) {
-////	su.mx.RLock()
-////	defer su.mx.RUnlock()
-////
-////	for key, val := range su.storage {
-////		if val.Name == user.Name && val.Password == user.Password {
-////			return key, nil
-////		}
-////	}
-////	return -1, nil
-////}
-////
-////func (su *StorageUserMemory) AddUser(newUser models.User) (int, error) {
-////	su.mx.Lock()
-////	defer su.mx.Unlock()
-////
-////	for _, val := range su.storage {
-////		if val == newUser {
-////			return -1, nil
-////		}
-////	}
-////	newId := len(su.storage) + 1
-////	su.storage[newId] = newUser
-////	return newId, nil
-////}
-////
-////func NewUser (name string, email string, password string) models.User {
-////	return models.User{
-////		Name: name,
-////		Email: email,
-////		Password: password,
-////	}
-////}
-////
-////func NewUserDataForInput (name string, password string) models.UserDataForInput {
-////	return models.UserDataForInput{
-////		Name: name,
-////		Password: password,
-////	}
-////}
-//
+import (
+	"bytes"
+	"encoding/json"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
+	mock_user "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/mocks"
+	"github.com/go-playground/validator"
+	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo/v4"
+	"github.com/magiconair/properties/assert"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func TestUserHandler_SignUp(t *testing.T) {
+	type mockBehavior func(s *mock_user.MockUsecase, userReg models.UserDataForReg)
+
+	user1, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
+		Email: "test@gmail.com", Password: "Qwerty123."})
+
+	user1get, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
+		Email: "test@gmail.com", Password: ""})
+
+	testTable := []struct{
+		name string
+		inputBody string
+		inputUser models.UserDataForReg
+		mockBehavior mockBehavior
+		expectedStatusCode int
+		expectedRequestBody string
+	} {
+		{
+			name: "OK",
+			inputBody: string(user1),
+			inputUser: models.UserDataForReg{
+				Name: "Test1",
+				Email: "test@gmail.com",
+				Password: "Qwerty123.",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+				s.EXPECT().AddUser(userReg).Return(1, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedRequestBody: string(user1get) + "\n",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUser := mock_user.NewMockUsecase(c)
+			testCase.mockBehavior(mockUser, testCase.inputUser)
+
+			handler := NewLoginHandler(mockUser)
+
+			router := echo.New()
+			router.POST("/signup", handler.SignUp)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			recorder := httptest.NewRecorder()
+			req := httptest.NewRequest("POST", "/signup",
+				bytes.NewBufferString(string(user1)))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
+
+
 //func TestCreateUserSuccessUnit(t *testing.T) {
 //	var mockStorage, _ = memory.NewStorageUserMemory()
 //

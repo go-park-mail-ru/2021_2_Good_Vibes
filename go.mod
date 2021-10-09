@@ -14,7 +14,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/spf13/viper v1.9.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210915214749-c084706c2272
 	golang.org/x/net v0.0.0-20210917221730-978cfadd31cf // indirect
 	golang.org/x/sys v0.0.0-20210917161153-d61c044b1678 // indirect
@@ -27,6 +27,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/golang/mock v1.6.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/lib/pq v1.10.2 // indirect
