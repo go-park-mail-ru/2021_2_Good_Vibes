@@ -20,16 +20,18 @@ import (
 func TestUserHandler_SignUp(t *testing.T) {
 	type mockBehavior func(s *mock_user.MockUsecase, userReg models.UserDataForReg)
 
-	user1, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
+	user1,_ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "Qwerty123."})
-
+	user2,_ := json.Marshal(models.UserDataForReg{Name: "Test1",
+		Email: "test@gmail.com", Password: "123"})
 
 	user1get, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: ""})
-	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
-	error3get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
-	error4get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
-	error5get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
+	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	error5get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
+	error6get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
 	testTable := []struct{
 		name string
 		inputBody string
@@ -53,6 +55,19 @@ func TestUserHandler_SignUp(t *testing.T) {
 			expectedRequestBody: string(user1get) + "\n",
 		},
 		{
+			name: "SimplePassword",
+			inputBody: string(user2),
+			inputUser: models.UserDataForReg{
+				Name: "",
+				Email: "",
+				Password: "",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
 			name: "BadJson",
 			inputBody: `"username":"Test2","email":"test@gmail.com","password":"Qwerty123."}`,
 			inputUser: models.UserDataForReg{
@@ -63,7 +78,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
-			expectedRequestBody: string(error2get) + "\n",
+			expectedRequestBody: string(error3get) + "\n",
 		},
 		{
 			name: "BadJsonData",
@@ -76,7 +91,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
-			expectedRequestBody: string(error3get) + "\n",
+			expectedRequestBody: string(error4get) + "\n",
 		},
 		{
 			name: "UserAlreadyExist",
@@ -90,7 +105,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 				s.EXPECT().AddUser(userReg).Return(customErrors.USER_EXISTS_ERROR, nil)
 			},
 			expectedStatusCode: http.StatusUnauthorized,
-			expectedRequestBody: string(error4get) + "\n",
+			expectedRequestBody: string(error5get) + "\n",
 		},
 		{
 			name: "BDError",
@@ -105,7 +120,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 													errors.New(customErrors.BD_ERROR_DESCR))
 			},
 			expectedStatusCode: http.StatusInternalServerError,
-			expectedRequestBody: string(error5get) + "\n",
+			expectedRequestBody: string(error6get) + "\n",
 		},
 	}
 
