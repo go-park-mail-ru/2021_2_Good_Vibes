@@ -53,3 +53,7 @@ func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 
 	return us.repository.InsertUser(newUser)
 }
+
+func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error) {
+	return us.repository.GetUserDataById(id)
+}

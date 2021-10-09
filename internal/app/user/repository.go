@@ -6,5 +6,6 @@ import (
 
 type Repository interface {
 	GetUserDataByName(name string) (*models.UserDataStorage, error)
+	GetUserDataById(id uint64) (*models.UserDataStorage, error)
 	InsertUser(newUser models.UserDataForReg) (int, error)
 }

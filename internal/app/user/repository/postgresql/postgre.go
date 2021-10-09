@@ -51,3 +51,19 @@ func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) 
 
 	return id, nil
 }
+
+func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {
+	var tmp models.UserDataStorage
+	row := su.db.QueryRow("SELECT * FROM customers WHERE id=$1", id)
+	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &tmp, nil
+}

@@ -1,13 +1,14 @@
 package http
 
 import (
-	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	errors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	session "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		newLoginError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
-	fmt.Println(newUserDataForInput)
+
 	if err := ctx.Validate(&newUserDataForInput); err != nil {
 		newLoginError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
@@ -95,13 +96,31 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newUser)
 }
 
+func (handler *UserHandler) Profile(ctx echo.Context) error {
+	token := ctx.Get("token").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+
+	idString := claims["id"].(string)
+	idNum, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+	}
+
+	userData, err := handler.Usecase.GetUserDataByID(idNum)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, err.Error()))
+	}
+
+	return ctx.JSON(http.StatusOK, userData)
+}
+
 func (handler *UserHandler) Logout(ctx echo.Context) error {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		HttpOnly: true,
 		MaxAge:   -1,
 		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
+		//Secure:   true,
 	}
 	ctx.SetCookie(cookie)
 	return ctx.NoContent(http.StatusOK)
@@ -114,7 +133,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
 		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
+		//Secure:   true,
 	}
 
 	ctx.SetCookie(cookie)

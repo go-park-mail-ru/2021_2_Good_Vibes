@@ -23,6 +23,7 @@ func IsLogin(next echo.HandlerFunc) echo.HandlerFunc {
 		})
 
 		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			context.Set("token", token)
 			return next(context)
 		}
 
