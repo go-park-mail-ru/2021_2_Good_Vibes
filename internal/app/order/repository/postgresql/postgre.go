@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"strconv"
 )
@@ -21,6 +22,11 @@ func NewStorageOrderDB(db *sql.DB, err error) (*StorageOrderPostgres, error) {
 }
 
 func (so *StorageOrderPostgres) PutOrder(order models.Order) (int, error) {
+	if order.Products == nil {
+		err := errors.New("No products, ")
+		return 0, err
+	}
+
 	err := tx(so.db, func(tx *sql.Tx) error {
 		err := tx.QueryRow(
 			"insert into orders (user_id, date, address, cost, status) values ($1, $2, $3, $4, $5) returning id",
@@ -60,7 +66,7 @@ func (so *StorageOrderPostgres) PutOrder(order models.Order) (int, error) {
 	})
 
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return order.OrderId, nil
@@ -78,11 +84,11 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 
 		query += `(`
 		for j := 0; j < numFields; j++ {
-			query += `$`+strconv.Itoa(n + j + 1) + `,`
+			query += `$`+ strconv.Itoa(n + j + 1) + `,`
 		}
-		query = query[:len(query)-1] + `),`
+		query = query[:len(query) - 1] + `),`
 	}
-	query = query[:len(query)-1]
+	query = query[:len(query) - 1]
 	return query, values
 }
 
