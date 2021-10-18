@@ -39,7 +39,7 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	return nil, nil
 }
 
-func (ph *StorageProductsDB) GetProductById(id int) (models.Product, error) {
+func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 	product := models.Product{}
 
 	row := ph.db.QueryRow("select id, name, category_id from products where id=$1", id)

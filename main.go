@@ -6,11 +6,18 @@ import (
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
+	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
+	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
+	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
+	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
+	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/repository/postgresql"
+	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-	storage_prod_handler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
-	storage_prod_impl "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/memory"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
+	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
+	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
@@ -26,6 +33,8 @@ var (
 	router      = echo.New()
 	storage     user.Repository
 	storageProd product.Repository
+	storageOrder order.Repository
+	storageBasket basket.Repository
 )
 
 func main() {
@@ -44,13 +53,13 @@ func main() {
 	userUс := userUsecase.NewUsecase(storage)
 
 	//storageProd, err = storage_prod_impl.NewStorageProductsDB(GetPostgres())
-	storageProd, err = storage_prod_impl.NewStorageProductsMemory()
+	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-	productUc := usecase.NewProductUsecase(storageProd)
+	productUc := productUseCase.NewProductUsecase(storageProd)
 
-	productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
+	/*productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
 	productUc.AddProduct(models.Product{2, "images/phone2.png", "Смартфон", 10000, 2.5, "PHONES"})
 	productUc.AddProduct(models.Product{3, "images/shirt1.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
 	productUc.AddProduct(models.Product{4, "images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5, "PHONES"})
@@ -59,13 +68,30 @@ func main() {
 	productUc.AddProduct(models.Product{7, "images/phone3.png", "Смартфон поддержанный", 10000, 2.5, "PHONES"})
 	productUc.AddProduct(models.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
 	productUc.AddProduct(models.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
+	*/
+	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
+	if err != nil {
+		panic(err)
+	}
 
-	productHandler := storage_prod_handler.NewProductHandler(productUc)
+	orderUc := orderUseCase.NewOrderUseCase(storageOrder)
+
+	storageBasket, err := basketRepoPostgres.NewBasketRepository(GetPostgres())
+	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
+	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc)
+
+	productHandler := productHandlerHttp.NewProductHandler(productUc)
 
 	userHandler := http2.NewLoginHandler(userUс)
 
-	serverRouting := configRouting.ServerConfigRouting{ProductHandler: productHandler,
-		UserHandler: userHandler}
+	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
+
+	serverRouting := configRouting.ServerConfigRouting{
+		ProductHandler: productHandler,
+		UserHandler: userHandler,
+		OrderHandler: orderHandler,
+		BasketHandler: basketHandler,
+	}
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
 
