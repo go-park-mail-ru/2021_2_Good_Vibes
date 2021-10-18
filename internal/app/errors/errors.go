@@ -18,6 +18,7 @@ const (
 	NO_USER_DESCR        = "user does not exist"
 	USER_EXISTS_DESCR    = "user already exists"
 	WRONG_PASSWORD_DESCR = "wrong password"
+	BD_ERROR_DESCR       = "bd error"
 )
 
 type Error struct {
