@@ -34,7 +34,11 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 		}
 		products = append(products, product)
 	}
-	return nil, nil
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
 }
 
 func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
@@ -74,6 +78,10 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 		}
 
 		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
 	}
 
 	return products, nil

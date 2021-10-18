@@ -27,6 +27,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
+	router.GET("/cart/get", cr.BasketHandler.GetBasket, middlewareAut.IsLogin)
 	router.POST("/cart/confirm", cr.OrderHandler.PutOrder, middlewareAut.IsLogin)
 	router.POST("/cart/put", cr.BasketHandler.PutInBasket, middlewareAut.IsLogin)
 	router.POST("/cart/drop", cr.BasketHandler.DropBasket, middlewareAut.IsLogin)

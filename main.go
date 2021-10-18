@@ -122,7 +122,7 @@ func main() {
 }
 
 func GetPostgres() (*sql.DB, error) {
-	dsn := "user=lida dbname=mydb password=123 host=127.0.0.1 port=5432 sslmode=disable"
+	dsn := "user=bush dbname=ozon password=sergeykust000 host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err

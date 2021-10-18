@@ -51,6 +51,33 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 	return nil
 }
 
+func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
+	var basketProducts []models.BasketProduct
+	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1", userId)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		product := models.BasketProduct{}
+
+		err := rows.Scan(&product.ProductId, &product.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		basketProducts = append(basketProducts, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return basketProducts, nil
+}
+
 func (sb *BasketRepository) DropBasket(userId int) error {
 	err := tx(sb.db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(`delete from basket where user_id=$1`, userId)

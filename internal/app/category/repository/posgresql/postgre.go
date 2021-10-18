@@ -42,5 +42,9 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 
 		nestingCategory = append(nestingCategory, category)
 	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
 	return nestingCategory, nil
 }

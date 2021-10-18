@@ -26,9 +26,9 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 
 	idString := claims["id"].(string)
-	idNum, err := strconv.ParseInt(idString, 10, 64)
+	userId, err := strconv.ParseInt(idString, 10, 64)
 
-	newOrder.UserId = int(idNum)
+	newOrder.UserId = int(userId)
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}

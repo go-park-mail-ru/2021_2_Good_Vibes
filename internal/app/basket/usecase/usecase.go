@@ -24,6 +24,15 @@ func (uc *UseCase) PutInBasket(basket models.BasketProduct) error {
 	return nil
 }
 
+func (uc *UseCase) GetBasket(userId int) ([]models.BasketProduct, error) {
+	basketProducts, err := uc.repositoryBasket.GetBasket(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return basketProducts, nil
+}
+
 func (uc *UseCase) DropBasket(userId int) error {
 	err := uc.repositoryBasket.DropBasket(userId)
 	if err != nil {
