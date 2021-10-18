@@ -23,7 +23,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
-	router.GET("/category", cr.CategoryHandler.GetAllCategories)
+	router.GET("/category", cr.CategoryHandler.GetCategories)
 }
 
 //пока просто для проверки middleware

@@ -20,7 +20,7 @@ func NewCategoryHandler(useCase category.UseCase) *CategoryHandler {
 	}
 }
 
-func (ch *CategoryHandler) GetAllCategories(ctx echo.Context) error {
+func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	val := ctx.QueryParams()
 
 	nameString := val.Get("name")

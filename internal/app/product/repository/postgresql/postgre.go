@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"database/sql"
-	"fmt"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
@@ -76,7 +75,7 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 
 		products = append(products, product)
 	}
-	fmt.Println(products)
+
 	return products, nil
 }
 
