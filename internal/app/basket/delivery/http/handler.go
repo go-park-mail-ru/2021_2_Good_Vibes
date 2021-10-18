@@ -33,17 +33,14 @@ func (bh *BasketHandler) PutInBasket(ctx echo.Context) error {
 	err := bh.useCase.PutInBasket(newProduct)
 	if err != nil {
 		newOrderError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newOrderError)
+		return ctx.JSON(http.StatusInternalServerError, newOrderError)
 	}
 
 	return ctx.JSON(http.StatusOK, newProduct)
 }
 
 func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
-	type User struct {
-		UserId int `json:"user_id"`
-	}
-	var user User
+	var user models.UserID
 	if err := ctx.Bind(&user); err != nil {
 		newOrderError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newOrderError)

@@ -5,23 +5,28 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"strconv"
+	"strings"
 )
 
-type StorageOrderPostgres struct {
+const (
+	FieldsNum = 3
+)
+
+type OrderRepository struct {
 	db *sql.DB
 }
 
-func NewStorageOrderDB(db *sql.DB, err error) (*StorageOrderPostgres, error) {
+func NewOrderRepository(db *sql.DB, err error) (*OrderRepository, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	return &StorageOrderPostgres{
+	return &OrderRepository{
 		db: db,
 	}, nil
 }
 
-func (so *StorageOrderPostgres) PutOrder(order models.Order) (int, error) {
+func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 	if order.Products == nil {
 		err := errors.New("No products, ")
 		return 0, err
@@ -73,23 +78,30 @@ func (so *StorageOrderPostgres) PutOrder(order models.Order) (int, error) {
 }
 
 func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
-	query := "insert into order_products (order_id, product_id, count) values"
+	query := strings.Builder{}
+	query.WriteString("insert into order_products (order_id, product_id, count) values")
 
-	var values []interface{}
+	values := make([]interface{}, FieldsNum * len(order.Products))
 	for i, s := range order.Products {
-		values = append(values, s.OrderId, s.ProductId, s.Number)
+		values[i * FieldsNum] = s.OrderId
+		values[i * FieldsNum + 1] = s.ProductId
+		values[i * FieldsNum + 2] = s.Number
 
-		numFields := 3
-		n := i * numFields
+		n := i * FieldsNum
 
-		query += `(`
-		for j := 0; j < numFields; j++ {
-			query += `$`+ strconv.Itoa(n + j + 1) + `,`
+		query.WriteString(`(`)
+		str := make([]string, FieldsNum)
+		for j := 0; j < FieldsNum; j++ {
+			str[j] = `$`+ strconv.Itoa(n + j + 1)
 		}
-		query = query[:len(query) - 1] + `),`
+
+		query.WriteString(strings.Join(str, ","))
+		query.WriteString(`),`)
 	}
-	query = query[:len(query) - 1]
-	return query, values
+
+	str := query.String()
+
+	return str[:len(str) - 1], values
 }
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {

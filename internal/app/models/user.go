@@ -17,3 +17,7 @@ type UserDataForReg struct {
 	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password,omitempty" validate:"required,customPassword"`
 }
+
+type UserID struct {
+	UserId int `json:"user_id"`
+}

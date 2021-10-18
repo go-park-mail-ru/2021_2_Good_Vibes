@@ -33,7 +33,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 	orderId, err := oh.useCase.PutOrder(newOrder)
 	if err != nil {
 		newOrderError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newOrderError)
+		return ctx.JSON(http.StatusInternalServerError, newOrderError)
 	}
 
 	newOrder.OrderId = orderId

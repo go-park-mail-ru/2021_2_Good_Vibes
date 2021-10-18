@@ -5,21 +5,21 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
-type StorageBasketPostgres struct {
+type BasketRepository struct {
 	db *sql.DB
 }
 
-func NewStorageBasketDB(db *sql.DB, err error) (*StorageBasketPostgres, error) {
+func NewBasketRepository(db *sql.DB, err error) (*BasketRepository, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	return &StorageBasketPostgres{
+	return &BasketRepository{
 		db: db,
 	}, nil
 }
 
-func (sb *StorageBasketPostgres) PutInBasket(basketProduct models.BasketProduct) error {
+func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) error {
 	err := tx(sb.db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(
 			"insert into basket (user_id) values ($1) on conflict(user_id) do nothing",
@@ -51,7 +51,8 @@ func (sb *StorageBasketPostgres) PutInBasket(basketProduct models.BasketProduct)
 	return nil
 }
 
-func (sb *StorageBasketPostgres) DropBasket(userId int) error {
+
+func (sb *BasketRepository) DropBasket(userId int) error {
 	err := tx(sb.db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(`delete from basket where user_id=$1`, userId)
 		if err != nil {
@@ -73,7 +74,7 @@ func (sb *StorageBasketPostgres) DropBasket(userId int) error {
 	return nil
 }
 
-func (sb *StorageBasketPostgres) DeleteProduct(product models.BasketProduct) error {
+func (sb *BasketRepository) DeleteProduct(product models.BasketProduct) error {
 	err := tx(sb.db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(`delete from basket_products where user_id=$1 and product_id=$2`, product.UserId, product.ProductId)
 		if err != nil {
@@ -105,6 +106,7 @@ func (sb *StorageBasketPostgres) DeleteProduct(product models.BasketProduct) err
 
 	return nil
 }
+
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()

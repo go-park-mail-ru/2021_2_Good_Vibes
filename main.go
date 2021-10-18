@@ -69,14 +69,14 @@ func main() {
 	productUc.AddProduct(models.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
 	productUc.AddProduct(models.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
 	*/
-	storageOrder, err := orderRepoPostgres.NewStorageOrderDB(GetPostgres())
+	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
 	if err != nil {
 		panic(err)
 	}
 
 	orderUc := orderUseCase.NewOrderUseCase(storageOrder)
 
-	storageBasket, err := basketRepoPostgres.NewStorageBasketDB(GetPostgres())
+	storageBasket, err := basketRepoPostgres.NewBasketRepository(GetPostgres())
 	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
 	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc)
 
