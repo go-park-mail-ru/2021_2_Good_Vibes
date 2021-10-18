@@ -12,10 +12,10 @@ import (
 )
 
 type ServerConfigRouting struct {
-	UserHandler    *http2.UserHandler
-	ProductHandler *handler2.ProductHandler
-	OrderHandler *orderHttp.OrderHandler
-	BasketHandler *basketHttp.BasketHandler
+	UserHandler     *http2.UserHandler
+	ProductHandler  *handler2.ProductHandler
+	OrderHandler    *orderHttp.OrderHandler
+	BasketHandler   *basketHttp.BasketHandler
 	CategoryHandler *categoryHttp.CategoryHandler
 }
 

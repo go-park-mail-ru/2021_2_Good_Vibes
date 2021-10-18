@@ -51,7 +51,6 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 	return nil
 }
 
-
 func (sb *BasketRepository) DropBasket(userId int) error {
 	err := tx(sb.db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(`delete from basket where user_id=$1`, userId)
@@ -107,7 +106,6 @@ func (sb *BasketRepository) DeleteProduct(product models.BasketProduct) error {
 
 	return nil
 }
-
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()

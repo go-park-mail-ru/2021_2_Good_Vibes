@@ -47,5 +47,3 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, products)
 }
-
-

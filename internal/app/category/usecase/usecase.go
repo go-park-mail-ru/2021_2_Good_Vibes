@@ -9,13 +9,13 @@ import (
 
 type UseCase struct {
 	repositoryCategory category.Repository
-	repositoryProduct product.Repository
+	repositoryProduct  product.Repository
 }
 
 func NewCategoryUseCase(repositoryCategory category.Repository, repositoryModel product.Repository) *UseCase {
 	return &UseCase{
 		repositoryCategory: repositoryCategory,
-		repositoryProduct: repositoryModel,
+		repositoryProduct:  repositoryModel,
 	}
 }
 
@@ -37,4 +37,3 @@ func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {
 
 	return node, nil
 }
-

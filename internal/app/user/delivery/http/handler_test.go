@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
 	mock_user "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/mocks"
 	"github.com/go-playground/validator"
@@ -20,9 +20,9 @@ import (
 func TestUserHandler_SignUp(t *testing.T) {
 	type mockBehavior func(s *mock_user.MockUsecase, userReg models.UserDataForReg)
 
-	user1,_ := json.Marshal(models.UserDataForReg{Name: "Test1",
+	user1, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "Qwerty123."})
-	user2,_ := json.Marshal(models.UserDataForReg{Name: "Test1",
+	user2, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "123"})
 
 	user1get, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
@@ -32,94 +32,94 @@ func TestUserHandler_SignUp(t *testing.T) {
 	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error5get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
 	error6get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
-	testTable := []struct{
-		name string
-		inputBody string
-		inputUser models.UserDataForReg
-		mockBehavior mockBehavior
-		expectedStatusCode int
+	testTable := []struct {
+		name                string
+		inputBody           string
+		inputUser           models.UserDataForReg
+		mockBehavior        mockBehavior
+		expectedStatusCode  int
 		expectedRequestBody string
-	} {
+	}{
 		{
-			name: "OK",
+			name:      "OK",
 			inputBody: string(user1),
 			inputUser: models.UserDataForReg{
-				Name: "Test1",
-				Email: "test@gmail.com",
+				Name:     "Test1",
+				Email:    "test@gmail.com",
 				Password: "Qwerty123.",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 				s.EXPECT().AddUser(userReg).Return(1, nil)
 			},
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(user1get) + "\n",
 		},
 		{
-			name: "SimplePassword",
+			name:      "SimplePassword",
 			inputBody: string(user2),
 			inputUser: models.UserDataForReg{
-				Name: "",
-				Email: "",
+				Name:     "",
+				Email:    "",
 				Password: "",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
 		},
 		{
-			name: "BadJson",
+			name:      "BadJson",
 			inputBody: `"username":"Test2","email":"test@gmail.com","password":"Qwerty123."}`,
 			inputUser: models.UserDataForReg{
-				Name: "",
-				Email: "",
+				Name:     "",
+				Email:    "",
 				Password: "",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error3get) + "\n",
 		},
 		{
-			name: "BadJsonData",
+			name:      "BadJsonData",
 			inputBody: `{"usrname":"incorrectNameField","email":"test@gmail.com","password":"Qwerty123."}`,
 			inputUser: models.UserDataForReg{
-				Name: "",
-				Email: "",
+				Name:     "",
+				Email:    "",
 				Password: "",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error4get) + "\n",
 		},
 		{
-			name: "UserAlreadyExist",
+			name:      "UserAlreadyExist",
 			inputBody: string(user1),
 			inputUser: models.UserDataForReg{
-				Name: "Test1",
-				Email: "test@gmail.com",
+				Name:     "Test1",
+				Email:    "test@gmail.com",
 				Password: "Qwerty123.",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 				s.EXPECT().AddUser(userReg).Return(customErrors.USER_EXISTS_ERROR, nil)
 			},
-			expectedStatusCode: http.StatusUnauthorized,
+			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(error5get) + "\n",
 		},
 		{
-			name: "BDError",
+			name:      "BDError",
 			inputBody: string(user1),
 			inputUser: models.UserDataForReg{
-				Name: "Test1",
-				Email: "test@gmail.com",
+				Name:     "Test1",
+				Email:    "test@gmail.com",
 				Password: "Qwerty123.",
 			},
 			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForReg) {
 				s.EXPECT().AddUser(userReg).Return(customErrors.DB_ERROR,
-													errors.New(customErrors.BD_ERROR_DESCR))
+					errors.New(customErrors.BD_ERROR_DESCR))
 			},
-			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusCode:  http.StatusInternalServerError,
 			expectedRequestBody: string(error6get) + "\n",
 		},
 	}
@@ -153,7 +153,6 @@ func TestUserHandler_SignUp(t *testing.T) {
 		})
 	}
 }
-
 
 //func TestCreateUserSuccessUnit(t *testing.T) {
 //	var mockStorage, _ = memory.NewStorageUserMemory()

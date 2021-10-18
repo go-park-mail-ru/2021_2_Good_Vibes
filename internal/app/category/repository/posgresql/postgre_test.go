@@ -26,7 +26,7 @@ func TestSelectAllCategories(t *testing.T) {
 	rows := sqlmock.
 		NewRows([]string{"nesting", "name"})
 
-	expect := []models.NestingCategory {
+	expect := []models.NestingCategory{
 		{0, "ALL_THINGS"},
 		{1, "CLOTHES"},
 		{2, "CLOTHES_MEN"},

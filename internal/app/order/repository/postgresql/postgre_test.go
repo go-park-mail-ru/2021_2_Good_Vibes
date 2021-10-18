@@ -26,12 +26,12 @@ func TestPutOrder(t *testing.T) {
 	}
 
 	order := models.Order{
-		OrderId: 1,
-		UserId: 1,
-		Date: "2014-04-04 18:32:59",
+		OrderId:  1,
+		UserId:   1,
+		Date:     "2014-04-04 18:32:59",
 		Address:  "Moscow",
-		Cost: 2000.0,
-		Status: "new",
+		Cost:     2000.0,
+		Status:   "new",
 		Products: orderProducts,
 	}
 	//ok query
@@ -46,14 +46,14 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectExec("insert into order_products").
-		WithArgs(order.Products[0].OrderId,order.Products[0].ProductId,order.Products[0].Number).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.
 		ExpectExec("delete from basket").WithArgs(order.UserId).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.
 		ExpectExec("delete from basket_products").WithArgs(order.UserId).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.ExpectCommit()
 
@@ -104,7 +104,7 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectExec("insert into order_products").
-		WithArgs(order.Products[0].OrderId,order.Products[0].ProductId,order.Products[0].Number).
+		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
 		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
 
 	mock.ExpectRollback()
@@ -131,8 +131,8 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectExec("insert into order_products").
-		WithArgs(order.Products[0].OrderId,order.Products[0].ProductId,order.Products[0].Number).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.
 		ExpectExec("delete from basket").WithArgs(order.UserId).
 		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
@@ -161,12 +161,12 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectExec("insert into order_products").
-		WithArgs(order.Products[0].OrderId,order.Products[0].ProductId,order.Products[0].Number).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.
 		ExpectExec("delete from basket").WithArgs(order.UserId).
-		WillReturnResult(sqlmock.NewResult(1,1))
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.
 		ExpectExec("delete from basket_products").WithArgs(order.UserId).
 		WillReturnError(fmt.Errorf("db error"))
@@ -208,12 +208,12 @@ func TestPutOrder(t *testing.T) {
 	orderProducts = nil
 
 	order = models.Order{
-		OrderId: 1,
-		UserId: 1,
-		Date: "2014-04-04 18:32:59",
+		OrderId:  1,
+		UserId:   1,
+		Date:     "2014-04-04 18:32:59",
 		Address:  "Moscow",
-		Cost: 2000.0,
-		Status: "new",
+		Cost:     2000.0,
+		Status:   "new",
 		Products: orderProducts,
 	}
 

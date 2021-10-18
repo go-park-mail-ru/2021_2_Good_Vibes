@@ -80,4 +80,3 @@ func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, product)
 }
-

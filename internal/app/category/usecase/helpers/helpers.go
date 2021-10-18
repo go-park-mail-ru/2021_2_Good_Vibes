@@ -2,12 +2,12 @@ package helpers
 
 import "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 
-func ParseCategories(nestingCategories []models.NestingCategory) models.CategoryNode{
+func ParseCategories(nestingCategories []models.NestingCategory) models.CategoryNode {
 	if nestingCategories == nil {
 		return models.CategoryNode{}
 	}
 
-	rootNode := models.CategoryNode {
+	rootNode := models.CategoryNode{
 		Name:    nestingCategories[0].Name,
 		Nesting: nestingCategories[0].Nesting,
 	}
@@ -17,34 +17,34 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 	currentNode := rootNode
 
 	for i := 1; i < len(nestingCategories); i++ {
-		if nestingCategories[i].Nesting > nestingCategories[i - 1].Nesting {
-			currentNode = models.CategoryNode {
-				Name: nestingCategories[i].Name,
-				Nesting: nestingCategories[i].Nesting,
+		if nestingCategories[i].Nesting > nestingCategories[i-1].Nesting {
+			currentNode = models.CategoryNode{
+				Name:     nestingCategories[i].Name,
+				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}
 			nodeSlice = append(nodeSlice, currentNode)
-		}  else if nestingCategories[i].Nesting == nestingCategories[i - 1].Nesting {
-			currentNode = models.CategoryNode {
-				Name: nestingCategories[i].Name,
-				Nesting: nestingCategories[i].Nesting,
+		} else if nestingCategories[i].Nesting == nestingCategories[i-1].Nesting {
+			currentNode = models.CategoryNode{
+				Name:     nestingCategories[i].Name,
+				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}
-			nodeSlice[len(nodeSlice) - 2].Children = append(nodeSlice[len(nodeSlice) - 2].Children, nodeSlice[len(nodeSlice) - 1])
+			nodeSlice[len(nodeSlice)-2].Children = append(nodeSlice[len(nodeSlice)-2].Children, nodeSlice[len(nodeSlice)-1])
 			nodeSlice = nodeSlice[:(len(nodeSlice) - 1)]
 			nodeSlice = append(nodeSlice, currentNode)
-		} else if nestingCategories[i].Nesting < nestingCategories[i - 1].Nesting {
-			diff := nestingCategories[i - 1].Nesting - nestingCategories[i].Nesting
+		} else if nestingCategories[i].Nesting < nestingCategories[i-1].Nesting {
+			diff := nestingCategories[i-1].Nesting - nestingCategories[i].Nesting
 
-			currentNode = models.CategoryNode {
-				Name: nestingCategories[i].Name,
-				Nesting: nestingCategories[i].Nesting,
+			currentNode = models.CategoryNode{
+				Name:     nestingCategories[i].Name,
+				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}
-			for i := 0; i < diff + 1; i++ {
-				nodeSlice[len(nodeSlice) - i - 2].Children = append(nodeSlice[len(nodeSlice) - i - 2].Children, nodeSlice[len(nodeSlice) - i - 1])
+			for i := 0; i < diff+1; i++ {
+				nodeSlice[len(nodeSlice)-i-2].Children = append(nodeSlice[len(nodeSlice)-i-2].Children, nodeSlice[len(nodeSlice)-i-1])
 			}
-			for i := 0; i < diff + 1; i++ {
+			for i := 0; i < diff+1; i++ {
 				nodeSlice = nodeSlice[:(len(nodeSlice) - 1)]
 			}
 			nodeSlice = append(nodeSlice, currentNode)

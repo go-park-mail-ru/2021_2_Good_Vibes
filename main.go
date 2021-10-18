@@ -39,13 +39,12 @@ import (
 )
 
 var (
-	router      = echo.New()
-	storage     user.Repository
-	storageProd product.Repository
-	storageOrder order.Repository
-	storageBasket basket.Repository
+	router          = echo.New()
+	storage         user.Repository
+	storageProd     product.Repository
+	storageOrder    order.Repository
+	storageBasket   basket.Repository
 	storageCategory category.Repository
-
 )
 
 func main() {
@@ -91,7 +90,6 @@ func main() {
 	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
 	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc)
 
-
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
 	if err != nil {
 		panic(err)
@@ -99,11 +97,9 @@ func main() {
 
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
-
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
 
 	userHandler := http2.NewLoginHandler(userUс)
-
 
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
 
@@ -111,9 +107,9 @@ func main() {
 
 	serverRouting := configRouting.ServerConfigRouting{
 		ProductHandler: productHandler,
-		UserHandler: userHandler,
-		OrderHandler: orderHandler,
-		BasketHandler: basketHandler,
+		UserHandler:    userHandler,
+		OrderHandler:   orderHandler,
+		BasketHandler:  basketHandler,
 
 		CategoryHandler: categoryHandler,
 	}
