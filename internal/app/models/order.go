@@ -8,7 +8,7 @@ type OrderProducts struct {
 
 type Order struct {
 	OrderId int `json:"order_id,omitempty"`
-	UserId    int  `json:"user_id"`
+	UserId    int  `json:"user_id,omitempty"`
 	Date     string  `json:"date"`
 	Address string `json:"address"`
 	Cost   float32 `json:"cost"`

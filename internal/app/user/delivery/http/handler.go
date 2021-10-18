@@ -114,7 +114,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
 		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
+		// Secure:   true,
 	}
 
 	ctx.SetCookie(cookie)

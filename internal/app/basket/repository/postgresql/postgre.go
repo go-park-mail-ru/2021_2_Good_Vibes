@@ -31,7 +31,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 		}
 
 		_, err = tx.Exec(
-			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3)",
+			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3) on conflict(user_id,product_id) do update set count=$3",
 			basketProduct.UserId,
 			basketProduct.ProductId,
 			basketProduct.Number,
@@ -88,13 +88,14 @@ func (sb *BasketRepository) DeleteProduct(product models.BasketProduct) error {
 
 		defer rows.Close()
 		if !rows.Next() {
-			if rows.Err() != nil {
-				return rows.Err()
-			}
 			_, err := tx.Exec(`delete from basket where user_id=$1`, product.UserId)
 			if err != nil {
 				return err
 			}
+		}
+
+		if rows.Err() != nil {
+			return rows.Err()
 		}
 
 		return nil

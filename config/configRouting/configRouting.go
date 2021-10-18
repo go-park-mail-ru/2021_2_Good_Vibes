@@ -25,10 +25,10 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
-	router.POST("/order/confirm", cr.OrderHandler.PutOrder)
-	router.POST("/order/basket/put", cr.BasketHandler.PutInBasket)
-	router.POST("/order/basket/drop", cr.BasketHandler.DropBasket)
-	router.POST("/order/basket/delete", cr.BasketHandler.DeleteProduct)
+	router.POST("/cart/confirm", cr.OrderHandler.PutOrder, middlewareAut.IsLogin)
+	router.POST("/cart/put", cr.BasketHandler.PutInBasket, middlewareAut.IsLogin)
+	router.POST("/cart/drop", cr.BasketHandler.DropBasket, middlewareAut.IsLogin)
+	router.POST("/cart/delete", cr.BasketHandler.DeleteProduct, middlewareAut.IsLogin)
 }
 
 //пока просто для проверки middleware
