@@ -3,6 +3,7 @@ package main
 //тут надо какой-то порядок с неймингами навести
 import (
 	"database/sql"
+	"fmt"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
@@ -53,7 +54,11 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
-	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
+
+	os.Setenv("DATABASE_URL", fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.Password,
+		configApp.ConfigApp.DataBase.Host, configApp.ConfigApp.DataBase.Port,
+		configApp.ConfigApp.DataBase.DBName))
 
 	//storage, err = impl.NewStorageUserDB(GetPostgres())
 	storage, err = postgresql.NewStorageUserDB(GetPostgres())
@@ -116,13 +121,16 @@ func main() {
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
 
-	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
+	if err := router.Start(configApp.ConfigApp.MainConfig.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 }
 
 func GetPostgres() (*sql.DB, error) {
-	dsn := "user=bush dbname=ozon password=sergeykust000 host=127.0.0.1 port=5432 sslmode=disable"
+	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
+		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.DBName,
+		configApp.ConfigApp.DataBase.Password, configApp.ConfigApp.DataBase.Host,
+		configApp.ConfigApp.DataBase.Port)
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err

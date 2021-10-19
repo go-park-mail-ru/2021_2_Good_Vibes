@@ -12,5 +12,5 @@ func GetToken(id int, name string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = strconv.Itoa(id)
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	return token.SignedString([]byte(config.ConfigApp.SecretKey))
+	return token.SignedString([]byte(config.ConfigApp.MainConfig.SecretKey))
 }

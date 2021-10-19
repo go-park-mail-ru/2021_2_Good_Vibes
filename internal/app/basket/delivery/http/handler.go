@@ -59,7 +59,7 @@ func (bh *BasketHandler) GetBasket(ctx echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 	stringId := claims["id"].(string)
 
-	userId, err := strconv.ParseInt(stringId, 10,64)
+	userId, err := strconv.ParseInt(stringId, 10, 64)
 
 	user.UserId = int(userId)
 	if err != nil {
@@ -84,7 +84,7 @@ func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 	stringId := claims["id"].(string)
 
-	userId, err := strconv.ParseInt(stringId, 10,64)
+	userId, err := strconv.ParseInt(stringId, 10, 64)
 
 	user.UserId = int(userId)
 	if err != nil {
@@ -117,7 +117,7 @@ func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
 	claims := token.Claims.(jwt.MapClaims)
 	stringId := claims["id"].(string)
 
-	userId, err := strconv.ParseInt(stringId, 10,64)
+	userId, err := strconv.ParseInt(stringId, 10, 64)
 
 	product.UserId = int(userId)
 	if err != nil {
