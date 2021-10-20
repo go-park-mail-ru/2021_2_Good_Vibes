@@ -20,7 +20,7 @@ func NewStorageProductsDB(db *sql.DB, err error) (*StorageProductsDB, error) {
 }
 
 func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
-	rows, err := ph.db.Query("select id, name, category_id from products")
+	rows, err := ph.db.Query("select id, image, name, price, rating, category_id from products")
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		product := models.Product{}
-		err = rows.Scan(&product.Id, &product.Name, &product.Category)
+		err = rows.Scan(&product.Id, &product.Image, &product.Name,  &product.Price, &product.Rating, &product.Category)
 		if err != nil {
 			return nil, err
 		}
@@ -44,9 +44,9 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 	product := models.Product{}
 
-	row := ph.db.QueryRow("select id, name, category_id from products where id=$1", id)
+	row := ph.db.QueryRow("select id, image, name, price, rating, category_id from products where id=$1", id)
 
-	err := row.Scan(&product.Id, &product.Name, &product.Category)
+	err := row.Scan(&product.Id, &product.Image, &product.Name,  &product.Price, &product.Rating, &product.Category)
 	if err == sql.ErrNoRows {
 		return models.Product{}, nil
 	}

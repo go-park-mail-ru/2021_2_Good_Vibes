@@ -134,3 +134,6 @@ func GetPostgres() (*sql.DB, error) {
 	db.SetMaxOpenConns(10)
 	return db, nil
 }
+
+
+

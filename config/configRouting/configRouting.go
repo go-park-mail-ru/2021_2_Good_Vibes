@@ -23,7 +23,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.Static("/", "static")
 	router.POST("/login", cr.UserHandler.Login)
 	router.POST("/signup", cr.UserHandler.SignUp)
-	router.GET("/myprofile", cr.UserHandler.Profile, middlewareAut.IsLogin)
+	router.GET("/profile", cr.UserHandler.Profile, middlewareAut.IsLogin)
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
