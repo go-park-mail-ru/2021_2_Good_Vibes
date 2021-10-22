@@ -6,11 +6,11 @@ import (
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
-
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/repository/postgresql"
@@ -22,8 +22,6 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
 	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
-	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 
 	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
@@ -54,6 +52,8 @@ func main() {
 		log.Fatal("cannot load config", err)
 	}
 	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
+	os.Setenv("AWS_ACCESS_KEY", configApp.ConfigApp.AwsAccessKey)
+	os.Setenv("AWS_SECRET_KEY", configApp.ConfigApp.AwsSecretKey)
 
 	//storage, err = impl.NewStorageUserDB(GetPostgres())
 	storage, err = postgresql.NewStorageUserDB(GetPostgres())
@@ -69,15 +69,15 @@ func main() {
 	}
 	productUc := productUseCase.NewProductUsecase(storageProd)
 
-	productUc.AddProduct(models.Product{Id: 1, Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN"})
-	productUc.AddProduct(models.Product{2, "images/phone2.png", "Смартфон", 10000, 2.5, "PHONES"})
-	productUc.AddProduct(models.Product{3, "images/shirt1.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
-	productUc.AddProduct(models.Product{4, "images/smartphone.png", "Смартфон чёрный цвет", 10000, 2.5, "PHONES"})
-	productUc.AddProduct(models.Product{5, "images/shirt4.png", "Кофта мужская", 10000, 2.5, "CLOTHES_UP_MEN"})
-	productUc.AddProduct(models.Product{6, "images/shoe5.png", "Кеды adidas желтые", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
-	productUc.AddProduct(models.Product{7, "images/phone3.png", "Смартфон поддержанный", 10000, 2.5, "PHONES"})
-	productUc.AddProduct(models.Product{8, "images/shoe1.png", "Кроссовки adidas красные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
-	productUc.AddProduct(models.Product{9, "images/shoe3.png", "Кроссовки adidas черные", 10000, 2.5, "SNICKERS_ADIDAS_MEN"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые adidas кроссовки"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой новый смартфон"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Крутая мужская кофта"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон чёрный цвет", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой черный смартфон"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Супер крутая красный смартфон"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кеды adidas желтые", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые желтые кроссовки"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон поддержанный", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой поддержанный смартфон"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas красные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые красные кроссовки"})
+	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas черные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые черные кроссовкин"})
 
 	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
 	if err != nil {

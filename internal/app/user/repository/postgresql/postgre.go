@@ -21,7 +21,7 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 
 func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT * FROM customers WHERE name=$1", name)
+	row := su.db.QueryRow("SELECT id, name, email, password FROM customers WHERE name=$1", name)
 
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
 	if err == sql.ErrNoRows {
@@ -52,7 +52,7 @@ func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) 
 
 func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT * FROM customers WHERE id=$1", id)
+	row := su.db.QueryRow("SELECT id, name, email, password FROM customers WHERE id=$1", id)
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
 
 	if err == sql.ErrNoRows {
@@ -64,4 +64,12 @@ func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, er
 	}
 
 	return &tmp, nil
+}
+
+func (su *StorageUserDB) SaveAvatarName(userId int, fileName string)  error {
+	_, err := su.db.Exec(`UPDATE customers SET avatar = $2 WHERE id = $1`, userId, fileName)
+	if err != nil {
+		return err
+	}
+	return nil
 }

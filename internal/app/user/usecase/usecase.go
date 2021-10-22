@@ -4,6 +4,7 @@ import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	guuid "github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -56,4 +57,17 @@ func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 
 func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error) {
 	return us.repository.GetUserDataById(id)
+}
+
+func (us *usecase) GenerateAvatarName() string {
+	return guuid.New().String()
+}
+
+func (us* usecase) SaveAvatarName(userId int,fileName string)  error {
+	err := us.repository.SaveAvatarName(userId, fileName)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

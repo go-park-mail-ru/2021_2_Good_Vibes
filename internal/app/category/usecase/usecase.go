@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase/helpers"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
@@ -32,6 +33,7 @@ func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {
 	if err != nil {
 		return models.CategoryNode{}, err
 	}
+	fmt.Println(nestingCategories)
 
 	node := helpers.ParseCategories(nestingCategories)
 

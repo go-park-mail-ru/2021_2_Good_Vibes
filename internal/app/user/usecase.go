@@ -8,4 +8,6 @@ type Usecase interface {
 	CheckPassword(user models.UserDataForInput) (int, error)
 	GetUserDataByID(id uint64) (*models.UserDataStorage, error)
 	AddUser(newUser models.UserDataForReg) (int, error)
+	GenerateAvatarName() string
+	SaveAvatarName(userId int,fileName string) error
 }
