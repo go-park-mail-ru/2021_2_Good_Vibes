@@ -1,6 +1,8 @@
 package helpers
 
-import "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+import (
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+)
 
 func ParseCategories(nestingCategories []models.NestingCategory) models.CategoryNode {
 	if nestingCategories == nil {
@@ -48,6 +50,12 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 				nodeSlice = nodeSlice[:(len(nodeSlice) - 1)]
 			}
 			nodeSlice = append(nodeSlice, currentNode)
+		}
+
+		if i == len(nestingCategories) - 1 {
+			for i := 0; i < len(nodeSlice) - 1; i++ {
+				nodeSlice[len(nodeSlice) - i - 2].Children = append(nodeSlice[len(nodeSlice) - i - 2].Children, nodeSlice[len(nodeSlice) - i - 1])
+			}
 		}
 	}
 	return nodeSlice[0]
