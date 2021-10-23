@@ -7,5 +7,5 @@ type Repository interface {
 	GetAll() ([]models.Product, error)
 	GetById(id int) (models.Product, error)
 	GetByCategory(category string) ([]models.Product, error)
-	SaveProductImageName(productId int,fileName string) error
+	SaveProductImageName(productId int, fileName string) error
 }

@@ -52,9 +52,9 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 			nodeSlice = append(nodeSlice, currentNode)
 		}
 
-		if i == len(nestingCategories) - 1 {
-			for i := 0; i < len(nodeSlice) - 1; i++ {
-				nodeSlice[len(nodeSlice) - i - 2].Children = append(nodeSlice[len(nodeSlice) - i - 2].Children, nodeSlice[len(nodeSlice) - i - 1])
+		if i == len(nestingCategories)-1 {
+			for i := 0; i < len(nodeSlice)-1; i++ {
+				nodeSlice[len(nodeSlice)-i-2].Children = append(nodeSlice[len(nodeSlice)-i-2].Children, nodeSlice[len(nodeSlice)-i-1])
 			}
 		}
 	}

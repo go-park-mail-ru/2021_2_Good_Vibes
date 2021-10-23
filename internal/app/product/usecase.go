@@ -9,5 +9,5 @@ type UseCase interface {
 	// GetProductsOnPage(page int) ([]product.Product, error)
 	GetProductById(id int) (models.Product, error)
 	GenerateProductImageName() string
-	SaveProductImageName(productId int,fileName string) error
+	SaveProductImageName(productId int, fileName string) error
 }

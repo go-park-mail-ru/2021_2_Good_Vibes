@@ -63,7 +63,7 @@ func (l *Logger) LogTraceDebug(requestId_ string, msg string) {
 }
 
 func (l *Logger) LogAccessLog(requestId_ string, method string, remoteAddress string,
-	workTime string, requestURI string)  {
+	workTime string, requestURI string) {
 	CustomLogger.LogrusLoggerAccess.WithFields(logrus.Fields{
 		RequestId:     requestId_,
 		Method:        method,

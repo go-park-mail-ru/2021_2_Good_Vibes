@@ -40,5 +40,3 @@ func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {
 func (uc *UseCase) CreateCategory(categoryName string, parentCategoryName string) error {
 	return uc.repositoryCategory.CreateCategory(categoryName, parentCategoryName)
 }
-
-

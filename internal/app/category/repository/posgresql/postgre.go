@@ -6,8 +6,8 @@ import (
 )
 
 type NestedListCategory struct {
-	Name string
-	LeftBoundary int
+	Name          string
+	LeftBoundary  int
 	RightBoundary int
 }
 
@@ -121,4 +121,3 @@ func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx.Commit()
 	return nil
 }
-

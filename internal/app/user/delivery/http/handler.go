@@ -56,13 +56,13 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 
 	if id == errors.NO_USER_ERROR {
 		newLoginError := errors.NewError(errors.NO_USER_ERROR, errors.NO_USER_DESCR)
-		logger.Debug(trace+" No user: "+newUserDataForInput.Name)
+		logger.Debug(trace + " No user: " + newUserDataForInput.Name)
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
 	if id == errors.WRONG_PASSWORD_ERROR {
 		newLoginError := errors.NewError(errors.WRONG_PASSWORD_ERROR, errors.WRONG_PASSWORD_DESCR)
-		logger.Debug(trace+" Wrong password for user: "+newUserDataForInput.Name)
+		logger.Debug(trace + " Wrong password for user: " + newUserDataForInput.Name)
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
@@ -75,7 +75,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 
 	handler.setCookieValue(ctx, claimsString)
 	newUserDataForInput.Password = ""
-	logger.Trace(trace+"ok login for user: "+newUserDataForInput.Name)
+	logger.Trace(trace + "ok login for user: " + newUserDataForInput.Name)
 	return ctx.JSON(http.StatusOK, newUserDataForInput)
 }
 
@@ -105,7 +105,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 
 	if newId == errors.USER_EXISTS_ERROR {
 		newSignupError := errors.NewError(errors.USER_EXISTS_ERROR, errors.USER_EXISTS_DESCR)
-		logger.Debug(trace+" User Already exist: "+newUser.Name)
+		logger.Debug(trace + " User Already exist: " + newUser.Name)
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
@@ -119,7 +119,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	handler.setCookieValue(ctx, claimsString)
 	newUser.Password = ""
 
-	logger.Trace(trace+"ok signup for user: "+newUser.Name)
+	logger.Trace(trace + "ok signup for user: " + newUser.Name)
 	return ctx.JSON(http.StatusOK, newUser)
 }
 

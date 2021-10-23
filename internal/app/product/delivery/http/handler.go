@@ -6,9 +6,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	"github.com/sirupsen/logrus"
 
 	"github.com/labstack/echo/v4"
@@ -27,6 +27,7 @@ func NewProductHandler(useCase product.UseCase) *ProductHandler {
 }
 
 const trace = "ProductHandler"
+
 //это должно быть, пока не нужно
 /*
 func addProduct(ctx echo.Context) error {

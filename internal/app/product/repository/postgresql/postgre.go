@@ -28,7 +28,7 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		product := models.Product{}
-		err = rows.Scan(&product.Id, &product.Image, &product.Name,  &product.Price, &product.Rating, &product.Category)
+		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category)
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +46,7 @@ func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 
 	row := ph.db.QueryRow("select id, image, name, price, rating, category_id, count_in_stock, description from products where id=$1", id)
 
-	err := row.Scan(&product.Id, &product.Image, &product.Name,  &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+	err := row.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
 	if err == sql.ErrNoRows {
 		return models.Product{}, nil
 	}
@@ -109,7 +109,7 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 	return int(lastInsertId), nil
 }
 
-func (ph *StorageProductsDB) SaveProductImageName(productId int,fileName string) error {
+func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
 	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
 	if err != nil {
 		return err

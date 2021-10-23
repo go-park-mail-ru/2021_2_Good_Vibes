@@ -66,7 +66,7 @@ func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, er
 	return &tmp, nil
 }
 
-func (su *StorageUserDB) SaveAvatarName(userId int, fileName string)  error {
+func (su *StorageUserDB) SaveAvatarName(userId int, fileName string) error {
 	_, err := su.db.Exec(`UPDATE customers SET avatar = $2 WHERE id = $1`, userId, fileName)
 	if err != nil {
 		return err

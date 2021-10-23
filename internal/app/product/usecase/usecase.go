@@ -28,11 +28,11 @@ func (uc *UseCase) GetProductById(id int) (models.Product, error) {
 	return uc.repository.GetById(id)
 }
 
-func (uc *UseCase) GenerateProductImageName() string{
+func (uc *UseCase) GenerateProductImageName() string {
 	return guuid.New().String()
 }
 
-func (uc*UseCase) SaveProductImageName(productId int,fileName string) error{
+func (uc *UseCase) SaveProductImageName(productId int, fileName string) error {
 	err := uc.repository.SaveProductImageName(productId, fileName)
 	if err != nil {
 		return err

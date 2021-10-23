@@ -63,7 +63,7 @@ func (us *usecase) GenerateAvatarName() string {
 	return guuid.New().String()
 }
 
-func (us* usecase) SaveAvatarName(userId int,fileName string)  error {
+func (us *usecase) SaveAvatarName(userId int, fileName string) error {
 	err := us.repository.SaveAvatarName(userId, fileName)
 	if err != nil {
 		return err
