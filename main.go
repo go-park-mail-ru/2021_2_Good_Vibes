@@ -19,6 +19,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
@@ -37,7 +38,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 )
 
 var (
@@ -50,6 +50,7 @@ var (
 )
 
 func main() {
+	logger.InitLogger()
 	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
@@ -106,10 +107,10 @@ func main() {
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
 	serverRouting := configRouting.ServerConfigRouting{
-		ProductHandler: productHandler,
-		UserHandler:    userHandler,
-		OrderHandler:   orderHandler,
-		BasketHandler:  basketHandler,
+		ProductHandler:  productHandler,
+		UserHandler:     userHandler,
+		OrderHandler:    orderHandler,
+		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
 	}
 	serverRouting.ConfigRouting(router)

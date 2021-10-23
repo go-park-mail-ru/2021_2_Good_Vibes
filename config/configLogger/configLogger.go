@@ -1,5 +1,0 @@
-package configLogger
-
-func ConfigLogger() {
-
-}
