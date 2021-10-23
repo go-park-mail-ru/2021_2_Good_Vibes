@@ -1,0 +1,5 @@
+package configLogger
+
+func ConfigLogger() {
+
+}

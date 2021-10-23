@@ -8,8 +8,6 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configMiddleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
-	"github.com/labstack/echo/v4/middleware"
-
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
@@ -39,6 +37,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 )
 
 var (
@@ -51,7 +50,6 @@ var (
 )
 
 func main() {
-
 	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
@@ -62,14 +60,12 @@ func main() {
 		configApp.ConfigApp.DataBase.Host, configApp.ConfigApp.DataBase.Port,
 		configApp.ConfigApp.DataBase.DBName))
 
-	//storage, err = impl.NewStorageUserDB(GetPostgres())
 	storage, err = postgresql.NewStorageUserDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
 	userUс := userUsecase.NewUsecase(storage)
 
-	//storageProd, err = storage_prod_impl.NewStorageProductsDB(GetPostgres())
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
@@ -105,11 +101,8 @@ func main() {
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
-
 	userHandler := http2.NewLoginHandler(userUс)
-
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
-
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
 	serverRouting := configRouting.ServerConfigRouting{
@@ -117,19 +110,10 @@ func main() {
 		UserHandler:    userHandler,
 		OrderHandler:   orderHandler,
 		BasketHandler:  basketHandler,
-
 		CategoryHandler: categoryHandler,
 	}
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
-
-	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://dreamy-yonath-26f2eb.netlify.app"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-		ExposeHeaders: []string{"Authorization"},
-		AllowCredentials: true,
-	}))
 
 	configMiddleware.ConfigMiddleware(router)
 	if err := router.Start(configApp.ConfigApp.MainConfig.ServerAddress); err != http.ErrServerClosed {
