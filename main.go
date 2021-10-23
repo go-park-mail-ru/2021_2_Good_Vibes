@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configMiddleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
@@ -121,6 +123,15 @@ func main() {
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
 
+	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"https://dreamy-yonath-26f2eb.netlify.app"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		ExposeHeaders: []string{"Authorization"},
+		AllowCredentials: true,
+	}))
+
+	configMiddleware.ConfigMiddleware(router)
 	if err := router.Start(configApp.ConfigApp.MainConfig.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
