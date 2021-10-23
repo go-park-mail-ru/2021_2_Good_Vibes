@@ -8,7 +8,6 @@ import (
 
 type Logger struct {
 	LogrusLoggerAccess  *logrus.Logger
-	LogrusLoggerError   *logrus.Logger
 	LogrusLoggerHandler *logrus.Logger
 }
 
@@ -34,16 +33,6 @@ func InitLogger() {
 		},
 	}
 
-	CustomLogger.LogrusLoggerError = &logrus.Logger{
-		Out:   os.Stderr,
-		Level: logrus.DebugLevel,
-		Formatter: &easy.Formatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-			LogFormat: "[%lvl%] [%request_id%] %time%:" +
-				" error - %msg%\n",
-		},
-	}
-
 	CustomLogger.LogrusLoggerHandler = &logrus.Logger{
 		Out:   os.Stderr,
 		Level: logrus.TraceLevel,
@@ -56,7 +45,7 @@ func InitLogger() {
 }
 
 func (l *Logger) LogErrorInfo(requestId_ string, err string) {
-	l.LogrusLoggerError.WithFields(logrus.Fields{
+	l.LogrusLoggerHandler.WithFields(logrus.Fields{
 		RequestId: requestId_,
 	}).Error(err)
 }
