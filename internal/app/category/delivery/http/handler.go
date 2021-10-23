@@ -47,3 +47,31 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, products)
 }
+
+func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
+	var newCategory models.CreateCategory
+
+	if err := ctx.Bind(&newCategory); err != nil {
+		newSignupError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
+	}
+
+	if err := ctx.Validate(&newCategory); err != nil {
+		newSignupError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newSignupError)
+	}
+
+	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
+	if err != nil {
+		return err
+	}
+
+	categories, err := ch.useCase.GetAllCategories()
+	if err != nil {
+		return err
+	}
+
+	AllCategoriesJson = categories
+
+	return ctx.JSON(http.StatusOK, categories)
+}

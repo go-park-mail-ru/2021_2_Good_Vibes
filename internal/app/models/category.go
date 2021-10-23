@@ -15,3 +15,8 @@ type CategoryNode struct {
 	Nesting  int            `json:"-"`
 	Children []CategoryNode `json:"children,omitempty"`
 }
+
+type CreateCategory struct {
+	Category string `json:"category"`
+	ParentCategory string `json:"parent_category"`
+}

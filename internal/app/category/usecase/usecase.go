@@ -36,3 +36,9 @@ func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {
 	node := helpers.ParseCategories(nestingCategories)
 	return node, nil
 }
+
+func (uc *UseCase) CreateCategory(categoryName string, parentCategoryName string) error {
+	return uc.repositoryCategory.CreateCategory(categoryName, parentCategoryName)
+}
+
+
