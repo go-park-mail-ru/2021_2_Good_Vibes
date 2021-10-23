@@ -3,7 +3,9 @@ package main
 //тут надо какой-то порядок с неймингами навести
 import (
 	"database/sql"
+	"fmt"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configMiddleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
@@ -18,6 +20,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
@@ -46,23 +49,25 @@ var (
 )
 
 func main() {
-
+	logger.InitLogger()
 	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
-	os.Setenv("DATABASE_URL", configApp.ConfigApp.DataBaseURL)
+
 	os.Setenv("AWS_ACCESS_KEY", configApp.ConfigApp.AwsAccessKey)
 	os.Setenv("AWS_SECRET_KEY", configApp.ConfigApp.AwsSecretKey)
+	os.Setenv("DATABASE_URL", fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.Password,
+		configApp.ConfigApp.DataBase.Host, configApp.ConfigApp.DataBase.Port,
+		configApp.ConfigApp.DataBase.DBName))
 
-	//storage, err = impl.NewStorageUserDB(GetPostgres())
 	storage, err = postgresql.NewStorageUserDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
 	userUс := userUsecase.NewUsecase(storage)
 
-	//storageProd, err = storage_prod_impl.NewStorageProductsDB(GetPostgres())
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
@@ -98,31 +103,31 @@ func main() {
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
-
 	userHandler := http2.NewLoginHandler(userUс)
-
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
-
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
 	serverRouting := configRouting.ServerConfigRouting{
-		ProductHandler: productHandler,
-		UserHandler:    userHandler,
-		OrderHandler:   orderHandler,
-		BasketHandler:  basketHandler,
-
+		ProductHandler:  productHandler,
+		UserHandler:     userHandler,
+		OrderHandler:    orderHandler,
+		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
 	}
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
 
-	if err := router.Start(configApp.ConfigApp.ServerAddress); err != http.ErrServerClosed {
+	configMiddleware.ConfigMiddleware(router)
+	if err := router.Start(configApp.ConfigApp.MainConfig.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 }
 
 func GetPostgres() (*sql.DB, error) {
-	dsn := "user=bush dbname=ozon password=sergeykust000 host=127.0.0.1 port=5432 sslmode=disable"
+	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
+		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.DBName,
+		configApp.ConfigApp.DataBase.Password, configApp.ConfigApp.DataBase.Host,
+		configApp.ConfigApp.DataBase.Port)
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err

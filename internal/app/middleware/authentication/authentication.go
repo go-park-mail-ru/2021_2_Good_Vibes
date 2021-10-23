@@ -19,7 +19,7 @@ func IsLogin(next echo.HandlerFunc) echo.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signin method")
 			}
-			return []byte(config.ConfigApp.SecretKey), nil
+			return []byte(config.ConfigApp.MainConfig.SecretKey), nil
 		})
 
 		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

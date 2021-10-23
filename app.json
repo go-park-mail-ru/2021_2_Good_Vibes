@@ -1,7 +1,19 @@
 {
   "SECRET_KEY" : "QWEWERTRWEGFDSGDFS",
   "ADDRESS_SERVER" : "127.0.0.1: 8080",
-  "DATABASE_URL" : "postgres://lida:123@localhost:5432/mydb",
   "AWS_ACCESS_KEY":"AKIAXHERTFSOBA323S7M",
-  "AWS_SECRET_KEY":"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"
+  "AWS_SECRET_KEY":"hbcCH/5ppKby83CNfG34ENf97II1YzmU2Qc48Z1T",
+
+  "MAIN_CONFIG": {
+    "SECRET_KEY": "QWEWERTRWEGFDSGDFS",
+    "ADDRESS_SERVER": "127.0.0.1: 8080"
+  },
+
+  "DATA_BASE_CONFIG": {
+    "USER" : "lida",
+    "DBNAME" : "mydb",
+    "PASSWORD" : "123",
+    "HOST" : "localhost",
+    "PORT" : "5432"
+  }
 }
