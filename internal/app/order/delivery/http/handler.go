@@ -3,11 +3,10 @@ package http
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
+	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -25,7 +24,7 @@ func NewOrderHandler(useCase order.UseCase) *OrderHandler {
 const trace = "OrderHandler"
 
 func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " PutOrder")
 
 	var newOrder models.Order

@@ -6,11 +6,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-	"github.com/sirupsen/logrus"
-
+	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -59,7 +57,7 @@ func (ph *ProductHandler) AddProduct(ctx echo.Context) error {
 }
 
 func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetAllProducts")
 
 	answer, err := ph.useCase.GetAllProducts()
@@ -72,7 +70,7 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 }
 
 func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetProductById")
 
 	val := ctx.QueryParams()

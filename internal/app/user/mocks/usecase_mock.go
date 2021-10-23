@@ -64,6 +64,20 @@ func (mr *MockUsecaseMockRecorder) CheckPassword(user interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckPassword", reflect.TypeOf((*MockUsecase)(nil).CheckPassword), user)
 }
 
+// GenerateAvatarName mocks base method.
+func (m *MockUsecase) GenerateAvatarName() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateAvatarName")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GenerateAvatarName indicates an expected call of GenerateAvatarName.
+func (mr *MockUsecaseMockRecorder) GenerateAvatarName() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateAvatarName", reflect.TypeOf((*MockUsecase)(nil).GenerateAvatarName))
+}
+
 // GetUserDataByID mocks base method.
 func (m *MockUsecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error) {
 	m.ctrl.T.Helper()
@@ -77,4 +91,18 @@ func (m *MockUsecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error
 func (mr *MockUsecaseMockRecorder) GetUserDataByID(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserDataByID", reflect.TypeOf((*MockUsecase)(nil).GetUserDataByID), id)
+}
+
+// SaveAvatarName mocks base method.
+func (m *MockUsecase) SaveAvatarName(userId int, fileName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveAvatarName", userId, fileName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveAvatarName indicates an expected call of SaveAvatarName.
+func (mr *MockUsecaseMockRecorder) SaveAvatarName(userId, fileName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAvatarName", reflect.TypeOf((*MockUsecase)(nil).SaveAvatarName), userId, fileName)
 }

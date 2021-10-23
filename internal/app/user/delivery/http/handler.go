@@ -2,17 +2,17 @@ package http
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/dgrijalva/jwt-go"
 	errors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
+	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,7 +31,7 @@ func NewLoginHandler(storageUser user.Usecase) *UserHandler {
 const trace = "UserHandler"
 
 func (handler *UserHandler) Login(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Login")
 
 	var newUserDataForInput models.UserDataForInput
@@ -80,7 +80,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".SignUp")
 
 	var newUser models.UserDataForReg
@@ -95,6 +95,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
+	fmt.Println("ya tyt bil")
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
@@ -115,10 +116,9 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, newSignupError)
 	}
-
 	handler.setCookieValue(ctx, claimsString)
-	newUser.Password = ""
 
+	newUser.Password = ""
 	logger.Trace(trace + "ok signup for user: " + newUser.Name)
 	return ctx.JSON(http.StatusOK, newUser)
 }
@@ -179,7 +179,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) Profile(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Profile")
 
 	token := ctx.Get("token").(*jwt.Token)
@@ -202,7 +202,7 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) Logout(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Logout")
 
 	cookie := &http.Cookie{
@@ -217,7 +217,7 @@ func (handler *UserHandler) Logout(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".setCookieValue")
 
 	cookie := &http.Cookie{

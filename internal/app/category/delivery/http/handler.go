@@ -3,10 +3,9 @@ package http
 import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -25,7 +24,7 @@ func NewCategoryHandler(useCase category.UseCase) *CategoryHandler {
 const trace = "CategoryHandler"
 
 func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
-	logger := ctx.Get(middlewareLogger.LoggerFieldName).(*logrus.Entry)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
 	val := ctx.QueryParams()

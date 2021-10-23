@@ -23,7 +23,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.41.8
+	github.com/aws/aws-sdk-go v1.41.9
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

@@ -12,6 +12,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/magiconair/properties/assert"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -141,11 +143,12 @@ func TestUserHandler_SignUp(t *testing.T) {
 			val.RegisterValidation("customPassword", validator2.Password)
 			router.Validator = &validator2.CustomValidator{Validator: val}
 
-			recorder := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/signup",
 				bytes.NewBufferString(string(testCase.inputBody)))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
 			router.ServeHTTP(recorder, req)
 
 			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)

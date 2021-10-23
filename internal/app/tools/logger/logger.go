@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/t-tomalak/logrus-easy-formatter"
 	"os"
@@ -18,6 +19,7 @@ const (
 	Method        = "method"
 	WorkTime      = "work_time"
 	RemoteAddress = "remote_address"
+	BadRequestId  = "-1"
 )
 
 func InitLogger() {
@@ -50,18 +52,6 @@ func (l *Logger) LogErrorInfo(requestId_ string, err string) {
 	}).Error(err)
 }
 
-func (l *Logger) LogTrace(requestId_ string, trace string) {
-	l.LogrusLoggerHandler.WithFields(logrus.Fields{
-		RequestId: requestId_,
-	}).Trace(trace)
-}
-
-func (l *Logger) LogTraceDebug(requestId_ string, msg string) {
-	l.LogrusLoggerHandler.WithFields(logrus.Fields{
-		RequestId: requestId_,
-	}).Debug(msg)
-}
-
 func (l *Logger) LogAccessLog(requestId_ string, method string, remoteAddress string,
 	workTime string, requestURI string) {
 	CustomLogger.LogrusLoggerAccess.WithFields(logrus.Fields{
@@ -70,4 +60,12 @@ func (l *Logger) LogAccessLog(requestId_ string, method string, remoteAddress st
 		RemoteAddress: remoteAddress,
 		WorkTime:      workTime,
 	}).Info(requestURI)
+}
+
+func TryGetLoggerFromContext(ctx echo.Context) *logrus.Entry {
+	logger, ok := ctx.Get("logger").(*logrus.Entry)
+	if !ok {
+		logger = logrus.WithField("req_id", "2299")
+	}
+	return logger
 }
