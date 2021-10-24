@@ -367,8 +367,8 @@ func TestUserHandler_Profile(t *testing.T) {
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
 
 	testTable := []struct {
-		name string
-		inputUser models.UserDataProfile
+		name                string
+		inputUser           models.UserDataProfile
 		mockBehaviorUseCase mockBehaviorUseCase
 		mockBehaviorSession mockBehaviorSession
 		expectedStatusCode  int
@@ -377,7 +377,7 @@ func TestUserHandler_Profile(t *testing.T) {
 		{
 			name: "OK",
 			inputUser: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, id uint64) {
@@ -387,13 +387,13 @@ func TestUserHandler_Profile(t *testing.T) {
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
 			},
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(user1get) + "\n",
 		},
 		{
 			name: "Token Error",
 			inputUser: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, id uint64) {
@@ -401,13 +401,13 @@ func TestUserHandler_Profile(t *testing.T) {
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), errors.New(customErrors.TOKEN_ERROR_DESCR))
 			},
-			expectedStatusCode: http.StatusUnauthorized,
+			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(error2get) + "\n",
 		},
 		{
 			name: "Token Error",
 			inputUser: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, id uint64) {
@@ -417,7 +417,7 @@ func TestUserHandler_Profile(t *testing.T) {
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
 			},
-			expectedStatusCode: http.StatusUnauthorized,
+			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(error3get) + "\n",
 		},
 	}

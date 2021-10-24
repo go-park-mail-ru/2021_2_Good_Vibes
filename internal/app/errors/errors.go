@@ -3,7 +3,7 @@ package errors
 const (
 	BIND_ERROR           = -20
 	VALIDATION_ERROR     = -21
-	TOKEN_ERROR          = -22
+	TOKEN_ERROR          = 0
 	NO_USER_ERROR        = -30
 	USER_EXISTS_ERROR    = -32
 	WRONG_PASSWORD_ERROR = -33
@@ -19,7 +19,7 @@ const (
 	USER_EXISTS_DESCR    = "user already exists"
 	WRONG_PASSWORD_DESCR = "wrong password"
 	BD_ERROR_DESCR       = "bd error"
-	BAD_INIT_SECRET_KEY = "bad init secret key"
+	BAD_INIT_SECRET_KEY  = "bad init secret key"
 )
 
 type Error struct {

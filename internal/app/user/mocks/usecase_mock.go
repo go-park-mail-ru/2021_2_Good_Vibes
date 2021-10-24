@@ -79,10 +79,10 @@ func (mr *MockUsecaseMockRecorder) GenerateAvatarName() *gomock.Call {
 }
 
 // GetUserDataByID mocks base method.
-func (m *MockUsecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error) {
+func (m *MockUsecase) GetUserDataByID(id uint64) (*models.UserDataProfile, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserDataByID", id)
-	ret0, _ := ret[0].(*models.UserDataStorage)
+	ret0, _ := ret[0].(*models.UserDataProfile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

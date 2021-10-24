@@ -55,8 +55,16 @@ func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 	return us.repository.InsertUser(newUser)
 }
 
-func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataStorage, error) {
-	return us.repository.GetUserDataById(id)
+func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataProfile, error) {
+	userDataStorage, err := us.repository.GetUserDataById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var userProfile models.UserDataProfile
+	userProfile.Name = userDataStorage.Name
+	userProfile.Email = userDataStorage.Email
+	return &userProfile, nil
 }
 
 func (us *usecase) GenerateAvatarName() string {

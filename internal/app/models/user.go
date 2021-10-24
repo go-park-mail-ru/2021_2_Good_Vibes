@@ -21,3 +21,8 @@ type UserDataForReg struct {
 type UserID struct {
 	UserId int `json:"user_id"`
 }
+
+type UserDataProfile struct {
+	Name  string `json:"username"`
+	Email string `json:"email"`
+}

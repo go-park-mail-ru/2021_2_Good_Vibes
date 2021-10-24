@@ -5,10 +5,10 @@
 package mock_jwt
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	echo "github.com/labstack/echo/v4"
 )
 
 // MockTokenManager is a mock of TokenManager interface.
@@ -50,7 +50,7 @@ func (mr *MockTokenManagerMockRecorder) GetToken(id, name interface{}) *gomock.C
 }
 
 // ParseTokenFromContext mocks base method.
-func (m *MockTokenManager) ParseTokenFromContext(ctx echo.Context) (uint64, error) {
+func (m *MockTokenManager) ParseTokenFromContext(ctx context.Context) (uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ParseTokenFromContext", ctx)
 	ret0, _ := ret[0].(uint64)
