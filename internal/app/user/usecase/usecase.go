@@ -10,13 +10,13 @@ import (
 
 type usecase struct {
 	repository user.Repository
-	hasher hasher.Hasher
+	hasher     hasher.Hasher
 }
 
 func NewUsecase(repositoryUser user.Repository, hasher hasher.Hasher) *usecase {
 	return &usecase{
 		repository: repositoryUser,
-		hasher: hasher,
+		hasher:     hasher,
 	}
 }
 

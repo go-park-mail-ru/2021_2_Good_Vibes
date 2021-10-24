@@ -4,7 +4,4 @@ package hasher
 type Hasher interface {
 	CompareHashAndPassword(hashPassword []byte, password []byte) error
 	GenerateFromPassword(password []byte) ([]byte, error)
-
-
-
 }

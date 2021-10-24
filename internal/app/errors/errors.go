@@ -20,6 +20,7 @@ const (
 	WRONG_PASSWORD_DESCR = "плохой пароль"
 	BD_ERROR_DESCR       = "bd error"
 	BAD_INIT_SECRET_KEY  = "bad init secret key"
+	HASHER_ERROR_DESCR   = "error hash password"
 )
 
 type Error struct {
