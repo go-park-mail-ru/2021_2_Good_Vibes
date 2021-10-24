@@ -3,6 +3,7 @@ package configRouting
 import (
 	basketHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	categoryHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
+	emailHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/email/delivery/http"
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
 	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
@@ -16,6 +17,7 @@ type ServerConfigRouting struct {
 	OrderHandler    *orderHttp.OrderHandler
 	BasketHandler   *basketHttp.BasketHandler
 	CategoryHandler *categoryHttp.CategoryHandler
+	EmailHandler    *emailHttp.EmailHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -36,4 +38,5 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("/cart/confirm", cr.OrderHandler.PutOrder, middlewareAut.IsLogin)
 	router.POST("/category/create", cr.CategoryHandler.CreateCategory)
 	router.GET("/category", cr.CategoryHandler.GetCategories)
+	router.GET("/email/confirm", cr.EmailHandler.ConfirmEmail)
 }

@@ -27,6 +27,10 @@ import (
 	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 
+	emailHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/email/delivery/http"
+	emailRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/email/repository/posgresql"
+	emailUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/email/usecase"
+
 	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
@@ -107,12 +111,17 @@ func main() {
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
+	storageEmail, err := emailRepoPostgres.NewStorageEmailDB(GetPostgres())
+	emailUc := emailUseCase.NewEmailUseCase(storageEmail)
+	emailHandler := emailHandlerHttp.NewEmailHandler(emailUc)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		ProductHandler:  productHandler,
 		UserHandler:     userHandler,
 		OrderHandler:    orderHandler,
 		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
+		EmailHandler: emailHandler,
 	}
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
