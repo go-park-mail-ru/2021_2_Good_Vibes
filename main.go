@@ -74,15 +74,15 @@ func main() {
 	}
 	productUc := productUseCase.NewProductUsecase(storageProd)
 
-	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые adidas кроссовки"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой новый смартфон"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Крутая мужская кофта"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон чёрный цвет", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой черный смартфон"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Супер крутая красный смартфон"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Кеды adidas желтые", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые желтые кроссовки"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Смартфон поддержанный", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой поддержанный смартфон"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas красные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые красные кроссовки"})
-	productUc.AddProduct(models.Product{Image: "", Name: "Кроссовки adidas черные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые черные кроссовкин"})
+	productUc.AddProduct(models.Product{Image: "images/shoe2.png", Name: "Кроссовки adidas голубые", Price: 250, Rating: 4, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые adidas кроссовки"})
+	productUc.AddProduct(models.Product{Image: "images/phone2.png", Name: "Смартфон", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой новый смартфон"})
+	productUc.AddProduct(models.Product{Image: "images/shirt1.png", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Крутая мужская кофта"})
+	productUc.AddProduct(models.Product{Image: "images/smartphone.png", Name: "Смартфон чёрный цвет", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой черный смартфон"})
+	productUc.AddProduct(models.Product{Image: "images/shirt4.png", Name: "Кофта мужская", Price: 10000, Rating: 2.5, Category: "CLOTHES_UP_MEN", CountInStock: 100, Description: "Супер крутая красный смартфон"})
+	productUc.AddProduct(models.Product{Image: "images/shoe5.png", Name: "Кеды adidas желтые", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые желтые кроссовки"})
+	productUc.AddProduct(models.Product{Image: "images/phone3.png", Name: "Смартфон поддержанный", Price: 10000, Rating: 2.5, Category: "PHONES", CountInStock: 100, Description: "Крутой поддержанный смартфон"})
+	productUc.AddProduct(models.Product{Image: "images/shoe1.png", Name: "Кроссовки adidas красные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые красные кроссовки"})
+	productUc.AddProduct(models.Product{Image: "images/shoe3.png", Name: "Кроссовки adidas черные", Price: 10000, Rating: 2.5, Category: "SNICKERS_ADIDAS_MEN", CountInStock: 100, Description: "Крутые черные кроссовкин"})
 
 	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
 	if err != nil {
