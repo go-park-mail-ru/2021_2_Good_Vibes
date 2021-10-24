@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/dgrijalva/jwt-go"
 	errors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
@@ -13,18 +12,17 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 type UserHandler struct {
-	Usecase user.Usecase
+	Usecase        user.Usecase
 	SessionManager sessionJwt.TokenManager
 }
 
 func NewLoginHandler(storageUser user.Usecase, sessionManager sessionJwt.TokenManager) *UserHandler {
 	return &UserHandler{
-		Usecase: storageUser,
+		Usecase:        storageUser,
 		SessionManager: sessionManager,
 	}
 }
@@ -127,7 +125,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".UploadAvatar")
 
-	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx)
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
@@ -188,11 +186,7 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Profile")
 
-	token := ctx.Get("token").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-
-	idString := claims["id"].(string)
-	idNum, err := strconv.ParseUint(idString, 10, 64)
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
@@ -201,7 +195,7 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 	userData, err := handler.Usecase.GetUserDataByID(idNum)
 	if err != nil {
 		logger.Error(err)
-		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, err.Error()))
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 	}
 
 	return ctx.JSON(http.StatusOK, userData)
