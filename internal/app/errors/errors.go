@@ -17,7 +17,7 @@ const (
 	TOKEN_ERROR_DESCR    = "can not get token"
 	NO_USER_DESCR        = "user does not exist"
 	USER_EXISTS_DESCR    = "user already exists"
-	WRONG_PASSWORD_DESCR = "wrong password"
+	WRONG_PASSWORD_DESCR = "плохой пароль"
 	BD_ERROR_DESCR       = "bd error"
 	BAD_INIT_SECRET_KEY  = "bad init secret key"
 )
