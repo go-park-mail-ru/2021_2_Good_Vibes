@@ -3,18 +3,20 @@ package usecase
 import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	guuid "github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type usecase struct {
 	repository user.Repository
+	hasher hasher.Hasher
 }
 
-func NewUsecase(repositoryUser user.Repository) *usecase {
+func NewUsecase(repositoryUser user.Repository, hasher hasher.Hasher) *usecase {
 	return &usecase{
 		repository: repositoryUser,
+		hasher: hasher,
 	}
 }
 
@@ -28,7 +30,7 @@ func (us *usecase) CheckPassword(user models.UserDataForInput) (int, error) {
 		return customErrors.NO_USER_ERROR, nil
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(userFromDb.Password), []byte(user.Password)); err != nil {
+	if err = us.hasher.CompareHashAndPassword([]byte(userFromDb.Password), []byte(user.Password)); err != nil {
 		return customErrors.WRONG_PASSWORD_ERROR, nil
 	}
 
@@ -45,7 +47,7 @@ func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 		return customErrors.USER_EXISTS_ERROR, nil
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newUser.Password))
 	if err != nil {
 		return customErrors.SERVER_ERROR, err
 	}
