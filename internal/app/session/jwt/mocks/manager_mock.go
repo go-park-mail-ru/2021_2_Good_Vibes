@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	echo "github.com/labstack/echo/v4"
 )
 
 // MockTokenManager is a mock of TokenManager interface.
@@ -48,17 +49,17 @@ func (mr *MockTokenManagerMockRecorder) GetToken(id, name interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetToken", reflect.TypeOf((*MockTokenManager)(nil).GetToken), id, name)
 }
 
-// ParseToken mocks base method.
-func (m *MockTokenManager) ParseToken(accessToken string) (string, error) {
+// ParseTokenFromContext mocks base method.
+func (m *MockTokenManager) ParseTokenFromContext(ctx echo.Context) (uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ParseToken", accessToken)
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "ParseTokenFromContext", ctx)
+	ret0, _ := ret[0].(uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ParseToken indicates an expected call of ParseToken.
-func (mr *MockTokenManagerMockRecorder) ParseToken(accessToken interface{}) *gomock.Call {
+// ParseTokenFromContext indicates an expected call of ParseTokenFromContext.
+func (mr *MockTokenManagerMockRecorder) ParseTokenFromContext(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ParseToken", reflect.TypeOf((*MockTokenManager)(nil).ParseToken), accessToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ParseTokenFromContext", reflect.TypeOf((*MockTokenManager)(nil).ParseTokenFromContext), ctx)
 }

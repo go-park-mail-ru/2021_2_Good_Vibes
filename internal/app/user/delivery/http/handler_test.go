@@ -357,7 +357,7 @@ func TestUserHandler_Login(t *testing.T) {
 	}
 }
 
-func TestUserHandler_UploadAvatar(t *testing.T) {
+func TestUserHandler_Profile(t *testing.T) {
 
 }
 
