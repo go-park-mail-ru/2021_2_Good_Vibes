@@ -157,6 +157,92 @@ func TestUserHandler_SignUp(t *testing.T) {
 	}
 }
 
+func TestUserHandler_Login(t *testing.T) {
+	type mockBehavior func(s *mock_user.MockUsecase, userInput models.UserDataForInput)
+
+	user1, _ := json.Marshal(models.UserDataForInput{Name: "Test1", Password: "Qwerty123."})
+
+	user1get, _ := json.Marshal(models.UserDataForInput{Name: "Test1", Password: ""})
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
+	error3get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+
+	testTable := []struct {
+		name                string
+		inputBody           string
+		inputUser           models.UserDataForInput
+		mockBehavior        mockBehavior
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		{
+			name: "OK",
+			inputBody : string(user1),
+			inputUser: models.UserDataForInput{
+				Name: "Test1",
+				Password: "Qwerty123.",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userInput models.UserDataForInput) {
+				s.EXPECT().CheckPassword(userInput).Return(1, nil)
+			},
+			expectedStatusCode:  http.StatusOK,
+			expectedRequestBody: string(user1get) + "\n",
+		},
+		{
+			name:      "BadJson",
+			inputBody: `"username":"Test2","password":"Qwerty123."}`,
+			inputUser: models.UserDataForInput{
+				Name:     "",
+				Password: "",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userReg models.UserDataForInput) {
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
+			name:      "BadJsonData",
+			inputBody: `{"usrname":"incorrectNameField","password":"Qwerty123."}`,
+			inputUser: models.UserDataForInput{
+				Name:     "",
+				Password: "",
+			},
+			mockBehavior: func(s *mock_user.MockUsecase, userInput models.UserDataForInput) {
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: string(error3get) + "\n",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUser := mock_user.NewMockUsecase(c)
+			testCase.mockBehavior(mockUser, testCase.inputUser)
+
+			handler := NewLoginHandler(mockUser)
+
+			router := echo.New()
+			router.POST("/login", handler.Login)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req := httptest.NewRequest("POST", "/login",
+				bytes.NewBufferString(testCase.inputBody))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
 //func TestCreateUserSuccessUnit(t *testing.T) {
 //	var mockStorage, _ = memory.NewStorageUserMemory()
 //

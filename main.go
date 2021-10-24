@@ -12,6 +12,7 @@ import (
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
@@ -20,6 +21,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt/manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
@@ -102,8 +104,15 @@ func main() {
 
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
+	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
+	{
+		if err != nil {
+			logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
+		}
+	}
+
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
-	userHandler := http2.NewLoginHandler(userUс)
+	userHandler := http2.NewLoginHandler(userUс, sessionManager)
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 

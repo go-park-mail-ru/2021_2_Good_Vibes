@@ -19,6 +19,7 @@ const (
 	USER_EXISTS_DESCR    = "user already exists"
 	WRONG_PASSWORD_DESCR = "wrong password"
 	BD_ERROR_DESCR       = "bd error"
+	BAD_INIT_SECRET_KEY = "bad init secret key"
 )
 
 type Error struct {

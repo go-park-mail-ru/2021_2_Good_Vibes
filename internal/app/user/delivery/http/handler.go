@@ -20,11 +20,13 @@ import (
 
 type UserHandler struct {
 	Usecase user.Usecase
+	SessionManager sessionJwt.TokenManager
 }
 
-func NewLoginHandler(storageUser user.Usecase) *UserHandler {
+func NewLoginHandler(storageUser user.Usecase, sessionManager sessionJwt.TokenManager) *UserHandler {
 	return &UserHandler{
 		Usecase: storageUser,
+		SessionManager: sessionManager,
 	}
 }
 
@@ -66,7 +68,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
-	claimsString, err := sessionJwt.GetToken(id, newUserDataForInput.Name)
+	claimsString, err := handler.SessionManager.GetToken(id, newUserDataForInput.Name)
 	if err != nil {
 		newLoginError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		logger.Error(err)
@@ -110,7 +112,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
-	claimsString, err := sessionJwt.GetToken(newId, newUser.Name)
+	claimsString, err := handler.SessionManager.GetToken(newId, newUser.Name)
 	if err != nil {
 		newSignupError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		logger.Error(err)
