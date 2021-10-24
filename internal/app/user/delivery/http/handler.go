@@ -2,7 +2,6 @@ package http
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -51,7 +50,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 
 	id, err := handler.Usecase.CheckPassword(newUserDataForInput)
 	if err != nil {
-		newLoginError := errors.NewError(id, err.Error())
+		newLoginError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
@@ -72,7 +71,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	if err != nil {
 		newLoginError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		logger.Error(err)
-		return ctx.JSON(http.StatusBadRequest, newLoginError)
+		return ctx.JSON(http.StatusInternalServerError, newLoginError)
 	}
 
 	handler.setCookieValue(ctx, claimsString)
@@ -97,7 +96,6 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
-	fmt.Println("ya tyt bil")
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
