@@ -1,14 +1,14 @@
 package errors
 
 const (
-	BIND_ERROR           = 20
-	VALIDATION_ERROR     = 21
-	TOKEN_ERROR          = 22
-	NO_USER_ERROR        = 30
-	USER_EXISTS_ERROR    = 32
-	WRONG_PASSWORD_ERROR = 33
-	DB_ERROR             = 40
-	SERVER_ERROR         = 50
+	BIND_ERROR           = -20
+	VALIDATION_ERROR     = -21
+	TOKEN_ERROR          = -22
+	NO_USER_ERROR        = -30
+	USER_EXISTS_ERROR    = -32
+	WRONG_PASSWORD_ERROR = -33
+	DB_ERROR             = -40
+	SERVER_ERROR         = -50
 )
 
 const (

@@ -356,6 +356,11 @@ func TestUserHandler_Login(t *testing.T) {
 		})
 	}
 }
+
+func TestUserHandler_UploadAvatar(t *testing.T) {
+
+}
+
 //func TestCreateUserSuccessUnit(t *testing.T) {
 //	var mockStorage, _ = memory.NewStorageUserMemory()
 //

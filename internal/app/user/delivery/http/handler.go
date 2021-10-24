@@ -124,21 +124,23 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
-	token := ctx.Get("token").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".UploadAvatar")
 
-	idString := claims["id"].(string)
-	idNum, err := strconv.ParseUint(idString, 10, 64)
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx)
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}
 
 	file, err := ctx.FormFile("file")
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	src, err := file.Open()
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	defer src.Close()
@@ -148,6 +150,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 
 	_, err = src.Read(buffer)
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
@@ -167,14 +170,17 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 		})
 
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
 	err = handler.Usecase.SaveAvatarName(int(idNum), fileName)
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
+	logger.Trace("success upload avatar")
 	return ctx.HTML(http.StatusOK, fileName)
 }
 
