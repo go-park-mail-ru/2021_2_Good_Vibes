@@ -22,7 +22,9 @@ import (
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt/manager"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
@@ -68,7 +70,9 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-	userUс := userUsecase.NewUsecase(storage)
+
+	hasher := impl.NewHasherBCrypt(bcrypt.DefaultCost)
+	userUс := userUsecase.NewUsecase(storage, hasher)
 
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {

@@ -60,6 +60,39 @@ func TestUseCase_CheckPassword(t *testing.T) {
 			expectedId: customErrors.USER_EXISTS_ERROR,
 			expectedError: errors.New(customErrors.BD_ERROR_DESCR),
 		},
+		{
+			name : "No user",
+			inputData: models.UserDataForInput{
+				Name: "Test",
+				Password: "Qwerty123.",
+			},
+			mockBehaviorRepository: func(s *mockUser.MockRepository, name string) {
+				s.EXPECT().GetUserDataByName(name).Return(nil, nil)
+			},
+			mockBehaviorHasher: func(s *mockHasher.MockHasher, hasherPassword []byte, password []byte) {
+			},
+			expectedId: customErrors.NO_USER_ERROR,
+			expectedError: nil,
+		},
+		{
+			name : "Wrong Password",
+			inputData: models.UserDataForInput{
+				Name: "Test",
+				Password: "Qwerty123.",
+			},
+			mockBehaviorRepository: func(s *mockUser.MockRepository, name string) {
+				s.EXPECT().GetUserDataByName(name).Return(&models.UserDataStorage{
+					Id: 1,
+					Name: "Test",
+					Password: "Qwerty123.",
+				}, nil)
+			},
+			mockBehaviorHasher: func(s *mockHasher.MockHasher, hasherPassword []byte, password []byte) {
+				s.EXPECT().CompareHashAndPassword(hasherPassword, password).Return(errors.New(customErrors.WRONG_PASSWORD_DESCR))
+			},
+			expectedId: customErrors.WRONG_PASSWORD_ERROR,
+			expectedError: nil,
+		},
 	}
 
 	for _, testCase := range testTable {
