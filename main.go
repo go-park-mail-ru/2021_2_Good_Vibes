@@ -112,7 +112,7 @@ func main() {
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
 	storageEmail, err := emailRepoPostgres.NewStorageEmailDB(GetPostgres())
-	emailUc := emailUseCase.NewEmailUseCase(storageEmail)
+	emailUc := emailUseCase.NewEmailUseCase(storageEmail, storage)
 	emailHandler := emailHandlerHttp.NewEmailHandler(emailUc)
 
 	serverRouting := configRouting.ServerConfigRouting{

@@ -50,6 +50,16 @@ func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) 
 	return id, nil
 }
 
+func (su *StorageUserDB) InsertUserToken(email string, token string) error {
+	_, err := su.db.Exec(`INSERT INTO email_confirm (email, status, token) VALUES ($1, 0, $2)`, email, token)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
 	row := su.db.QueryRow("SELECT id, name, email, password FROM customers WHERE id=$1", id)

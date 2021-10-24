@@ -39,4 +39,5 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("/category/create", cr.CategoryHandler.CreateCategory)
 	router.GET("/category", cr.CategoryHandler.GetCategories)
 	router.GET("/email/confirm", cr.EmailHandler.ConfirmEmail)
+	router.POST("/email/send", cr.EmailHandler.SendConfirmationEmail, middlewareAut.IsLogin)
 }
