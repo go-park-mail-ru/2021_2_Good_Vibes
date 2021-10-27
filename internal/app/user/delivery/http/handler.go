@@ -2,11 +2,9 @@ package http
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/dgrijalva/jwt-go"
 	errors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
@@ -14,17 +12,18 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 type UserHandler struct {
-	Usecase user.Usecase
+	Usecase        user.Usecase
+	SessionManager sessionJwt.TokenManager
 }
 
-func NewLoginHandler(storageUser user.Usecase) *UserHandler {
+func NewLoginHandler(storageUser user.Usecase, sessionManager sessionJwt.TokenManager) *UserHandler {
 	return &UserHandler{
-		Usecase: storageUser,
+		Usecase:        storageUser,
+		SessionManager: sessionManager,
 	}
 }
 
@@ -49,7 +48,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 
 	id, err := handler.Usecase.CheckPassword(newUserDataForInput)
 	if err != nil {
-		newLoginError := errors.NewError(id, err.Error())
+		newLoginError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
@@ -66,11 +65,11 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
-	claimsString, err := sessionJwt.GetToken(id, newUserDataForInput.Name)
+	claimsString, err := handler.SessionManager.GetToken(id, newUserDataForInput.Name)
 	if err != nil {
 		newLoginError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		logger.Error(err)
-		return ctx.JSON(http.StatusBadRequest, newLoginError)
+		return ctx.JSON(http.StatusInternalServerError, newLoginError)
 	}
 
 	handler.setCookieValue(ctx, claimsString)
@@ -95,7 +94,6 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
-	fmt.Println("ya tyt bil")
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
@@ -110,7 +108,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
-	claimsString, err := sessionJwt.GetToken(newId, newUser.Name)
+	claimsString, err := handler.SessionManager.GetToken(newId, newUser.Name)
 	if err != nil {
 		newSignupError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
 		logger.Error(err)
@@ -124,21 +122,23 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 }
 
 func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
-	token := ctx.Get("token").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".UploadAvatar")
 
-	idString := claims["id"].(string)
-	idNum, err := strconv.ParseUint(idString, 10, 64)
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}
 
 	file, err := ctx.FormFile("file")
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	src, err := file.Open()
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 	defer src.Close()
@@ -148,6 +148,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 
 	_, err = src.Read(buffer)
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
@@ -167,14 +168,17 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 		})
 
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
 	err = handler.Usecase.SaveAvatarName(int(idNum), fileName)
 	if err != nil {
+		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
+	logger.Trace("success upload avatar")
 	return ctx.HTML(http.StatusOK, fileName)
 }
 
@@ -182,11 +186,7 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Profile")
 
-	token := ctx.Get("token").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-
-	idString := claims["id"].(string)
-	idNum, err := strconv.ParseUint(idString, 10, 64)
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
@@ -195,7 +195,7 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 	userData, err := handler.Usecase.GetUserDataByID(idNum)
 	if err != nil {
 		logger.Error(err)
-		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, err.Error()))
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 	}
 
 	return ctx.JSON(http.StatusOK, userData)

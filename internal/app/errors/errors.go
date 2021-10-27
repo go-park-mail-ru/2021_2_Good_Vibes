@@ -1,14 +1,14 @@
 package errors
 
 const (
-	BIND_ERROR           = 20
-	VALIDATION_ERROR     = 21
-	TOKEN_ERROR          = 22
-	NO_USER_ERROR        = 30
-	USER_EXISTS_ERROR    = 32
-	WRONG_PASSWORD_ERROR = 33
-	DB_ERROR             = 40
-	SERVER_ERROR         = 50
+	BIND_ERROR           = -20
+	VALIDATION_ERROR     = -21
+	TOKEN_ERROR          = 0
+	NO_USER_ERROR        = -30
+	USER_EXISTS_ERROR    = -32
+	WRONG_PASSWORD_ERROR = -33
+	DB_ERROR             = -40
+	SERVER_ERROR         = -50
 )
 
 const (
@@ -17,8 +17,10 @@ const (
 	TOKEN_ERROR_DESCR    = "can not get token"
 	NO_USER_DESCR        = "user does not exist"
 	USER_EXISTS_DESCR    = "user already exists"
-	WRONG_PASSWORD_DESCR = "wrong password"
+	WRONG_PASSWORD_DESCR = "плохой пароль"
 	BD_ERROR_DESCR       = "bd error"
+	BAD_INIT_SECRET_KEY  = "bad init secret key"
+	HASHER_ERROR_DESCR   = "error hash password"
 )
 
 type Error struct {

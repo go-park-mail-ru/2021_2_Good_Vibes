@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	context2 "context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
@@ -23,7 +24,11 @@ func IsLogin(next echo.HandlerFunc) echo.HandlerFunc {
 		})
 
 		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			context.Set("token", token)
+			trueContext := context.Request().Context()
+			trueContext = context2.WithValue(trueContext, "token", token)
+			req := context.Request()
+			req = req.WithContext(trueContext)
+			context.SetRequest(req)
 			return next(context)
 		}
 
