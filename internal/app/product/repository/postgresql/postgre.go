@@ -28,7 +28,7 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		product := models.Product{}
-		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category)
+		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description )
 		if err != nil {
 			return nil, err
 		}

@@ -10,9 +10,9 @@
   },
 
   "DATA_BASE_CONFIG": {
-    "USER" : "lida",
-    "DBNAME" : "mydb",
-    "PASSWORD" : "123",
+    "USER" : "bush",
+    "DBNAME" : "ozon",
+    "PASSWORD" : "sergeykust000",
     "HOST" : "localhost",
     "PORT" : "5432"
   }
