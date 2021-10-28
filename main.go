@@ -97,9 +97,16 @@ func main() {
 
 	orderUc := orderUseCase.NewOrderUseCase(storageOrder)
 
+	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
+	{
+		if err != nil {
+			logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
+		}
+	}
+
 	storageBasket, err := basketRepoPostgres.NewBasketRepository(GetPostgres())
 	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
-	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc)
+	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc, sessionManager)
 
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
 	if err != nil {
@@ -108,16 +115,9 @@ func main() {
 
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
-	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
-	{
-		if err != nil {
-			logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
-		}
-	}
-
 	productHandler := productHandlerHttp.NewProductHandler(productUc)
 	userHandler := http2.NewLoginHandler(userUс, sessionManager)
-	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc)
+	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc, sessionManager)
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
 	serverRouting := configRouting.ServerConfigRouting{
