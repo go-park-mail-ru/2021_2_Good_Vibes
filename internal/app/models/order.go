@@ -8,12 +8,12 @@ type OrderProducts struct {
 
 type Address struct {
 	Country string `json:"country"`
-	Region  string `json:"Region"`
-	City    string `json:"City"`
-	Street  string `json:"Street"`
-	House   string `json:"House"`
-	Flat    string `json:"Flat"`
-	Index   string `json:"Index"`
+	Region  string `json:"region"`
+	City    string `json:"city"`
+	Street  string `json:"street"`
+	House   string `json:"house"`
+	Flat    string `json:"flat"`
+	Index   string `json:"index"`
 }
 
 type Order struct {

@@ -34,13 +34,29 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 
 	err := tx(so.db, func(tx *sql.Tx) error {
 		err := tx.QueryRow(
-			"insert into orders (user_id, date, address, cost, status) values ($1, $2, $3, $4, $5) returning id",
+			`insert into orders (user_id, date, cost, status) values ($1, $2, $3, $4) returning id`,
 			order.UserId,
 			order.Date,
-			order.Address,
 			order.Cost,
 			order.Status,
 		).Scan(&order.OrderId)
+
+		if err != nil {
+			return err
+		}
+
+		address := order.Address
+
+		_, err = tx.Exec(
+			`insert into delivery_address (order_id, country, region, city, street, house, flat, a_index) values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+			order.OrderId,
+			address.Country,
+			address.Region,
+			address.City,
+			address.Street,
+			address.House,
+			address.Flat,
+			address.Index)
 
 		if err != nil {
 			return err

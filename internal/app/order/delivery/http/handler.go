@@ -10,6 +10,8 @@ import (
 	"net/http"
 )
 
+const NewOrder = "new"
+
 type OrderHandler struct {
 	useCase order.UseCase
 	sessionManager sessionJwt.TokenManager
@@ -49,6 +51,8 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 		newOrderError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newOrderError)
 	}
+
+	newOrder.Status = NewOrder
 
 	orderId, err := oh.useCase.PutOrder(newOrder)
 	if err != nil {

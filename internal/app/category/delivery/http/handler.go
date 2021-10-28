@@ -27,26 +27,29 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
-	val := ctx.QueryParams()
-
-	nameString := val.Get("name")
-	if nameString == "" {
-		if AllCategoriesJson.Name != "" {
-			logger.Debug(AllCategoriesJson)
-			return ctx.JSON(http.StatusOK, AllCategoriesJson)
-		}
-
-		categories, err := ch.useCase.GetAllCategories()
-		if err != nil {
-			logger.Error(err)
-			newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
-			return ctx.JSON(http.StatusBadRequest, newCategoryError)
-		}
-		AllCategoriesJson = categories
-
+	if AllCategoriesJson.Name != "" {
 		logger.Debug(AllCategoriesJson)
-		return ctx.JSON(http.StatusOK, categories)
+		return ctx.JSON(http.StatusOK, AllCategoriesJson)
 	}
+
+	categories, err := ch.useCase.GetAllCategories()
+	if err != nil {
+		logger.Error(err)
+		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
+	}
+	AllCategoriesJson = categories
+
+	logger.Debug(AllCategoriesJson)
+	return ctx.JSON(http.StatusOK, categories)
+}
+
+
+func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + " GetCategoryProducts")
+
+	nameString := ctx.Param("name")
 
 	products, err := ch.useCase.GetProductsByCategory(nameString)
 	if err != nil {
@@ -58,6 +61,7 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger.Debug(products)
 	return ctx.JSON(http.StatusOK, products)
 }
+
 
 func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 	var newCategory models.CreateCategory
