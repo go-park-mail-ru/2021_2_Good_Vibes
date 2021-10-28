@@ -15,7 +15,7 @@ func TestPutOrder(t *testing.T) {
 	}
 	defer db.Close()
 
-	storage, err := NewStorageOrderDB(db, nil)
+	storage, err := NewOrderRepository(db, nil)
 	if err != nil {
 		t.Errorf("unexpected err: %s", err)
 		return
@@ -233,7 +233,7 @@ func TestNewStorageOrderDB_Fail(t *testing.T) {
 
 	err = errors.New("This is error: ")
 
-	_, err = NewStorageOrderDB(db, err)
+	_, err = NewOrderRepository(db, err)
 
 	if err == nil {
 		t.Errorf("expected error, got nil")
