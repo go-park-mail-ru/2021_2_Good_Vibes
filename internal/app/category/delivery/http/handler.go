@@ -44,7 +44,6 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, categories)
 }
 
-
 func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategoryProducts")
@@ -61,7 +60,6 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	logger.Debug(products)
 	return ctx.JSON(http.StatusOK, products)
 }
-
 
 func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 	var newCategory models.CreateCategory

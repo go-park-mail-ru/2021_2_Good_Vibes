@@ -12,7 +12,7 @@ import (
 func TestOrderUseCase_PutOrder(t *testing.T) {
 	type mockBehaviorRepository func(s *mock_order.MockRepository, order models.Order)
 
-	products := []models.OrderProducts {
+	products := []models.OrderProducts{
 		{
 			OrderId:   1,
 			ProductId: 10,
@@ -41,8 +41,8 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 	}
 
 	order := models.Order{
-		OrderId: 1,
-		UserId: 3,
+		OrderId:  1,
+		UserId:   3,
 		Date:     "28-10-2021 03:03:59",
 		Address:  address,
 		Cost:     1000.99,
@@ -52,32 +52,31 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 
 	tests := []struct {
 		name                   string
-		order              models.Order
+		order                  models.Order
 		mockBehaviorRepository mockBehaviorRepository
 		expectedId             int
 		expectedError          error
 	}{
 		{
-			name : "correct",
-			order : order,
+			name:  "correct",
+			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(3, nil)
 			},
-			expectedId : 3,
+			expectedId:    3,
 			expectedError: nil,
 		},
 		{
-			name : "error",
-			order : order,
+			name:  "error",
+			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, errors.New("new error"))
 			},
-			expectedId : 0,
+			expectedId:    0,
 			expectedError: errors.New("new error"),
 		},
-
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := gomock.NewController(t)
 			newOrderRepo := mock_order.NewMockRepository(c)

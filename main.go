@@ -70,7 +70,6 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-
 	hasher := impl.NewHasherBCrypt(bcrypt.DefaultCost)
 	userUс := userUsecase.NewUsecase(storage, hasher)
 

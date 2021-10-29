@@ -13,13 +13,13 @@ import (
 const NewOrder = "new"
 
 type OrderHandler struct {
-	useCase order.UseCase
+	useCase        order.UseCase
 	sessionManager sessionJwt.TokenManager
 }
 
 func NewOrderHandler(useCase order.UseCase, sessionManager sessionJwt.TokenManager) *OrderHandler {
 	return &OrderHandler{
-		useCase: useCase,
+		useCase:        useCase,
 		sessionManager: sessionManager,
 	}
 }
