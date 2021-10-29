@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 )
@@ -15,11 +16,28 @@ func NewOrderUseCase(repositoryOrder order.Repository) *UseCase {
 	}
 }
 
-func (uc *UseCase) PutOrder(order models.Order) (int, error) {
-	orderId, err := uc.repositoryOrder.PutOrder(order)
-	if err != nil {
-		return 0, err
+func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
+	productPrices, err := uc.repositoryOrder.SelectPrices(order.Products)
+
+	productPricesMap := make(map[int] float64, len(productPrices))
+	for _, productPrice := range productPrices {
+		productPricesMap[productPrice.Id] = productPrice.Price
 	}
 
-	return orderId, nil
+	var cost float64
+
+	fmt.Println(productPrices)
+
+	for _, product := range order.Products {
+		cost += float64(product.Number) * productPricesMap[product.ProductId]
+	}
+
+	order.Cost = cost
+
+	orderId, err := uc.repositoryOrder.PutOrder(order)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return orderId, cost, nil
 }

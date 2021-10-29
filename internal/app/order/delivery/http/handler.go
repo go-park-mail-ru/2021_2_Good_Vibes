@@ -54,7 +54,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 
 	newOrder.Status = NewOrder
 
-	orderId, err := oh.useCase.PutOrder(newOrder)
+	orderId, orderCost, err := oh.useCase.PutOrder(newOrder)
 	if err != nil {
 		logger.Error(err, newOrder)
 		newOrderError := errors.NewError(errors.SERVER_ERROR, err.Error())
@@ -62,6 +62,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 	}
 
 	newOrder.OrderId = orderId
+	newOrder.Cost = orderCost
 
 	logger.Trace(trace + " success PutOrder")
 	return ctx.JSON(http.StatusOK, newOrder)

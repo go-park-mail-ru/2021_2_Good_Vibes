@@ -1,7 +1,7 @@
 package models
 
 type OrderProducts struct {
-	OrderId   int `json:"order_id,omitempty" validate:"required"`
+	OrderId   int `json:"order_id,omitempty"`
 	ProductId int `json:"product_id" validate:"required"`
 	Number    int `json:"number" validate:"required"`
 }
@@ -17,11 +17,11 @@ type Address struct {
 }
 
 type Order struct {
-	OrderId  int             `json:"order_id,omitempty" validate:"required"`
-	UserId   int             `json:"user_id,omitempty" validate:"required"`
+	OrderId  int             `json:"order_id,omitempty"`
+	UserId   int             `json:"user_id,omitempty"`
 	Date     string          `json:"date" validate:"required"`
 	Address  Address         `json:"address" validate:"required"`
-	Cost     float32         `json:"cost" validate:"required"`
-	Status   string          `json:"status,omitempty" validate:"required"`
+	Cost     float64        `json:"cost,omitempty"`
+	Status   string          `json:"status,omitempty"`
 	Products []OrderProducts `json:"products" validate:"required"`
 }
