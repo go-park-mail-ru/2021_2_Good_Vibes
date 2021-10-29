@@ -25,11 +25,21 @@ func TestPutOrder(t *testing.T) {
 		{1, 5, 1},
 	}
 
+	address := models.Address{
+		Country: "Russia",
+		Region:  "Moscow",
+		City:    "Moscow",
+		Street:  "Izmailovskiy prospect",
+		House:   "73B",
+		Flat:    "44",
+		Index:   "109834",
+	}
+
 	order := models.Order{
 		OrderId:  1,
 		UserId:   1,
 		Date:     "2014-04-04 18:32:59",
-		Address:  "Moscow",
+		Address:  address,
 		Cost:     2000.0,
 		Status:   "new",
 		Products: orderProducts,
@@ -41,8 +51,19 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnRows(rows)
+	mock.
+		ExpectExec("insert into delivery_address").
+		WithArgs(
+			order.OrderId,
+			order.Address.Country,
+			order.Address.Region,
+			order.Address.City,
+			order.Address.Street,
+			order.Address.House,
+			order.Address.Flat,
+			order.Address.Index).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.
 		ExpectExec("insert into order_products").
@@ -77,7 +98,7 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnError(fmt.Errorf("db error"))
 
 	mock.ExpectRollback()
@@ -99,13 +120,22 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnRows(rows)
 
 	mock.
-		ExpectExec("insert into order_products").
-		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
+		ExpectExec("insert into delivery_address").
+		WithArgs(
+			order.OrderId,
+			order.Address.Country,
+			order.Address.Region,
+			order.Address.City,
+			order.Address.Street,
+			order.Address.House,
+			order.Address.Flat,
+			order.Address.Index).
 		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
+
 
 	mock.ExpectRollback()
 
@@ -126,15 +156,24 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnRows(rows)
+
+	mock.
+		ExpectExec("insert into delivery_address").
+		WithArgs(
+			order.OrderId,
+			order.Address.Country,
+			order.Address.Region,
+			order.Address.City,
+			order.Address.Street,
+			order.Address.House,
+			order.Address.Flat,
+			order.Address.Index).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.
 		ExpectExec("insert into order_products").
 		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.
-		ExpectExec("delete from basket").WithArgs(order.UserId).
 		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
 
 	mock.ExpectRollback()
@@ -156,8 +195,62 @@ func TestPutOrder(t *testing.T) {
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnRows(rows)
+
+	mock.
+		ExpectExec("insert into delivery_address").
+		WithArgs(
+			order.OrderId,
+			order.Address.Country,
+			order.Address.Region,
+			order.Address.City,
+			order.Address.Street,
+			order.Address.House,
+			order.Address.Flat,
+			order.Address.Index).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.
+		ExpectExec("insert into order_products").
+		WithArgs(order.Products[0].OrderId, order.Products[0].ProductId, order.Products[0].Number).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.
+		ExpectExec("delete from basket").WithArgs(order.UserId).
+		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
+
+	mock.ExpectRollback()
+
+	_, err = storage.PutOrder(order)
+	if err == nil {
+		t.Errorf("expected error, got nil")
+		return
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	// query error 5
+
+	mock.ExpectBegin()
+
+	rows = sqlmock.NewRows([]string{"id"}).AddRow(order.OrderId)
+
+	mock.
+		ExpectQuery(`insert into orders`).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
+		WillReturnRows(rows)
+
+	mock.
+		ExpectExec("insert into delivery_address").
+		WithArgs(
+			order.OrderId,
+			order.Address.Country,
+			order.Address.Region,
+			order.Address.City,
+			order.Address.Street,
+			order.Address.House,
+			order.Address.Flat,
+			order.Address.Index).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.
 		ExpectExec("insert into order_products").
@@ -185,11 +278,11 @@ func TestPutOrder(t *testing.T) {
 	// result error
 	mock.ExpectBegin()
 	rows = sqlmock.NewRows([]string{"id", "address"}).
-		AddRow(order.OrderId, order.Address)
+		AddRow(order.OrderId,  order.Cost)
 
 	mock.
 		ExpectQuery(`insert into orders`).
-		WithArgs(order.UserId, order.Date, order.Address, order.Cost, order.Status).
+		WithArgs(order.UserId, order.Date, order.Cost, order.Status).
 		WillReturnRows(rows)
 
 	mock.ExpectRollback()
@@ -211,7 +304,7 @@ func TestPutOrder(t *testing.T) {
 		OrderId:  1,
 		UserId:   1,
 		Date:     "2014-04-04 18:32:59",
-		Address:  "Moscow",
+		Address:  address,
 		Cost:     2000.0,
 		Status:   "new",
 		Products: orderProducts,
