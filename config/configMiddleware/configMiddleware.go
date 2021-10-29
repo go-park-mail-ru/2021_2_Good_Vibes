@@ -26,5 +26,6 @@ func ConfigMiddleware(router *echo.Echo) {
 			},
 			CookieHTTPOnly: true,
 		}),
+		middleware.Secure(),
 	)
 }
