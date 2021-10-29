@@ -48,3 +48,18 @@ func (mr *MockRepositoryMockRecorder) PutOrder(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutOrder", reflect.TypeOf((*MockRepository)(nil).PutOrder), arg0)
 }
+
+// SelectPrices mocks base method.
+func (m *MockRepository) SelectPrices(arg0 []models.OrderProducts) ([]models.ProductPrice, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectPrices", arg0)
+	ret0, _ := ret[0].([]models.ProductPrice)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectPrices indicates an expected call of SelectPrices.
+func (mr *MockRepositoryMockRecorder) SelectPrices(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectPrices", reflect.TypeOf((*MockRepository)(nil).SelectPrices), arg0)
+}

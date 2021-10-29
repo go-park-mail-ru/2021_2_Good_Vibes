@@ -3,7 +3,6 @@ package postgresql
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"strconv"
 	"strings"
@@ -97,12 +96,11 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 func (so* OrderRepository) SelectPrices(products []models.OrderProducts) ([]models.ProductPrice, error) {
 	query := makeSelectPricesQuery(products)
 
-	fmt.Println(query)
-
 	rows, err := so.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	var productPrices []models.ProductPrice
 

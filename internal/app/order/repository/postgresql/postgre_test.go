@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"reflect"
 	"testing"
 )
 
@@ -313,6 +314,90 @@ func TestPutOrder(t *testing.T) {
 	_, err = storage.PutOrder(order)
 	if err == nil {
 		t.Errorf("expected error, got nil")
+		return
+	}
+}
+
+func TestSelectPrices(t *testing.T) {
+	orderProducts := []models.OrderProducts {
+		{1, 5, 1},
+	}
+
+	expectedProductPrices := []models.ProductPrice {
+		{
+			Id: 1,
+			Price: 10000,
+		},
+	}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("cant create mock: %s", err)
+	}
+	defer db.Close()
+
+	storage, err := NewOrderRepository(db, nil)
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+
+	//ok query
+	rows := sqlmock.NewRows([]string{"id", "price"}).AddRow(1, 10000)
+
+	mock.
+		ExpectQuery(`select`).
+		WithArgs().
+		WillReturnRows(rows)
+
+	productPrices, err := storage.SelectPrices(orderProducts)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	if err != nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(productPrices, expectedProductPrices) {
+		t.Errorf("bad id: want %v, have %v", expectedProductPrices, productPrices)
+		return
+	}
+
+	// error 1
+	mock.
+		ExpectQuery(`select`).
+		WithArgs().
+		WillReturnError(errors.New("new error"))
+
+	_, err = storage.SelectPrices(orderProducts)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	if err == nil {
+		t.Errorf("unexpected err: %s", err)
+		return
+	}
+
+	// error 2
+	rows = sqlmock.NewRows([]string{"id"}).AddRow(1)
+
+	mock.
+		ExpectQuery(`select`).
+		WithArgs().
+		WillReturnRows(rows)
+
+	_, err = storage.SelectPrices(orderProducts)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	if err == nil {
+		t.Errorf("unexpected err: %s", err)
 		return
 	}
 }

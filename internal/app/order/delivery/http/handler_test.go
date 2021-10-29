@@ -64,7 +64,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 		UserId: 3,
 		Date:     "28-10-2021 03:03:59",
 		Address:  address,
-		Cost:     1000.99,
+		Cost:     50000.00,
 		Status:   "new",
 		Products: products,
 	}
@@ -73,7 +73,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 
 	badOrder:= models.Order{
 		Address:  address,
-		Cost:     1000.99,
+		Cost:     50000.00,
 		Status:   "new",
 		Products: products,
 	}
@@ -92,7 +92,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 			name : "correct",
 			order : string(orderJson),
 			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
-				s.EXPECT().PutOrder(order).Return(1, nil)
+				s.EXPECT().PutOrder(order).Return(1, 50000.00, nil)
 			},
 			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(3), nil)
@@ -115,7 +115,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 			name : "incorrect put order",
 			order : string(orderJson),
 			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
-				s.EXPECT().PutOrder(order).Return(0,  errors.New(customErrors.BD_ERROR_DESCR))
+				s.EXPECT().PutOrder(order).Return(0, 50000.00, errors.New(customErrors.BD_ERROR_DESCR))
 			},
 			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(3), nil)
