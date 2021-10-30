@@ -5,10 +5,20 @@ import (
 	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	middlewarePanic "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/panic"
 	middlewareRequestId "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/requestId"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"net/http"
 )
+
+func CsrfSetHeader(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
+		k, ok := context.Get("csrf").(string)
+		if ok {
+			context.Response().Header().Add("X-CSRF-Token", k)
+		}
+		return next(context)
+	}
+}
 
 func ConfigMiddleware(router *echo.Echo) {
 	router.Use(
@@ -24,8 +34,11 @@ func ConfigMiddleware(router *echo.Echo) {
 				}
 				return false
 			},
-			CookieHTTPOnly: true,
+			CookiePath:     "/",
+			CookieSameSite: http.SameSiteNoneMode,
+			CookieSecure:   true,
 		}),
+		CsrfSetHeader,
 		middleware.Secure(),
 	)
 }
