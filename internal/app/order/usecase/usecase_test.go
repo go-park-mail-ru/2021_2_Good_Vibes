@@ -50,6 +50,13 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 		Products: products,
 	}
 
+	productPrices := []models.ProductPrice{
+		{
+			Id: 1,
+			Price: 1000.99,
+		},
+	}
+
 	tests := []struct {
 		name                   string
 		order                  models.Order
@@ -62,15 +69,26 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(3, nil)
+				s.EXPECT().SelectPrices(order.Products).Return(productPrices, nil)
 			},
 			expectedId:    3,
 			expectedError: nil,
 		},
 		{
-			name:  "error",
-			order: order,
+			name : "error put order",
+			order : order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, errors.New("new error"))
+				s.EXPECT().SelectPrices(order.Products).Return(productPrices, nil)
+			},
+			expectedId : 0,
+			expectedError: errors.New("new error"),
+		},
+		{
+			name : "error select prices",
+			order : order,
+			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
+				s.EXPECT().SelectPrices(order.Products).Return(nil, errors.New("new error"))
 			},
 			expectedId:    0,
 			expectedError: errors.New("new error"),
@@ -85,7 +103,7 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 
 			useCase := NewOrderUseCase(newOrderRepo)
 
-			orderId, err := useCase.PutOrder(tt.order)
+			orderId, _, err := useCase.PutOrder(tt.order)
 
 			assert.Equal(t, orderId, tt.expectedId)
 			assert.Equal(t, err, tt.expectedError)

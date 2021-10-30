@@ -10,3 +10,8 @@ type Product struct {
 	CountInStock int     `json:"count_in_stock"`
 	Description  string  `json:"description"`
 }
+
+type ProductPrice struct {
+	Id int
+	Price float64
+}

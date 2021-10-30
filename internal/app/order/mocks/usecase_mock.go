@@ -35,12 +35,13 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // PutOrder mocks base method.
-func (m *MockUseCase) PutOrder(arg0 models.Order) (int, error) {
+func (m *MockUseCase) PutOrder(arg0 models.Order) (int, float64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PutOrder", arg0)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(float64)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // PutOrder indicates an expected call of PutOrder.
