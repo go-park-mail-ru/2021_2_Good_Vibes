@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher"
@@ -80,4 +81,17 @@ func (us *usecase) SaveAvatarName(userId int, fileName string) error {
 	}
 
 	return nil
+}
+
+func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
+	userFromDb, err := us.repository.GetUserDataByName(newData.Name)
+	if err != nil {
+		return customErrors.DB_ERROR, errors.New(customErrors.BD_ERROR_DESCR)
+	}
+
+	if userFromDb != nil {
+		return customErrors.USER_EXISTS_ERROR, nil
+	}
+
+	return userFromDb.Id, us.repository.UpdateUser(newData)
 }

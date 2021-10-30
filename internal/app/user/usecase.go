@@ -9,4 +9,5 @@ type Usecase interface {
 	AddUser(newUser models.UserDataForReg) (int, error)
 	GenerateAvatarName() string
 	SaveAvatarName(userId int, fileName string) error
+	UpdateProfile(newData models.UserDataProfile) (int, error)
 }
