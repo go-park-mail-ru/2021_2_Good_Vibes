@@ -72,18 +72,20 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 	}
 
 	if err := ctx.Validate(&newCategory); err != nil {
-		newSignupError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newSignupError)
+		newCategoryError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
 	if err != nil {
-		return err
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
-		return err
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	AllCategoriesJson = categories
