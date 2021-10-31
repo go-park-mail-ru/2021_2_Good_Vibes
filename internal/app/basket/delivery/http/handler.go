@@ -80,7 +80,7 @@ func (bh *BasketHandler) GetBasket(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success GetBasket")
@@ -91,37 +91,21 @@ func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".DropBasket")
 
-	var user models.UserID
-
 	userId, err := bh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}
 
-	user.UserId = int(userId)
-
-	if err := ctx.Bind(&user); err != nil {
-		logger.Error(err)
-		newBasketError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
-	}
-
-	if err := ctx.Validate(&user); err != nil {
-		logger.Error(err, user)
-		newBasketError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
-	}
-
-	err = bh.useCase.DropBasket(user.UserId)
+	err = bh.useCase.DropBasket(int(userId))
 	if err != nil {
-		logger.Error(err, user)
+		logger.Error(err, userId)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success DropBasket")
-	return ctx.JSON(http.StatusOK, user)
+	return ctx.NoContent(http.StatusOK)
 }
 
 func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
@@ -154,7 +138,7 @@ func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err, product)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success DeleteProduct")
