@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+const BucketUrl = ""
+
 type UserHandler struct {
 	Usecase        user.Usecase
 	SessionManager sessionJwt.TokenManager
@@ -65,6 +67,8 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newLoginError)
 	}
 
+	userProfile, err := handler.Usecase.GetUserDataByID(uint64(id))
+
 	claimsString, err := handler.SessionManager.GetToken(id, newUserDataForInput.Name)
 	if err != nil {
 		newLoginError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
@@ -73,9 +77,9 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	}
 
 	handler.setCookieValue(ctx, claimsString)
-	newUserDataForInput.Password = ""
+
 	logger.Trace(trace + "ok login for user: " + newUserDataForInput.Name)
-	return ctx.JSON(http.StatusOK, newUserDataForInput)
+	return ctx.JSON(http.StatusOK, *userProfile)
 }
 
 func (handler *UserHandler) SignUp(ctx echo.Context) error {
@@ -108,6 +112,8 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
+	userProfile, err := handler.Usecase.GetUserDataByID(uint64(newId))
+
 	claimsString, err := handler.SessionManager.GetToken(newId, newUser.Name)
 	if err != nil {
 		newSignupError := errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR)
@@ -116,9 +122,8 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	}
 	handler.setCookieValue(ctx, claimsString)
 
-	newUser.Password = ""
 	logger.Trace(trace + "ok signup for user: " + newUser.Name)
-	return ctx.JSON(http.StatusOK, newUser)
+	return ctx.JSON(http.StatusOK, *userProfile)
 }
 
 func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
@@ -172,7 +177,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = handler.Usecase.SaveAvatarName(int(idNum), fileName)
+	err = handler.Usecase.SaveAvatarName(int(idNum), BucketUrl + fileName)
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)

@@ -52,8 +52,8 @@ func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) 
 
 func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT id, name, email, password FROM customers WHERE id=$1", id)
-	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
+	row := su.db.QueryRow("SELECT id, name, email, password, avatar FROM customers WHERE id=$1", id)
+	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password, &tmp.Avatar)
 
 	if err == sql.ErrNoRows {
 		return nil, nil

@@ -14,6 +14,8 @@ import (
 	"strconv"
 )
 
+const BucketUrl = ""
+
 type ProductHandler struct {
 	useCase product.UseCase
 }
@@ -143,7 +145,7 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = ph.useCase.SaveProductImageName(productId, fileName)
+	err = ph.useCase.SaveProductImageName(productId, BucketUrl + fileName)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
