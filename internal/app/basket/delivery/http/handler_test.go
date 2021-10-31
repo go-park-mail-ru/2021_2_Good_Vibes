@@ -144,7 +144,7 @@ func TestBasketHandler_GetBasket(t *testing.T) {
 	basket := []models.BasketProduct{
 		{
 			ProductId: 1,
-			Number: 2,
+			Number:    2,
 		},
 	}
 
@@ -160,7 +160,7 @@ func TestBasketHandler_GetBasket(t *testing.T) {
 		expectedRequestBody string
 	}{
 		{
-			name:         "OK",
+			name: "OK",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), nil)
 			},
@@ -171,7 +171,7 @@ func TestBasketHandler_GetBasket(t *testing.T) {
 			expectedRequestBody: string(basketGet) + "\n",
 		},
 		{
-			name:         "Unauthorized",
+			name: "Unauthorized",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), errors.New(customErrors.TOKEN_ERROR_DESCR))
 			},
@@ -181,7 +181,7 @@ func TestBasketHandler_GetBasket(t *testing.T) {
 			expectedRequestBody: string(errorGet2) + "\n",
 		},
 		{
-			name:         "BD_ERROR",
+			name: "BD_ERROR",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), nil)
 			},
@@ -242,8 +242,8 @@ func TestBasketHandler_DeleteProduct(t *testing.T) {
 
 	testTable := []struct {
 		name                string
-		inputBody			string
-		inputProduct 		models.BasketProduct
+		inputBody           string
+		inputProduct        models.BasketProduct
 		mockBehaviorUseCase mockBehaviorUseCase
 		mockBehaviorSession mockBehaviorSession
 		expectedStatusCode  int
@@ -263,7 +263,7 @@ func TestBasketHandler_DeleteProduct(t *testing.T) {
 			expectedRequestBody: string(productForDel) + "\n",
 		},
 		{
-			name:         "Unauthorized",
+			name: "Unauthorized",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), errors.New(customErrors.TOKEN_ERROR_DESCR))
 			},
@@ -347,7 +347,6 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 	type mockBehaviorUseCase func(s *mocks.MockUseCase, id int)
 	type mockBehaviorSession func(s *mockJwt.MockTokenManager)
 
-
 	errorGet2, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
 	errorGet3, _ := json.Marshal(customErrors.NewError(customErrors.SERVER_ERROR, customErrors.BD_ERROR_DESCR))
 
@@ -359,7 +358,7 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 		expectedRequestBody string
 	}{
 		{
-			name:         "OK",
+			name: "OK",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), nil)
 			},
@@ -370,7 +369,7 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 			expectedRequestBody: "",
 		},
 		{
-			name:         "Unauthorized",
+			name: "Unauthorized",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), errors.New(customErrors.TOKEN_ERROR_DESCR))
 			},
@@ -380,7 +379,7 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 			expectedRequestBody: string(errorGet2) + "\n",
 		},
 		{
-			name:         "BD_ERROR",
+			name: "BD_ERROR",
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), nil)
 			},
@@ -423,6 +422,3 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 		})
 	}
 }
-
-
-

@@ -23,7 +23,7 @@ func TestUseCase_PutInBasket(t *testing.T) {
 			name: "OK",
 			inputData: models.BasketProduct{
 				ProductId: 1,
-				Number: 2,
+				Number:    2,
 			},
 			mockBehaviorRepository: func(s *mocks.MockRepository, product models.BasketProduct) {
 				s.EXPECT().PutInBasket(product).Return(nil)
@@ -34,7 +34,7 @@ func TestUseCase_PutInBasket(t *testing.T) {
 			name: "BD_ERROR",
 			inputData: models.BasketProduct{
 				ProductId: 1,
-				Number: 2,
+				Number:    2,
 			},
 			mockBehaviorRepository: func(s *mocks.MockRepository, product models.BasketProduct) {
 				s.EXPECT().PutInBasket(product).Return(errors.New(customErrors.BD_ERROR_DESCR))
@@ -71,7 +71,7 @@ func TestUseCase_GetBasket(t *testing.T) {
 		expectedError          error
 	}{
 		{
-			name: "OK",
+			name:      "OK",
 			inputData: 1,
 			mockBehaviorRepository: func(s *mocks.MockRepository, id int) {
 				s.EXPECT().GetBasket(id).Return(nil, nil)
@@ -79,7 +79,7 @@ func TestUseCase_GetBasket(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "BD_ERROR",
+			name:      "BD_ERROR",
 			inputData: 2,
 			mockBehaviorRepository: func(s *mocks.MockRepository, id int) {
 				s.EXPECT().GetBasket(id).Return(nil, errors.New(customErrors.BD_ERROR_DESCR))
@@ -116,7 +116,7 @@ func TestUseCase_DropBasket(t *testing.T) {
 		expectedError          error
 	}{
 		{
-			name: "OK",
+			name:      "OK",
 			inputData: 1,
 			mockBehaviorRepository: func(s *mocks.MockRepository, id int) {
 				s.EXPECT().DropBasket(id).Return(nil)
@@ -124,7 +124,7 @@ func TestUseCase_DropBasket(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "BD_ERROR",
+			name:      "BD_ERROR",
 			inputData: 2,
 			mockBehaviorRepository: func(s *mocks.MockRepository, id int) {
 				s.EXPECT().DropBasket(id).Return(errors.New(customErrors.BD_ERROR_DESCR))
@@ -164,7 +164,7 @@ func TestUseCase_DeleteProduct(t *testing.T) {
 			name: "OK",
 			inputData: models.BasketProduct{
 				ProductId: 1,
-				Number: 2,
+				Number:    2,
 			},
 			mockBehaviorRepository: func(s *mocks.MockRepository, product models.BasketProduct) {
 				s.EXPECT().DeleteProduct(product).Return(nil)
@@ -175,7 +175,7 @@ func TestUseCase_DeleteProduct(t *testing.T) {
 			name: "BD_ERROR",
 			inputData: models.BasketProduct{
 				ProductId: 1,
-				Number: 2,
+				Number:    2,
 			},
 			mockBehaviorRepository: func(s *mocks.MockRepository, product models.BasketProduct) {
 				s.EXPECT().DeleteProduct(product).Return(errors.New(customErrors.BD_ERROR_DESCR))
@@ -201,4 +201,3 @@ func TestUseCase_DeleteProduct(t *testing.T) {
 		})
 	}
 }
-

@@ -52,7 +52,7 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 
 	productPrices := []models.ProductPrice{
 		{
-			Id: 1,
+			Id:    1,
 			Price: 1000.99,
 		},
 	}
@@ -75,18 +75,18 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name : "error put order",
-			order : order,
+			name:  "error put order",
+			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, errors.New("new error"))
 				s.EXPECT().SelectPrices(order.Products).Return(productPrices, nil)
 			},
-			expectedId : 0,
+			expectedId:    0,
 			expectedError: errors.New("new error"),
 		},
 		{
-			name : "error select prices",
-			order : order,
+			name:  "error select prices",
+			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().SelectPrices(order.Products).Return(nil, errors.New("new error"))
 			},

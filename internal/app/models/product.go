@@ -12,6 +12,6 @@ type Product struct {
 }
 
 type ProductPrice struct {
-	Id int
+	Id    int
 	Price float64
 }

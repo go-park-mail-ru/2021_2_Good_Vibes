@@ -318,13 +318,13 @@ func TestPutOrder(t *testing.T) {
 }
 
 func TestSelectPrices(t *testing.T) {
-	orderProducts := []models.OrderProducts {
+	orderProducts := []models.OrderProducts{
 		{1, 5, 1},
 	}
 
-	expectedProductPrices := []models.ProductPrice {
+	expectedProductPrices := []models.ProductPrice{
 		{
-			Id: 1,
+			Id:    1,
 			Price: 10000,
 		},
 	}

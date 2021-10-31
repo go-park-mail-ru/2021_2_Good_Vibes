@@ -44,13 +44,12 @@ func TestCategoryHandler_GetCategories(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "/category", nil)
 
-
 	// correct
 	AllCategoriesJson.Name = ""
 
 	recorder := httptest.NewRecorder()
 
-    expectedStatusCode := http.StatusOK
+	expectedStatusCode := http.StatusOK
 	expectedRequestBody := string(categoriesJson) + "\n"
 
 	router.ServeHTTP(recorder, req)
@@ -89,43 +88,43 @@ func TestOrderHandler_GetCategoryProducts(t *testing.T) {
 	err := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.BD_ERROR_DESCR)
 	errJson, _ := json.Marshal(err)
 
-	products := []models.Product {
+	products := []models.Product{
 		{
-			Id : 1,
-			Image : "image",
-			Name : "name",
-			Price : 1000.0,
-			Rating : 5,
-			Category : "CLOTHES",
-			CountInStock : 1000,
-			Description  : "cool description",
+			Id:           1,
+			Image:        "image",
+			Name:         "name",
+			Price:        1000.0,
+			Rating:       5,
+			Category:     "CLOTHES",
+			CountInStock: 1000,
+			Description:  "cool description",
 		},
 	}
 
 	productsJson, _ := json.Marshal(products)
 
 	tests := []struct {
-		name                string
+		name                              string
 		mockBehaviorGetProductsByCategory mockBehaviorGetProductsByCategory
-		expectedStatusCode  int
-		expectedRequestBody string
-	} {
+		expectedStatusCode                int
+		expectedRequestBody               string
+	}{
 		{
-			name : "correct",
-			mockBehaviorGetProductsByCategory : func(s *mock_category.MockUseCase) {
+			name: "correct",
+			mockBehaviorGetProductsByCategory: func(s *mock_category.MockUseCase) {
 				s.EXPECT().GetProductsByCategory("clothes").Return(products, nil)
 			},
 
-			expectedStatusCode : http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(productsJson) + "\n",
 		},
 		{
-			name : "error",
-			mockBehaviorGetProductsByCategory : func(s *mock_category.MockUseCase) {
+			name: "error",
+			mockBehaviorGetProductsByCategory: func(s *mock_category.MockUseCase) {
 				s.EXPECT().GetProductsByCategory("clothes").Return(nil, errors.New(customErrors.BD_ERROR_DESCR))
 			},
 
-			expectedStatusCode : http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(errJson) + "\n",
 		},
 	}
@@ -155,12 +154,11 @@ func TestOrderHandler_GetCategoryProducts(t *testing.T) {
 	}
 }
 
-
 func TestCategoryHandler_CreateCategory(t *testing.T) {
 	type mockBehaviorCreateCategory func(s *mock_category.MockUseCase)
 	type mockBehaviorGetAllCategories func(s *mock_category.MockUseCase)
 
-	categories := models.CategoryNode {
+	categories := models.CategoryNode{
 		Name:     "CLOTHES",
 		Nesting:  0,
 		Children: nil,
@@ -168,8 +166,8 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 
 	categoriesJson, _ := json.Marshal(categories)
 
-	newCategory := models.CreateCategory {
-		Category : "MEN_CLOTHES",
+	newCategory := models.CreateCategory{
+		Category:       "MEN_CLOTHES",
 		ParentCategory: "CLOTHES",
 	}
 
@@ -179,33 +177,33 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 	errJson, _ := json.Marshal(err)
 
 	tests := []struct {
-		name                string
-		mockBehaviorCreateCategory mockBehaviorCreateCategory
+		name                         string
+		mockBehaviorCreateCategory   mockBehaviorCreateCategory
 		mockBehaviorGetAllCategories mockBehaviorGetAllCategories
-		expectedStatusCode  int
-		expectedRequestBody string
-	} {
+		expectedStatusCode           int
+		expectedRequestBody          string
+	}{
 		{
-			name : "correct",
-			mockBehaviorCreateCategory : func(s *mock_category.MockUseCase) {
+			name: "correct",
+			mockBehaviorCreateCategory: func(s *mock_category.MockUseCase) {
 				s.EXPECT().CreateCategory("MEN_CLOTHES", "CLOTHES").Return(nil)
 			},
-			mockBehaviorGetAllCategories : func(s *mock_category.MockUseCase) {
+			mockBehaviorGetAllCategories: func(s *mock_category.MockUseCase) {
 				s.EXPECT().GetAllCategories().Return(categories, nil)
 			},
 
-			expectedStatusCode : http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(categoriesJson) + "\n",
 		},
 		{
-			name : "error create",
-			mockBehaviorCreateCategory : func(s *mock_category.MockUseCase) {
+			name: "error create",
+			mockBehaviorCreateCategory: func(s *mock_category.MockUseCase) {
 				s.EXPECT().CreateCategory("MEN_CLOTHES", "CLOTHES").Return(errors.New(customErrors.BD_ERROR_DESCR))
 			},
-			mockBehaviorGetAllCategories : func(s *mock_category.MockUseCase) {
+			mockBehaviorGetAllCategories: func(s *mock_category.MockUseCase) {
 			},
 
-			expectedStatusCode : http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(errJson) + "\n",
 		},
 	}

@@ -489,8 +489,8 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 	type mockBehaviorSession func(s *mockJwt.MockTokenManager)
 
 	user1, _ := json.Marshal(models.UserDataProfile{
-		Id: 1,
-		Name: "Test1",
+		Id:    1,
+		Name:  "Test1",
 		Email: "test@gmail.com"})
 	//user2, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
 	//	Email: "test@gmail.com"})
@@ -516,9 +516,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "OK",
 			inputBody: string(user1),
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 				s.EXPECT().UpdateProfile(userReg).Return(1, nil)
@@ -533,9 +533,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "unauthorized",
 			inputBody: string(user1),
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 			},
@@ -549,9 +549,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "BadJson",
 			inputBody: "{bad",
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 			},
@@ -565,9 +565,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "BadJsonData",
 			inputBody: `{"username": "Misha", "email": "fasg"}`,
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 			},
@@ -581,9 +581,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "BD_ERROR",
 			inputBody: string(user1),
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 				s.EXPECT().UpdateProfile(userReg).Return(1, errors.New(customErrors.BD_ERROR_DESCR))
@@ -598,9 +598,9 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 			name:      "User_exist_error",
 			inputBody: string(user1),
 			inputUser: models.UserDataProfile{
-				Id: 1,
-				Name:     "Test1",
-				Email:    "test@gmail.com",
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
 			},
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
 				s.EXPECT().UpdateProfile(userReg).Return(customErrors.USER_EXISTS_ERROR, nil)
@@ -645,4 +645,3 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 		})
 	}
 }
-

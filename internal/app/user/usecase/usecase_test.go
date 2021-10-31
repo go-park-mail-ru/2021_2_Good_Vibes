@@ -383,7 +383,7 @@ func TestUsecase_UpdateProfile(t *testing.T) {
 		{
 			name: "OK",
 			inputData: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "Qwerty123@gmail.com",
 			},
 			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
@@ -398,7 +398,7 @@ func TestUsecase_UpdateProfile(t *testing.T) {
 		{
 			name: "DB_ERROR",
 			inputData: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "Qwerty123@gmail.com",
 			},
 			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
@@ -412,12 +412,12 @@ func TestUsecase_UpdateProfile(t *testing.T) {
 		{
 			name: "User_Already_exists",
 			inputData: models.UserDataProfile{
-				Name:     "Test",
+				Name:  "Test",
 				Email: "Qwerty123@gmail.com",
 			},
 			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
-				s.EXPECT().GetUserDataByName(name).Return( &models.UserDataStorage{
-					Id: 123,
+				s.EXPECT().GetUserDataByName(name).Return(&models.UserDataStorage{
+					Id:   123,
 					Name: name,
 				}, nil)
 			},

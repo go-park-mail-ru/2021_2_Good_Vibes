@@ -93,7 +93,7 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 	return order.OrderId, nil
 }
 
-func (so* OrderRepository) SelectPrices(products []models.OrderProducts) ([]models.ProductPrice, error) {
+func (so *OrderRepository) SelectPrices(products []models.OrderProducts) ([]models.ProductPrice, error) {
 	query := makeSelectPricesQuery(products)
 
 	rows, err := so.db.Query(query)
@@ -142,18 +142,18 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 	query := strings.Builder{}
 	query.WriteString("insert into order_products (order_id, product_id, count) values")
 
-	values := make([]interface{}, FieldsNum * len(order.Products))
+	values := make([]interface{}, FieldsNum*len(order.Products))
 	for i, s := range order.Products {
-		values[i * FieldsNum] = s.OrderId
-		values[i * FieldsNum + 1] = s.ProductId
-		values[i * FieldsNum + 2] = s.Number
+		values[i*FieldsNum] = s.OrderId
+		values[i*FieldsNum+1] = s.ProductId
+		values[i*FieldsNum+2] = s.Number
 
 		n := i * FieldsNum
 
 		query.WriteString(`(`)
 		str := make([]string, FieldsNum)
 		for j := 0; j < FieldsNum; j++ {
-			str[j] = `$` + strconv.Itoa(n + j + 1)
+			str[j] = `$` + strconv.Itoa(n+j+1)
 		}
 
 		query.WriteString(strings.Join(str, ","))
@@ -162,7 +162,7 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 
 	str := query.String()
 
-	return str[:len(str) - 1], values
+	return str[:len(str)-1], values
 }
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {

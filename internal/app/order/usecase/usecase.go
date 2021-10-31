@@ -22,7 +22,7 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		return 0, 0, err
 	}
 
-	productPricesMap := make(map[int] float64, len(productPrices))
+	productPricesMap := make(map[int]float64, len(productPrices))
 	for _, productPrice := range productPrices {
 		productPricesMap[productPrice.Id] = productPrice.Price
 	}

@@ -23,13 +23,13 @@ func TestProductHandler_AddProduct(t *testing.T) {
 	type mockBehaviorUseCase func(s *mocks.MockUseCase, product models.Product)
 
 	product1 := models.Product{
-		Id: 1,
-		Image: "cartinka",
-		Name: "cartinka",
-		Price: 2280,
-		Rating: 6,
+		Id:           1,
+		Image:        "cartinka",
+		Name:         "cartinka",
+		Price:        2280,
+		Rating:       6,
 		CountInStock: 50,
-		Description: "OPICANIE",
+		Description:  "OPICANIE",
 	}
 	product1Send, _ := json.Marshal(product1)
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
@@ -45,41 +45,41 @@ func TestProductHandler_AddProduct(t *testing.T) {
 		expectedRequestBody string
 	}{
 		{
-			name: "OK",
-			inputBody: string(product1Send),
+			name:         "OK",
+			inputBody:    string(product1Send),
 			inputProduct: product1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
 				s.EXPECT().AddProduct(product).Return(1, nil)
 			},
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(product1Send) + "\n",
 		},
 		{
-			name: "BadJson",
-			inputBody: "{bad json}",
+			name:         "BadJson",
+			inputBody:    "{bad json}",
 			inputProduct: product1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
 		},
 		{
-			name: "BadJsonData",
-			inputBody: `{"id": 123,"imggg": "sdfsg"}`,
+			name:         "BadJsonData",
+			inputBody:    `{"id": 123,"imggg": "sdfsg"}`,
 			inputProduct: product1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error3get) + "\n",
 		},
 		{
-			name: "BDERROR",
-			inputBody: string(product1Send),
+			name:         "BDERROR",
+			inputBody:    string(product1Send),
 			inputProduct: product1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
 				s.EXPECT().AddProduct(product).Return(1, errors.New(customErrors.BD_ERROR_DESCR))
 			},
-			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusCode:  http.StatusInternalServerError,
 			expectedRequestBody: string(error4get) + "\n",
 		},
 	}
@@ -118,13 +118,13 @@ func TestProductHandler_GetProductById(t *testing.T) {
 	type mockBehaviorUseCase func(s *mocks.MockUseCase, id int)
 
 	product1 := models.Product{
-		Id: 1,
-		Image: "cartinka",
-		Name: "cartinka",
-		Price: 2280,
-		Rating: 6,
+		Id:           1,
+		Image:        "cartinka",
+		Name:         "cartinka",
+		Price:        2280,
+		Rating:       6,
 		CountInStock: 50,
-		Description: "OPICANIE",
+		Description:  "OPICANIE",
 	}
 	product1Send, _ := json.Marshal(product1)
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
@@ -139,34 +139,34 @@ func TestProductHandler_GetProductById(t *testing.T) {
 		expectedRequestBody string
 	}{
 		{
-			name: "OK",
-			inputBody: string(product1Send),
-			target: "/product?id=1",
+			name:         "OK",
+			inputBody:    string(product1Send),
+			target:       "/product?id=1",
 			inputProduct: 1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
 				s.EXPECT().GetProductById(id).Return(product1, nil)
 			},
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(product1Send) + "\n",
 		},
 		{
-			name: "BadQueryParamName",
-			inputBody: string(product1Send),
-			target: "/product?ids=1",
+			name:         "BadQueryParamName",
+			inputBody:    string(product1Send),
+			target:       "/product?ids=1",
 			inputProduct: 1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
 		},
 		{
-			name: "BadQueryParamValues",
-			inputBody: string(product1Send),
-			target: "/product?id=adf",
+			name:         "BadQueryParamValues",
+			inputBody:    string(product1Send),
+			target:       "/product?id=adf",
 			inputProduct: 1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
 		},
 	}
@@ -205,13 +205,13 @@ func TestProductHandler_GetAllProducts(t *testing.T) {
 	type mockBehaviorUseCase func(s *mocks.MockUseCase)
 
 	product1 := models.Product{
-		Id: 1,
-		Image: "cartinka",
-		Name: "cartinka",
-		Price: 2280,
-		Rating: 6,
+		Id:           1,
+		Image:        "cartinka",
+		Name:         "cartinka",
+		Price:        2280,
+		Rating:       6,
 		CountInStock: 50,
-		Description: "OPICANIE",
+		Description:  "OPICANIE",
 	}
 	products := []models.Product{product1}
 	product1Send, _ := json.Marshal(products)
@@ -226,26 +226,25 @@ func TestProductHandler_GetAllProducts(t *testing.T) {
 		expectedRequestBody string
 	}{
 		{
-			name: "OK",
-			inputBody: string(product1Send),
+			name:         "OK",
+			inputBody:    string(product1Send),
 			inputProduct: 1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase) {
 				s.EXPECT().GetAllProducts().Return(products, nil)
 			},
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(product1Send) + "\n",
 		},
 		{
-			name: "BDERROR",
-			inputBody: string(product1Send),
+			name:         "BDERROR",
+			inputBody:    string(product1Send),
 			inputProduct: 1,
 			mockBehaviorUseCase: func(s *mocks.MockUseCase) {
 				s.EXPECT().GetAllProducts().Return(products, errors.New(customErrors.BD_ERROR_DESCR))
 			},
-			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusCode:  http.StatusInternalServerError,
 			expectedRequestBody: string(error2get) + "\n",
 		},
-
 	}
 
 	for _, testCase := range testTable {
