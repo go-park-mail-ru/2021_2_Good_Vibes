@@ -212,14 +212,14 @@ func TestUserHandler_Login(t *testing.T) {
 	error7get, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
 
 	testTable := []struct {
-		name                string
-		inputBody           string
-		inputUser           models.UserDataForInput
-		mockBehaviorUseCase mockBehaviorUseCase
-		mockBehaviorSession mockBehaviorSession
+		name                               string
+		inputBody                          string
+		inputUser                          models.UserDataForInput
+		mockBehaviorUseCase                mockBehaviorUseCase
+		mockBehaviorSession                mockBehaviorSession
 		mockBehaviorUseCaseGetUserDataById mockBehaviorUseCaseGetUserDataByid
-		expectedStatusCode  int
-		expectedRequestBody string
+		expectedStatusCode                 int
+		expectedRequestBody                string
 	}{
 		{
 			name:      "OK",
