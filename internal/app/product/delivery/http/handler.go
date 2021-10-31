@@ -37,18 +37,19 @@ func addProduct(ctx echo.Context) error {
 func (ph *ProductHandler) AddProduct(ctx echo.Context) error {
 	var newProduct models.Product
 	if err := ctx.Bind(&newProduct); err != nil {
-		newLoginError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newLoginError)
+		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
 	if err := ctx.Validate(&newProduct); err != nil {
-		newLoginError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newLoginError)
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
 	productId, err := ph.useCase.AddProduct(newProduct)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 
 	newProduct.Id = productId
@@ -63,8 +64,8 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 	answer, err := ph.useCase.GetAllProducts()
 	if err != nil {
 		logger.Error(err)
-		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newProductError)
+		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 	return ctx.JSON(http.StatusOK, answer)
 }
@@ -74,7 +75,6 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	logger.Trace(trace + "GetProductById")
 
 	val := ctx.QueryParams()
-
 	idString := val.Get("id")
 	if idString == "" {
 		logger.Error("bad query param for GetProductById")
@@ -85,7 +85,7 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	id, err := strconv.Atoi(idString)
 	if err != nil {
 		logger.Error(err)
-		newProductError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newProductError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 

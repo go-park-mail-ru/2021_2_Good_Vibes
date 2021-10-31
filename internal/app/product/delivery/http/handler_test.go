@@ -1,139 +1,279 @@
 package http
 
-//
-//import (
-//	"encoding/json"
-//	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-//	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
-//	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/storage/impl"
-//	"github.com/labstack/echo/v4"
-//	"github.com/stretchr/testify/assert"
-//	"net/http"
-//	"net/http/httptest"
-//	"testing"
-//)
-//
-//func InitMockStorage() *impl.StorageProductsMemory {
-//	var mockStorage = impl.NewStorageProductsMemory()
-//
-//	mockStorage.AddProduct(product.Product{Id: 1, Image: "images/cat1.jpeg", Name: "cat1", Price: 1000, Rating: 100})
-//	mockStorage.AddProduct(product.Product{Id: 2, Image: "images/cat2.jpeg", Name: "cat2", Price: 1000, Rating: 100})
-//	return mockStorage
-//}
-//
-//func TestGetAllProductsSuccessUnit(t *testing.T) {
-//	mockStorage := InitMockStorage()
-//
-//	product1 := product.NewProduct(1, "images/cat1.jpeg", "cat1", 1000, 100)
-//	product2 := product.NewProduct(2, "images/cat2.jpeg", "cat2", 1000, 100)
-//
-//	var products []product.Product
-//	products = append(products, product1)
-//	products = append(products, product2)
-//
-//	wantedProductResp, _ := json.Marshal(products)
-//
-//	tests := []struct {
-//		name       string
-//		wantedJson string
-//		statusCode int
-//	}{
-//		{
-//			"products",
-//			string(wantedProductResp) + "\n",
-//			http.StatusOK,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			router := echo.New()
-//
-//			rec, ctx, h := constructRequest("/homepage", router, mockStorage)
-//
-//			if assert.NoError(t, h.GetAllProducts(ctx)) {
-//				assert.Equal(t, tt.statusCode, rec.Code)
-//				assert.Equal(t, tt.wantedJson, rec.Body.String())
-//			}
-//		})
-//	}
-//}
-//
-//func TestGetProductByIdSuccessUnit(t *testing.T) {
-//	mockStorage := InitMockStorage()
-//
-//	product1 := product.NewProduct(1, "images/cat1.jpeg", "cat1", 1000, 100)
-//
-//	wantedProductResp, _ := json.Marshal(product1)
-//
-//	tests := []struct {
-//		name       string
-//		id         string
-//		wantedJson string
-//		statusCode int
-//	}{
-//		{
-//			"success",
-//			"1",
-//			string(wantedProductResp) + "\n",
-//			http.StatusOK,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			router := echo.New()
-//
-//			rec, ctx, h := constructRequest("/product?id="+tt.id, router, mockStorage)
-//
-//			if assert.NoError(t, h.GetProductById(ctx)) {
-//				assert.Equal(t, tt.statusCode, rec.Code)
-//				assert.Equal(t, tt.wantedJson, rec.Body.String())
-//			}
-//		})
-//	}
-//}
-//
-//func TestGetProductByIdSFailUnit(t *testing.T) {
-//	mockStorage := InitMockStorage()
-//
-//	err := product.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-//
-//	wantedProductResp, _ := json.Marshal(err)
-//
-//	tests := []struct {
-//		name       string
-//		id         string
-//		wantedJson string
-//		statusCode int
-//	}{
-//		{
-//			"fail",
-//			"",
-//			string(wantedProductResp) + "\n",
-//			http.StatusBadRequest,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			router := echo.New()
-//
-//			rec, ctx, h := constructRequest("/product?id="+tt.id, router, mockStorage)
-//
-//			if assert.NoError(t, h.GetProductById(ctx)) {
-//				assert.Equal(t, tt.statusCode, rec.Code)
-//				assert.Equal(t, tt.wantedJson, rec.Body.String())
-//			}
-//		})
-//	}
-//}
-//
-//func constructRequest(target string, router *echo.Echo, mockStorage *impl.StorageProductsMemory) (*httptest.ResponseRecorder, echo.Context, *ProductHandler) {
-//	req := httptest.NewRequest(http.MethodGet, target, nil)
-//	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-//	rec := httptest.NewRecorder()
-//	ctx := router.NewContext(req, rec)
-//	h := &ProductHandler{mockStorage}
-//	return rec, ctx, h
-//}
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	mocks "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/mocks"
+	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
+	"github.com/go-playground/validator"
+	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo/v4"
+	"github.com/magiconair/properties/assert"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func TestProductHandler_AddProduct(t *testing.T) {
+	type mockBehaviorUseCase func(s *mocks.MockUseCase, product models.Product)
+
+	product1 := models.Product{
+		Id: 1,
+		Image: "cartinka",
+		Name: "cartinka",
+		Price: 2280,
+		Rating: 6,
+		CountInStock: 50,
+		Description: "OPICANIE",
+	}
+	product1Send, _ := json.Marshal(product1)
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
+	error3get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	error4get, _ := json.Marshal(customErrors.NewError(customErrors.SERVER_ERROR, customErrors.BD_ERROR_DESCR))
+
+	testTable := []struct {
+		name                string
+		inputBody           string
+		inputProduct        models.Product
+		mockBehaviorUseCase mockBehaviorUseCase
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		{
+			name: "OK",
+			inputBody: string(product1Send),
+			inputProduct: product1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
+				s.EXPECT().AddProduct(product).Return(1, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedRequestBody: string(product1Send) + "\n",
+		},
+		{
+			name: "BadJson",
+			inputBody: "{bad json}",
+			inputProduct: product1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
+			name: "BadJsonData",
+			inputBody: `{"id": 123,"imggg": "sdfsg"}`,
+			inputProduct: product1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error3get) + "\n",
+		},
+		{
+			name: "BDERROR",
+			inputBody: string(product1Send),
+			inputProduct: product1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, product models.Product) {
+				s.EXPECT().AddProduct(product).Return(1, errors.New(customErrors.BD_ERROR_DESCR))
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedRequestBody: string(error4get) + "\n",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUseCase := mocks.NewMockUseCase(c)
+			testCase.mockBehaviorUseCase(mockUseCase, testCase.inputProduct)
+
+			handler := NewProductHandler(mockUseCase)
+			router := echo.New()
+			router.POST("/product/add", handler.AddProduct)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req := httptest.NewRequest("POST", "/product/add",
+				bytes.NewBufferString(testCase.inputBody))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
+
+func TestProductHandler_GetProductById(t *testing.T) {
+	type mockBehaviorUseCase func(s *mocks.MockUseCase, id int)
+
+	product1 := models.Product{
+		Id: 1,
+		Image: "cartinka",
+		Name: "cartinka",
+		Price: 2280,
+		Rating: 6,
+		CountInStock: 50,
+		Description: "OPICANIE",
+	}
+	product1Send, _ := json.Marshal(product1)
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+
+	testTable := []struct {
+		name                string
+		inputBody           string
+		target              string
+		inputProduct        int
+		mockBehaviorUseCase mockBehaviorUseCase
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		{
+			name: "OK",
+			inputBody: string(product1Send),
+			target: "/product?id=1",
+			inputProduct: 1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
+				s.EXPECT().GetProductById(id).Return(product1, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedRequestBody: string(product1Send) + "\n",
+		},
+		{
+			name: "BadQueryParamName",
+			inputBody: string(product1Send),
+			target: "/product?ids=1",
+			inputProduct: 1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
+			name: "BadQueryParamValues",
+			inputBody: string(product1Send),
+			target: "/product?id=adf",
+			inputProduct: 1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase, id int) {
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUseCase := mocks.NewMockUseCase(c)
+			testCase.mockBehaviorUseCase(mockUseCase, testCase.inputProduct)
+
+			handler := NewProductHandler(mockUseCase)
+			router := echo.New()
+			router.GET("/product", handler.GetProductById)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req := httptest.NewRequest("GET", testCase.target,
+				bytes.NewBufferString(testCase.inputBody))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
+
+func TestProductHandler_GetAllProducts(t *testing.T) {
+	type mockBehaviorUseCase func(s *mocks.MockUseCase)
+
+	product1 := models.Product{
+		Id: 1,
+		Image: "cartinka",
+		Name: "cartinka",
+		Price: 2280,
+		Rating: 6,
+		CountInStock: 50,
+		Description: "OPICANIE",
+	}
+	products := []models.Product{product1}
+	product1Send, _ := json.Marshal(products)
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
+
+	testTable := []struct {
+		name                string
+		inputBody           string
+		inputProduct        int
+		mockBehaviorUseCase mockBehaviorUseCase
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		{
+			name: "OK",
+			inputBody: string(product1Send),
+			inputProduct: 1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase) {
+				s.EXPECT().GetAllProducts().Return(products, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedRequestBody: string(product1Send) + "\n",
+		},
+		{
+			name: "BDERROR",
+			inputBody: string(product1Send),
+			inputProduct: 1,
+			mockBehaviorUseCase: func(s *mocks.MockUseCase) {
+				s.EXPECT().GetAllProducts().Return(products, errors.New(customErrors.BD_ERROR_DESCR))
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUseCase := mocks.NewMockUseCase(c)
+			testCase.mockBehaviorUseCase(mockUseCase)
+
+			handler := NewProductHandler(mockUseCase)
+			router := echo.New()
+			router.GET("/homepage", handler.GetAllProducts)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req := httptest.NewRequest("GET", "/homepage",
+				bytes.NewBufferString(testCase.inputBody))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
