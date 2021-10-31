@@ -367,3 +367,84 @@ func TestUseCase_SaveAvatarName(t *testing.T) {
 		})
 	}
 }
+
+func TestUsecase_UpdateProfile(t *testing.T) {
+	type mockBehaviorRepositoryGetUserDataByName func(s *mockUser.MockRepository, name string)
+	type mockBehaviorRepositoryUpdateUser func(s *mockUser.MockRepository, user models.UserDataProfile)
+
+	testTable := []struct {
+		name                                    string
+		inputData                               models.UserDataProfile
+		mockBehaviorRepositoryGetUserDataByName mockBehaviorRepositoryGetUserDataByName
+		mockBehaviorRepositoryUpdateUser        mockBehaviorRepositoryUpdateUser
+		expectedId                              int
+		expectedError                           error
+	}{
+		{
+			name: "OK",
+			inputData: models.UserDataProfile{
+				Name:     "Test",
+				Email: "Qwerty123@gmail.com",
+			},
+			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
+				s.EXPECT().GetUserDataByName(name).Return(nil, nil)
+			},
+			mockBehaviorRepositoryUpdateUser: func(s *mockUser.MockRepository, user models.UserDataProfile) {
+				s.EXPECT().UpdateUser(user).Return(nil)
+			},
+			expectedId:    0,
+			expectedError: nil,
+		},
+		{
+			name: "DB_ERROR",
+			inputData: models.UserDataProfile{
+				Name:     "Test",
+				Email: "Qwerty123@gmail.com",
+			},
+			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
+				s.EXPECT().GetUserDataByName(name).Return(nil, errors.New(customErrors.BD_ERROR_DESCR))
+			},
+			mockBehaviorRepositoryUpdateUser: func(s *mockUser.MockRepository, user models.UserDataProfile) {
+			},
+			expectedId:    customErrors.DB_ERROR,
+			expectedError: errors.New(customErrors.BD_ERROR_DESCR),
+		},
+		{
+			name: "User_Already_exists",
+			inputData: models.UserDataProfile{
+				Name:     "Test",
+				Email: "Qwerty123@gmail.com",
+			},
+			mockBehaviorRepositoryGetUserDataByName: func(s *mockUser.MockRepository, name string) {
+				s.EXPECT().GetUserDataByName(name).Return( &models.UserDataStorage{
+					Id: 123,
+					Name: name,
+				}, nil)
+			},
+			mockBehaviorRepositoryUpdateUser: func(s *mockUser.MockRepository, user models.UserDataProfile) {
+			},
+			expectedId:    customErrors.USER_EXISTS_ERROR,
+			expectedError: nil,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockRepository := mockUser.NewMockRepository(c)
+			mockHasher := mockHasher.NewMockHasher(c)
+
+			testCase.mockBehaviorRepositoryGetUserDataByName(mockRepository, testCase.inputData.Name)
+			testCase.mockBehaviorRepositoryUpdateUser(mockRepository, testCase.inputData)
+
+			usecase := NewUsecase(mockRepository, mockHasher)
+
+			id, err := usecase.UpdateProfile(testCase.inputData)
+
+			assert.Equal(t, testCase.expectedId, id)
+			assert.Equal(t, testCase.expectedError, err)
+		})
+	}
+}
