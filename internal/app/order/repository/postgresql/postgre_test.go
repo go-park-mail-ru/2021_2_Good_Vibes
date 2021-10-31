@@ -137,7 +137,6 @@ func TestPutOrder(t *testing.T) {
 			order.Address.Index).
 		WillReturnResult(sqlmock.NewErrorResult(fmt.Errorf("db error")))
 
-
 	mock.ExpectRollback()
 
 	_, err = storage.PutOrder(order)
@@ -279,7 +278,7 @@ func TestPutOrder(t *testing.T) {
 	// result error
 	mock.ExpectBegin()
 	rows = sqlmock.NewRows([]string{"id", "address"}).
-		AddRow(order.OrderId,  order.Cost)
+		AddRow(order.OrderId, order.Cost)
 
 	mock.
 		ExpectQuery(`insert into orders`).

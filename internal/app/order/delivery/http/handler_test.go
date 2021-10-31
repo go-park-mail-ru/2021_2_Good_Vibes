@@ -31,7 +31,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 	serverErrorJson, _ := json.Marshal(serverError)
 	validErrorJson, _ := json.Marshal(validError)
 
-	products := []models.OrderProducts {
+	products := []models.OrderProducts{
 		{
 			OrderId:   1,
 			ProductId: 10,
@@ -60,8 +60,8 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 	}
 
 	order := models.Order{
-		OrderId: 1,
-		UserId: 3,
+		OrderId:  1,
+		UserId:   3,
 		Date:     "28-10-2021 03:03:59",
 		Address:  address,
 		Cost:     50000.00,
@@ -71,7 +71,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 
 	orderJson, _ := json.Marshal(order)
 
-	badOrder:= models.Order{
+	badOrder := models.Order{
 		Address:  address,
 		Cost:     50000.00,
 		Status:   "new",
@@ -81,61 +81,61 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 	badOrderJson, _ := json.Marshal(badOrder)
 
 	tests := []struct {
-		name                string
-		order               string
-		mockBehaviorPutOrder mockBehaviorPutOrder
+		name                   string
+		order                  string
+		mockBehaviorPutOrder   mockBehaviorPutOrder
 		mockBehaviorParseToken mockBehaviorParseToken
-		expectedStatusCode  int
-		expectedRequestBody string
-	} {
+		expectedStatusCode     int
+		expectedRequestBody    string
+	}{
 		{
 			name : "correct",
 			order : string(orderJson),
 			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(1, 50000.00, nil)
 			},
-			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
+			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(3), nil)
 			},
-			expectedStatusCode : http.StatusOK,
+			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(orderJson) + "\n",
 		},
 		{
-			name : "incorrect parse token",
-			order : string(orderJson),
-			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
+			name:  "incorrect parse token",
+			order: string(orderJson),
+			mockBehaviorPutOrder: func(s *mock_order.MockUseCase, order models.Order) {
 			},
-			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
+			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(0), errors.New(string(tokenErrorJson)))
 			},
-			expectedStatusCode : http.StatusUnauthorized,
+			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(tokenErrorJson) + "\n",
 		},
 		{
+
 			name : "incorrect put order",
 			order : string(orderJson),
 			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, 50000.00, errors.New(customErrors.BD_ERROR_DESCR))
 			},
-			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
+			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(3), nil)
 			},
-			expectedStatusCode : http.StatusInternalServerError,
+			expectedStatusCode:  http.StatusInternalServerError,
 			expectedRequestBody: string(serverErrorJson) + "\n",
 		},
 		{
-			name : "not valid input",
-			order : string(badOrderJson),
-			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
+			name:  "not valid input",
+			order: string(badOrderJson),
+			mockBehaviorPutOrder: func(s *mock_order.MockUseCase, order models.Order) {
 			},
-			mockBehaviorParseToken : func(s *mock_jwt.MockTokenManager) {
+			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(3), nil)
 			},
-			expectedStatusCode : http.StatusBadRequest,
+			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(validErrorJson) + "\n",
 		},
 	}
-
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

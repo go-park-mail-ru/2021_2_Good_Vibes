@@ -17,6 +17,6 @@ type CategoryNode struct {
 }
 
 type CreateCategory struct {
-	Category       string `json:"category"`
-	ParentCategory string `json:"parent_category"`
+	Category       string `json:"category" validate:"required"`
+	ParentCategory string `json:"parent_category" validate:"required"`
 }

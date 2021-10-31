@@ -11,13 +11,13 @@ import (
 )
 
 type BasketHandler struct {
-	useCase basket.UseCase
+	useCase        basket.UseCase
 	sessionManager sessionJwt.TokenManager
 }
 
 func NewBasketHandler(useCase basket.UseCase, sessionManager sessionJwt.TokenManager) *BasketHandler {
 	return &BasketHandler{
-		useCase: useCase,
+		useCase:        useCase,
 		sessionManager: sessionManager,
 	}
 }

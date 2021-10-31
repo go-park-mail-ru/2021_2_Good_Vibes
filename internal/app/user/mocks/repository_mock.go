@@ -92,3 +92,17 @@ func (mr *MockRepositoryMockRecorder) SaveAvatarName(userId, fileName interface{
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAvatarName", reflect.TypeOf((*MockRepository)(nil).SaveAvatarName), userId, fileName)
 }
+
+// UpdateUser mocks base method.
+func (m *MockRepository) UpdateUser(newData models.UserDataProfile) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", newData)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUser indicates an expected call of UpdateUser.
+func (mr *MockRepositoryMockRecorder) UpdateUser(newData interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockRepository)(nil).UpdateUser), newData)
+}

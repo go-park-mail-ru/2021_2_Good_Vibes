@@ -44,7 +44,6 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, categories)
 }
 
-
 func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategoryProducts")
@@ -62,7 +61,6 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, products)
 }
 
-
 func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 	var newCategory models.CreateCategory
 
@@ -72,18 +70,20 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 	}
 
 	if err := ctx.Validate(&newCategory); err != nil {
-		newSignupError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newSignupError)
+		newCategoryError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
 	if err != nil {
-		return err
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
-		return err
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
 	AllCategoriesJson = categories

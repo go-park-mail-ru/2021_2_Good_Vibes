@@ -106,3 +106,18 @@ func (mr *MockUsecaseMockRecorder) SaveAvatarName(userId, fileName interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAvatarName", reflect.TypeOf((*MockUsecase)(nil).SaveAvatarName), userId, fileName)
 }
+
+// UpdateProfile mocks base method.
+func (m *MockUsecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProfile", newData)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProfile indicates an expected call of UpdateProfile.
+func (mr *MockUsecaseMockRecorder) UpdateProfile(newData interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProfile", reflect.TypeOf((*MockUsecase)(nil).UpdateProfile), newData)
+}

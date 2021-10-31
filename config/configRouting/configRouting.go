@@ -25,6 +25,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("/signup", cr.UserHandler.SignUp)
 	router.POST("/upload/avatar", cr.UserHandler.UploadAvatar, middlewareAut.IsLogin)
 	router.GET("/profile", cr.UserHandler.Profile, middlewareAut.IsLogin)
+	router.POST("/profile", cr.UserHandler.UpdateProfile, middlewareAut.IsLogin)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/product", cr.ProductHandler.GetProductById)

@@ -201,6 +201,47 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, userData)
 }
 
+func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".UpdateProfile")
+
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+	}
+
+	var UserDataForUpdate models.UserDataProfile
+	UserDataForUpdate.Id = idNum
+
+	if err := ctx.Bind(&UserDataForUpdate); err != nil {
+		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&UserDataForUpdate); err != nil {
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	id, err := handler.Usecase.UpdateProfile(UserDataForUpdate)
+	if err != nil {
+		newError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
+
+	if id == errors.USER_EXISTS_ERROR {
+		newError := errors.NewError(errors.USER_EXISTS_ERROR, errors.USER_EXISTS_DESCR)
+		logger.Debug(err, UserDataForUpdate.Name)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	return ctx.NoContent(http.StatusOK)
+}
+
 func (handler *UserHandler) Logout(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".Logout")
