@@ -18,6 +18,7 @@ type ServerConfigRouting struct {
 	CategoryHandler *categoryHttp.CategoryHandler
 }
 
+
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	// router.Static("/img/avatar", "upload/img/avatars")
 	router.POST("/login", cr.UserHandler.Login)
