@@ -3,7 +3,6 @@ package manager
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"strconv"
@@ -36,10 +35,8 @@ func (m *Manager) GetToken(id int, name string) (string, error) {
 }
 
 func (m *Manager) ParseTokenFromContext(ctx context.Context) (uint64, error) {
-	fmt.Println(ctx)
 	token, ok := ctx.Value("token").(*jwt.Token)
 	if !ok {
-		fmt.Println(token)
 		return customErrors.TOKEN_ERROR, errors.New(customErrors.TOKEN_ERROR_DESCR)
 	}
 
