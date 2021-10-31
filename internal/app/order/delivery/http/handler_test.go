@@ -89,9 +89,9 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 		expectedRequestBody    string
 	}{
 		{
-			name : "correct",
-			order : string(orderJson),
-			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
+			name:  "correct",
+			order: string(orderJson),
+			mockBehaviorPutOrder: func(s *mock_order.MockUseCase, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(1, 50000.00, nil)
 			},
 			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {
@@ -113,9 +113,9 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 		},
 		{
 
-			name : "incorrect put order",
-			order : string(orderJson),
-			mockBehaviorPutOrder : func(s *mock_order.MockUseCase, order models.Order) {
+			name:  "incorrect put order",
+			order: string(orderJson),
+			mockBehaviorPutOrder: func(s *mock_order.MockUseCase, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, 50000.00, errors.New(customErrors.BD_ERROR_DESCR))
 			},
 			mockBehaviorParseToken: func(s *mock_jwt.MockTokenManager) {

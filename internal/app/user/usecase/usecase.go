@@ -94,5 +94,5 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 		return customErrors.USER_EXISTS_ERROR, nil
 	}
 
-	return userFromDb.Id, us.repository.UpdateUser(newData)
+	return 0, us.repository.UpdateUser(newData)
 }

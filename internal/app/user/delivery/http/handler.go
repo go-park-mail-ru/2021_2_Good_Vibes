@@ -211,15 +211,13 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".UpdateProfile")
+	var UserDataForUpdate models.UserDataProfile
 
 	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}
-
-	var UserDataForUpdate models.UserDataProfile
-	UserDataForUpdate.Id = idNum
 
 	if err := ctx.Bind(&UserDataForUpdate); err != nil {
 		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
@@ -232,6 +230,8 @@ func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
+
+	UserDataForUpdate.Id = idNum
 
 	id, err := handler.Usecase.UpdateProfile(UserDataForUpdate)
 	if err != nil {

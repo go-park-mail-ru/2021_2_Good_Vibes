@@ -502,3 +502,165 @@ func TestUserHandler_Logout(t *testing.T) {
 		assert.Equal(t, http.StatusOK, recorder.Code)
 	})
 }
+
+func TestUserHandler_UpdateProfile(t *testing.T) {
+	type mockBehaviorUseCase func(s *mockUser.MockUsecase, userReg models.UserDataProfile)
+	type mockBehaviorSession func(s *mockJwt.MockTokenManager)
+
+	user1, _ := json.Marshal(models.UserDataProfile{
+		Id:    1,
+		Name:  "Test1",
+		Email: "test@gmail.com"})
+	//user2, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
+	//	Email: "test@gmail.com"})
+	//
+
+	error2get, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
+	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
+	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	error6get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
+	error5get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
+	//error7get, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
+
+	testTable := []struct {
+		name                string
+		inputBody           string
+		inputUser           models.UserDataProfile
+		mockBehaviorUseCase mockBehaviorUseCase
+		mockBehaviorSession mockBehaviorSession
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		{
+			name:      "OK",
+			inputBody: string(user1),
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+				s.EXPECT().UpdateProfile(userReg).Return(1, nil)
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
+			},
+			expectedStatusCode:  http.StatusOK,
+			expectedRequestBody: "",
+		},
+		{
+			name:      "unauthorized",
+			inputBody: string(user1),
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), errors.New(customErrors.TOKEN_ERROR_DESCR))
+			},
+			expectedStatusCode:  http.StatusUnauthorized,
+			expectedRequestBody: string(error2get) + "\n",
+		},
+		{
+			name:      "BadJson",
+			inputBody: "{bad",
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: string(error3get) + "\n",
+		},
+		{
+			name:      "BadJsonData",
+			inputBody: `{"username": "Misha", "email": "fasg"}`,
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: string(error4get) + "\n",
+		},
+		{
+			name:      "BD_ERROR",
+			inputBody: string(user1),
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+				s.EXPECT().UpdateProfile(userReg).Return(1, errors.New(customErrors.BD_ERROR_DESCR))
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
+			},
+			expectedStatusCode:  http.StatusInternalServerError,
+			expectedRequestBody: string(error5get) + "\n",
+		},
+		{
+			name:      "User_exist_error",
+			inputBody: string(user1),
+			inputUser: models.UserDataProfile{
+				Id:    1,
+				Name:  "Test1",
+				Email: "test@gmail.com",
+			},
+			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userReg models.UserDataProfile) {
+				s.EXPECT().UpdateProfile(userReg).Return(customErrors.USER_EXISTS_ERROR, nil)
+			},
+			mockBehaviorSession: func(s *mockJwt.MockTokenManager) {
+				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: string(error6get) + "\n",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			mockUser := mockUser.NewMockUsecase(c)
+			mockJwtToken := mockJwt.NewMockTokenManager(c)
+			testCase.mockBehaviorSession(mockJwtToken)
+			testCase.mockBehaviorUseCase(mockUser, testCase.inputUser)
+
+			handler := NewLoginHandler(mockUser, mockJwtToken)
+
+			router := echo.New()
+			router.POST("/profile", handler.UpdateProfile)
+
+			val := validator.New()
+			val.RegisterValidation("customPassword", validator2.Password)
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req := httptest.NewRequest("POST", "/profile",
+				bytes.NewBufferString(string(testCase.inputBody)))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			logrus.SetOutput(ioutil.Discard)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, testCase.expectedStatusCode, recorder.Code)
+			assert.Equal(t, testCase.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
