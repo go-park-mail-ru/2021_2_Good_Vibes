@@ -31,7 +31,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 		Email: "test@gmail.com", Password: "123"})
 
 	user1get, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
-		Email: "test@gmail.com"})
+		Email: "test@gmail.com", Avatar: CustomAvatar})
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
 	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))

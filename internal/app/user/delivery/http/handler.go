@@ -16,6 +16,7 @@ import (
 )
 
 const BucketUrl = ""
+const CustomAvatar = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/29654677-7947-46d9-a2e5-1ca33223e30d"
 
 type UserHandler struct {
 	Usecase        user.Usecase
@@ -115,6 +116,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	var userProfile models.UserDataProfile
 	userProfile.Name = newUser.Name
 	userProfile.Email = newUser.Email
+	userProfile.Avatar = CustomAvatar
 
 	claimsString, err := handler.SessionManager.GetToken(newId, newUser.Name)
 	if err != nil {
