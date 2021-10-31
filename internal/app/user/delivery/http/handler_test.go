@@ -30,8 +30,8 @@ func TestUserHandler_SignUp(t *testing.T) {
 	user2, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "123"})
 
-	user1get, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
-		Email: "test@gmail.com", Password: ""})
+	user1get, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
+		Email: "test@gmail.com"})
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
 	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
@@ -198,10 +198,12 @@ func TestUserHandler_SignUp(t *testing.T) {
 func TestUserHandler_Login(t *testing.T) {
 	type mockBehaviorUseCase func(s *mockUser.MockUsecase, userInput models.UserDataForInput)
 	type mockBehaviorSession func(s *mockJwt.MockTokenManager, id int, name string)
+	type mockBehaviorUseCaseGetUserDataByid func(s *mockUser.MockUsecase, id uint64)
 
 	user1, _ := json.Marshal(models.UserDataForInput{Name: "Test1", Password: "Qwerty123."})
 
-	user1get, _ := json.Marshal(models.UserDataForInput{Name: "Test1", Password: ""})
+	userGet := models.UserDataProfile{Name: "Test1", Email: "test1@gmail.com"}
+	user1get, _ := json.Marshal(userGet)
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error4get, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR))
@@ -215,6 +217,7 @@ func TestUserHandler_Login(t *testing.T) {
 		inputUser           models.UserDataForInput
 		mockBehaviorUseCase mockBehaviorUseCase
 		mockBehaviorSession mockBehaviorSession
+		mockBehaviorUseCaseGetUserDataById mockBehaviorUseCaseGetUserDataByid
 		expectedStatusCode  int
 		expectedRequestBody string
 	}{
@@ -231,6 +234,9 @@ func TestUserHandler_Login(t *testing.T) {
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
 				s.EXPECT().GetToken(id, name).Return("RandomJWT", nil)
 			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
+				s.EXPECT().GetUserDataByID(id).Return(&userGet, nil)
+			},
 			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(user1get) + "\n",
 		},
@@ -245,6 +251,8 @@ func TestUserHandler_Login(t *testing.T) {
 			},
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
 			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
+			},
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
 		},
@@ -258,6 +266,8 @@ func TestUserHandler_Login(t *testing.T) {
 			mockBehaviorUseCase: func(s *mockUser.MockUsecase, userInput models.UserDataForInput) {
 			},
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
+			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
 			},
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error3get) + "\n",
@@ -274,6 +284,8 @@ func TestUserHandler_Login(t *testing.T) {
 			},
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
 			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
+			},
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error4get) + "\n",
 		},
@@ -289,6 +301,8 @@ func TestUserHandler_Login(t *testing.T) {
 			},
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
 			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
+			},
 			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(error5get) + "\n",
 		},
@@ -303,6 +317,8 @@ func TestUserHandler_Login(t *testing.T) {
 				s.EXPECT().CheckPassword(userInput).Return(customErrors.WRONG_PASSWORD_ERROR, nil)
 			},
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
+			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
 			},
 			expectedStatusCode:  http.StatusUnauthorized,
 			expectedRequestBody: string(error6get) + "\n",
@@ -320,6 +336,9 @@ func TestUserHandler_Login(t *testing.T) {
 			mockBehaviorSession: func(s *mockJwt.MockTokenManager, id int, name string) {
 				s.EXPECT().GetToken(id, name).Return("RandomJWT", errors.New(customErrors.TOKEN_ERROR_DESCR))
 			},
+			mockBehaviorUseCaseGetUserDataById: func(s *mockUser.MockUsecase, id uint64) {
+				s.EXPECT().GetUserDataByID(id).Return(&userGet, nil)
+			},
 			expectedStatusCode:  http.StatusInternalServerError,
 			expectedRequestBody: string(error7get) + "\n",
 		},
@@ -334,7 +353,7 @@ func TestUserHandler_Login(t *testing.T) {
 			mockJwtToken := mockJwt.NewMockTokenManager(c)
 			testCase.mockBehaviorSession(mockJwtToken, 1, testCase.inputUser.Name)
 			testCase.mockBehaviorUseCase(mockUser, testCase.inputUser)
-
+			testCase.mockBehaviorUseCaseGetUserDataById(mockUser, uint64(1))
 			handler := NewLoginHandler(mockUser, mockJwtToken)
 
 			router := echo.New()

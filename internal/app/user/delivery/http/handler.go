@@ -112,7 +112,9 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, newSignupError)
 	}
 
-	userProfile, err := handler.Usecase.GetUserDataByID(uint64(newId))
+	var userProfile models.UserDataProfile
+	userProfile.Name = newUser.Name
+	userProfile.Email = newUser.Email
 
 	claimsString, err := handler.SessionManager.GetToken(newId, newUser.Name)
 	if err != nil {
@@ -123,7 +125,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 	handler.setCookieValue(ctx, claimsString)
 
 	logger.Trace(trace + "ok signup for user: " + newUser.Name)
-	return ctx.JSON(http.StatusOK, *userProfile)
+	return ctx.JSON(http.StatusOK, userProfile)
 }
 
 func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
