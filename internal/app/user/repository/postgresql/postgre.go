@@ -23,7 +23,7 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 
 func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT id, name, email, password FROM customers WHERE name=$1", name)
+	row := su.db.QueryRow("select id, name, email, password from customers where name=$1", name)
 
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password)
 	if err == sql.ErrNoRows {
@@ -38,7 +38,7 @@ func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage
 }
 
 func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) {
-	rows := su.db.QueryRow("INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
+	rows := su.db.QueryRow("insert into customers (name, email, password) values ($1, $2, $3) returning id",
 		newUser.Name,
 		newUser.Email,
 		newUser.Password)
@@ -54,7 +54,7 @@ func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) 
 
 func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT id, name, email, password, avatar FROM customers WHERE id=$1", id)
+	row := su.db.QueryRow("select id, name, email, password, avatar from customers where id=$1", id)
 	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password, &tmp.Avatar)
 
 	if err == sql.ErrNoRows {
@@ -73,7 +73,7 @@ func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, er
 }
 
 func (su *StorageUserDB) SaveAvatarName(userId int, fileName string) error {
-	_, err := su.db.Exec(`UPDATE customers SET avatar = $2 WHERE id = $1`, userId, fileName)
+	_, err := su.db.Exec(`update customers set avatar = $2 where id = $1`, userId, fileName)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (su *StorageUserDB) SaveAvatarName(userId int, fileName string) error {
 }
 
 func (su *StorageUserDB) UpdateUser(newData models.UserDataProfile) error {
-	_, err := su.db.Exec(`UPDATE customers SET name = $1, email = $2 WHERE id = $3`, newData.Name,
+	_, err := su.db.Exec(`update customers set name = $1, email = $2 where id = $3`, newData.Name,
 		newData.Email, newData.Id)
 	return err
 }

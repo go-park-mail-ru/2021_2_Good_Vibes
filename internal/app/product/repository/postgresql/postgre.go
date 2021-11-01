@@ -110,7 +110,7 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 }
 
 func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
-	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
+	_, err := ph.db.Exec(`update products set image = $2 where id = $1`, productId, fileName)
 	if err != nil {
 		return err
 	}

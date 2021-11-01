@@ -31,7 +31,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 		}
 
 		_, err = tx.Exec(
-			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3) on conflict(user_id,product_id) do update set count=$3",
+			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3)",
 			basketProduct.UserId,
 			basketProduct.ProductId,
 			basketProduct.Number,
