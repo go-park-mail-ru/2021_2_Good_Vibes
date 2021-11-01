@@ -9,6 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -48,6 +49,8 @@ func (ph *ProductHandler) AddProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
+	newProduct = sanitizer.SanitizeData(&newProduct).(models.Product)
+
 	productId, err := ph.useCase.AddProduct(newProduct)
 	if err != nil {
 		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
@@ -69,6 +72,11 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
+
+	for i, _ := range answer {
+		answer[i] = sanitizer.SanitizeData(&answer[i]).(models.Product)
+	}
+
 	return ctx.JSON(http.StatusOK, answer)
 }
 
@@ -97,6 +105,8 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
+
+	answer = sanitizer.SanitizeData(&answer).(models.Product)
 
 	return ctx.JSON(http.StatusOK, answer)
 }
@@ -145,7 +155,7 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = ph.useCase.SaveProductImageName(productId, BucketUrl+fileName)
+	err = ph.useCase.SaveProductImageName(productId, BucketUrl + fileName)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

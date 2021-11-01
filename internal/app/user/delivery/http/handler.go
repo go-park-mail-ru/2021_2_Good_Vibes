@@ -9,6 +9,7 @@ import (
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -16,7 +17,8 @@ import (
 )
 
 const BucketUrl = ""
-const CustomAvatar = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/29654677-7947-46d9-a2e5-1ca33223e30d"
+const CustomAvatar = BucketUrl + "29654677-7947-46d9-a2e5-1ca33223e30d"
+const trace = "UserHandler"
 
 type UserHandler struct {
 	Usecase        user.Usecase
@@ -29,8 +31,6 @@ func NewLoginHandler(storageUser user.Usecase, sessionManager sessionJwt.TokenMa
 		SessionManager: sessionManager,
 	}
 }
-
-const trace = "UserHandler"
 
 func (handler *UserHandler) Login(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
@@ -48,6 +48,8 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newLoginError)
 	}
+
+	newUserDataForInput = sanitizer.SanitizeData(&newUserDataForInput).(models.UserDataForInput)
 
 	id, err := handler.Usecase.CheckPassword(newUserDataForInput)
 	if err != nil {
@@ -69,6 +71,14 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	}
 
 	userProfile, err := handler.Usecase.GetUserDataByID(uint64(id))
+
+	if err != nil {
+		newLoginError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, newLoginError)
+	}
+
+	*userProfile = sanitizer.SanitizeData(userProfile).(models.UserDataProfile)
 
 	claimsString, err := handler.SessionManager.GetToken(id, newUserDataForInput.Name)
 	if err != nil {
@@ -99,6 +109,8 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newSignupError)
 	}
+
+	newUser = sanitizer.SanitizeData(&newUser).(models.UserDataForReg)
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
@@ -207,6 +219,8 @@ func (handler *UserHandler) Profile(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 	}
 
+	*userData = sanitizer.SanitizeData(userData).(models.UserDataProfile)
+
 	return ctx.JSON(http.StatusOK, userData)
 }
 
@@ -232,6 +246,8 @@ func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
 		logger.Error(err)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
+
+	UserDataForUpdate = sanitizer.SanitizeData(&UserDataForUpdate).(models.UserDataProfile)
 
 	UserDataForUpdate.Id = idNum
 

@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -51,6 +52,8 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 		newOrderError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newOrderError)
 	}
+
+	newOrder = sanitizer.SanitizeData(&newOrder).(models.Order)
 
 	newOrder.Status = NewOrder
 

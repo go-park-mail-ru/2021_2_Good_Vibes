@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -38,6 +39,9 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
+
+	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
+
 	AllCategoriesJson = categories
 
 	logger.Debug(AllCategoriesJson)
@@ -57,6 +61,10 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
 	logger.Debug(products)
 	return ctx.JSON(http.StatusOK, products)
 }
@@ -74,6 +82,8 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
+	newCategory = sanitizer.SanitizeData(&newCategory).(models.CreateCategory)
+
 	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
 	if err != nil {
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
@@ -85,6 +95,8 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
+
+	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
 	AllCategoriesJson = categories
 

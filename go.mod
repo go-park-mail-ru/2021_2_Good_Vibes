@@ -34,6 +34,7 @@ require (
 	github.com/lib/pq v1.10.2 // indirect
 	github.com/magiconair/properties v1.8.5
 	github.com/mattn/go-colorable v0.1.8 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1
@@ -54,8 +55,10 @@ require (
 )
 
 require (
+	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/gorilla/css v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
