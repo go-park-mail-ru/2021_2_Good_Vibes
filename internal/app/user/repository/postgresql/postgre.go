@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	userHandler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 )
 
-const customAvatar = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/29654677-7947-46d9-a2e5-1ca33223e30d"
+const customAvatar = userHandler.BucketUrl + "29654677-7947-46d9-a2e5-1ca33223e30d"
 
 type StorageUserDB struct {
 	db *sql.DB
