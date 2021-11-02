@@ -29,5 +29,5 @@ type UserDataProfile struct {
 	Id     uint64         `json:"id,omitempty"`
 	Name   string         `json:"username"`
 	Email  string         `json:"email" validate:"email"`
-	Avatar string `json:"avatar"`
+	Avatar string         `json:"avatar,omitempty"`
 }

@@ -193,14 +193,14 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = handler.Usecase.SaveAvatarName(int(idNum), BucketUrl+fileName)
+	err = handler.Usecase.SaveAvatarName(int(idNum), BucketUrl + fileName)
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
 	logger.Trace("success upload avatar")
-	return ctx.HTML(http.StatusOK, fileName)
+	return ctx.HTML(http.StatusOK, BucketUrl + fileName)
 }
 
 func (handler *UserHandler) Profile(ctx echo.Context) error {

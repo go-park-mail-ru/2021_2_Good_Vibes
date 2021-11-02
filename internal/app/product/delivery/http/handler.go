@@ -160,5 +160,5 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	return ctx.HTML(http.StatusOK, fileName)
+	return ctx.HTML(http.StatusOK, BucketUrl + fileName)
 }
