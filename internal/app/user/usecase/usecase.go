@@ -90,7 +90,7 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 		return customErrors.DB_ERROR, errors.New(customErrors.BD_ERROR_DESCR)
 	}
 
-	if userFromDb != nil {
+	if userFromDb != nil && userFromDb.Id != int(newData.Id) {
 		return customErrors.USER_EXISTS_ERROR, nil
 	}
 
