@@ -1,0 +1,3 @@
+1. NUmber в баскет продакт
+2. status в аддресе заказа +
+3. router.GET("/category/{name}", cr.CategoryHandler.GetAllProducts)+

@@ -8,6 +8,21 @@ type Config struct {
 	SecretKey     string `mapstructure:"SECRET_KEY"`
 	ServerAddress string `mapstructure:"ADDRESS_SERVER"`
 	DataBaseURL   string `mapstructure:"DATABASE_URL"`
+	AwsAccessKey  string `mapstructure:"AWS_ACCESS_KEY"`
+	AwsSecretKey  string `mapstructure:"AWS_SECRET_KEY"`
+
+	MainConfig struct {
+		SecretKey     string `mapstructure:"SECRET_KEY"`
+		ServerAddress string `mapstructure:"ADDRESS_SERVER"`
+	} `mapstructure:"MAIN_CONFIG"`
+
+	DataBase struct {
+		User     string `mapstructure:"USER"`
+		DBName   string `mapstructure:"DBNAME"`
+		Password string `mapstructure:"PASSWORD"`
+		Host     string `mapstructure:"HOST"`
+		Port     string `mapstructure:"PORT"`
+	} `mapstructure:"DATA_BASE_CONFIG"`
 }
 
 var ConfigApp Config
