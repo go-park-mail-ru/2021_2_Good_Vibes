@@ -2,8 +2,8 @@ package models
 
 type Product struct {
 	Id           int     `json:"id,omitempty"`
-	Image        string  `json:"image"`
-	Name         string  `json:"name" validate:"required"`
+	Image        string  `json:"image,omitempty"`
+	Name         string  `json:"name"`
 	Price        float64 `json:"price"`
 	Rating       float32 `json:"rating"`
 	Category     string  `json:"category"`
@@ -14,4 +14,9 @@ type Product struct {
 type ProductPrice struct {
 	Id    int
 	Price float64
+}
+
+type FavouriteProduct struct {
+	Id int `json:"id" validate:"required"`
+	UserId int `json:"user_id,-"`
 }

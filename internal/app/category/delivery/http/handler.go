@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-var AllCategoriesJson models.CategoryNode
+// var AllCategoriesJson models.CategoryNode
 
 type CategoryHandler struct {
 	useCase category.UseCase
@@ -28,10 +28,10 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
-	if AllCategoriesJson.Name != "" {
+	/*if AllCategoriesJson.Name != "" {
 		logger.Debug(AllCategoriesJson)
 		return ctx.JSON(http.StatusOK, AllCategoriesJson)
-	}
+	}*/
 
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
@@ -42,9 +42,9 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	AllCategoriesJson = categories
+	// AllCategoriesJson = categories
 
-	logger.Debug(AllCategoriesJson)
+	//logger.Debug(AllCategoriesJson)
 	return ctx.JSON(http.StatusOK, categories)
 }
 
@@ -84,7 +84,7 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 
 	newCategory = sanitizer.SanitizeData(&newCategory).(models.CreateCategory)
 
-	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
+	err := ch.useCase.CreateCategory(newCategory)
 	if err != nil {
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
@@ -98,7 +98,7 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	AllCategoriesJson = categories
+	// AllCategoriesJson = categories
 
 	return ctx.JSON(http.StatusOK, categories)
 }

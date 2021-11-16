@@ -121,6 +121,89 @@ func (so *OrderRepository) SelectPrices(products []models.OrderProducts) ([]mode
 	return productPrices, nil
 }
 
+func (so *OrderRepository)GetAllOrders(user int) ([]models.Order, error) {
+	var orders []models.Order
+
+	err := tx(so.db, func(tx *sql.Tx) error {
+		rows, err := so.db.Query("select id, user_id, date, cost, status from orders where user_id = $1", user)
+		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			order := models.Order{}
+
+			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status)
+			if err != nil {
+				return err
+			}
+
+			orders = append(orders, order)
+		}
+
+		if rows.Err() != nil {
+			return nil
+		}
+
+		for i, _ := range orders {
+			var products []models.OrderProducts
+			rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orders[i].OrderId)
+			if err != nil {
+				return err
+			}
+
+			defer rows.Close()
+
+			for rows.Next() {
+				product := models.OrderProducts{}
+
+				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+				if err != nil {
+					return err
+				}
+
+				products = append(products, product)
+			}
+			orders[i].Products = products
+
+			if rows.Err() != nil {
+				return nil
+			}
+
+			rows.Close()
+		}
+
+		for i, _ := range orders {
+			var address models.Address
+			err := so.db.QueryRow("select country, region, city, street, house, flat, a_index from delivery_address where order_id = $1", orders[i].OrderId).
+				Scan(
+					&address.Country,
+					&address.Region,
+					&address.City,
+					&address.Street,
+					&address.House,
+					&address.Flat,
+					&address.Index,
+				)
+
+			if err != nil {
+				return err
+			}
+
+			orders[i].Address = address
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
 func makeSelectPricesQuery(products []models.OrderProducts) string {
 	query := strings.Builder{}
 	query.WriteString("select id, price from products where id in ")
@@ -175,3 +258,4 @@ func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx.Commit()
 	return nil
 }
+

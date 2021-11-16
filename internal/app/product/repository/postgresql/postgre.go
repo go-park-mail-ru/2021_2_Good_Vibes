@@ -87,13 +87,74 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 	return products, nil
 }
 
+func (ph *StorageProductsDB) AddFavouriteProduct(product models.FavouriteProduct) error {
+	_, err := ph.db.Exec(
+		`insert into favourite_prod (user_id, product_id) values ($1, $2)`,
+		product.UserId,
+		product.Id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ph *StorageProductsDB) DeleteFavouriteProduct(product models.FavouriteProduct) error {
+	_, err := ph.db.Exec(
+		`delete from favourite_prod where user_id=$1 and product_id=$2`,
+		product.UserId,
+		product.Id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product, error) {
+	var products []models.Product
+
+	rows, err:= ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, " +
+                                "p.count_in_stock, p.description, p.image from products as p "+
+                                "join favourite_prod fp on p.id = fp.product_id "+
+                                "where fp.user_id=$1 "+
+                                "order by name", userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		product := models.Product{}
+
+		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Rating,
+			             &product.Category, &product.CountInStock, &product.Description, &product.Image)
+		if err != nil {
+			return nil, err
+		}
+
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return products, nil
+}
+
 func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 	var lastInsertId int64
 
 	err := ph.db.QueryRow(
-		"with a(id) as (select id from categories where name=$5) "+
-			"insert into products (image, name, price, rating, category_id, count_in_stock, description) values ($1, $2, $3, $4, (select id from a), $6, $7) returning id",
-		product.Image,
+		"with a(id) as (select id from categories where name=$4) "+
+			"insert into products (name, price, rating, category_id, count_in_stock, description) values ($1, $2, $3, (select id from a), $5, $6) returning id",
 		product.Name,
 		product.Price,
 		product.Rating,
@@ -110,9 +171,21 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 }
 
 func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
-	_, err := ph.db.Exec(`update products set image = $2 where id = $1`, productId, fileName)
+	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+
+func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
+	trx, _ := db.Begin()
+	err := fb(trx)
+	if err != nil {
+		trx.Rollback()
+		return err
+	}
+	trx.Commit()
 	return nil
 }

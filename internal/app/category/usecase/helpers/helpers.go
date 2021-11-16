@@ -11,6 +11,7 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 
 	rootNode := models.CategoryNode{
 		Name:    nestingCategories[0].Name,
+		Description: nestingCategories[0].Description,
 		Nesting: nestingCategories[0].Nesting,
 	}
 	var nodeSlice []models.CategoryNode
@@ -22,6 +23,7 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 		if nestingCategories[i].Nesting > nestingCategories[i-1].Nesting {
 			currentNode = models.CategoryNode{
 				Name:     nestingCategories[i].Name,
+				Description: nestingCategories[i].Description,
 				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}
@@ -29,6 +31,7 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 		} else if nestingCategories[i].Nesting == nestingCategories[i-1].Nesting {
 			currentNode = models.CategoryNode{
 				Name:     nestingCategories[i].Name,
+				Description: nestingCategories[i].Description,
 				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}
@@ -40,6 +43,7 @@ func ParseCategories(nestingCategories []models.NestingCategory) models.Category
 
 			currentNode = models.CategoryNode{
 				Name:     nestingCategories[i].Name,
+				Description: nestingCategories[i].Description,
 				Nesting:  nestingCategories[i].Nesting,
 				Children: nil,
 			}

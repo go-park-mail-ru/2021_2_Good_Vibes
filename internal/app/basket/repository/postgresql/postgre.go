@@ -31,7 +31,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 		}
 
 		_, err = tx.Exec(
-			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3)",
+			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3) on conflict(user_id,product_id) do update set count=$3",
 			basketProduct.UserId,
 			basketProduct.ProductId,
 			basketProduct.Number,
@@ -53,7 +53,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 
 func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
 	var basketProducts []models.BasketProduct
-	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1", userId)
+	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1 order by product_id", userId)
 	if err != nil {
 		return nil, err
 	}

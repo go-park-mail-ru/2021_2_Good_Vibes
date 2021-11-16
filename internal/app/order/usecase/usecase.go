@@ -42,3 +42,7 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 
 	return orderId, cost, nil
 }
+
+func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
+	return uc.repositoryOrder.GetAllOrders(user)
+}

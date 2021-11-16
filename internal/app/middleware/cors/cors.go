@@ -9,8 +9,8 @@ import (
 var (
 	allowOrigins  = []string{"https://dreamy-yonath-26f2eb.netlify.app", "https://peaceful-bell-d76220.netlify.app"}
 	allowMethods  = []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions}
-	allowHeaders  = []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept}
-	exposeHeaders = []string{"Authorization"}
+	allowHeaders  = []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-Csrf-Token"}
+	exposeHeaders = []string{"Authorization", "X-Csrf-Token"}
 )
 
 func GetCORSConfigStruct() middleware.CORSConfig {

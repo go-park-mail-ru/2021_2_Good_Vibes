@@ -24,6 +24,18 @@ func (uc *UseCase) GetAllProducts() ([]models.Product, error) {
 	return uc.repository.GetAll()
 }
 
+func (uc *UseCase) AddFavouriteProduct(product models.FavouriteProduct) error {
+	return uc.repository.AddFavouriteProduct(product)
+}
+
+func (uc *UseCase) DeleteFavouriteProduct(product models.FavouriteProduct) error {
+	return uc.repository.DeleteFavouriteProduct(product)
+}
+
+func (uc *UseCase) GetFavouriteProducts(userId int) ([]models.Product, error) {
+	return uc.repository.GetFavouriteProducts(userId)
+}
+
 func (uc *UseCase) GetProductById(id int) (models.Product, error) {
 	return uc.repository.GetById(id)
 }

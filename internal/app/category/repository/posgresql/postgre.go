@@ -24,10 +24,10 @@ func NewStorageCategoryDB(db *sql.DB, err error) (*StorageCategoryPostgres, erro
 	}, nil
 }
 
-func (sc *StorageCategoryPostgres) CreateCategory(categoryName string, parentCategoryName string) error {
+func (sc *StorageCategoryPostgres) CreateCategory(category models.CreateCategory) error {
 	err := tx(sc.db, func(tx *sql.Tx) error {
 		var parentCategory NestedListCategory
-		row := tx.QueryRow(`select name, lft, rgt from categories where name=$1`, parentCategoryName)
+		row := tx.QueryRow(`select name, lft, rgt from categories where name=$1`, category.ParentCategory)
 
 		err := row.Scan(&parentCategory.Name, &parentCategory.LeftBoundary, &parentCategory.RightBoundary)
 		if err != nil {
@@ -40,10 +40,11 @@ func (sc *StorageCategoryPostgres) CreateCategory(categoryName string, parentCat
 		var categoryId int
 
 		err = tx.QueryRow(
-			`insert into categories(name, lft, rgt) values ($1, $2, $3) returning id`,
-			categoryName,
+			`insert into categories(name, lft, rgt, description) values ($1, $2, $3, $4) returning id`,
+			category.Category,
 			leftBoundary,
 			rightBoundary,
+			category.Description,
 		).Scan(&categoryId)
 		if err != nil {
 			return err
@@ -54,7 +55,7 @@ func (sc *StorageCategoryPostgres) CreateCategory(categoryName string, parentCat
 			"join categories nc2 on nc1.rgt < nc2.lft "+
 			"where nc1.name = $1) "+
 			"update categories set lft=lft+2,rgt=rgt+2 "+
-			"where name in (select name from a)", parentCategoryName)
+			"where name in (select name from a)", category.ParentCategory)
 
 		if err != nil {
 			return err
@@ -65,7 +66,7 @@ func (sc *StorageCategoryPostgres) CreateCategory(categoryName string, parentCat
 			"join categories nc2 on nc1.lft >= nc2.lft and nc1.rgt <= nc2.rgt "+
 			"where nc1.name = $1) "+
 			"update categories set rgt=rgt+2"+
-			"where name in (select name from a)", parentCategoryName)
+			"where name in (select name from a)", category.ParentCategory)
 
 		if err != nil {
 			return err
@@ -82,10 +83,10 @@ func (sc *StorageCategoryPostgres) CreateCategory(categoryName string, parentCat
 
 func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCategory, error) {
 	var nestingCategory []models.NestingCategory
-	rows, err := sc.db.Query("select ((count(parent.name) - 1)::int), node.name as name " +
+	rows, err := sc.db.Query("select ((count(parent.name) - 1)::int), node.name as name, node.description as description " +
 		"from categories as node, categories as parent " +
 		"where node.lft between parent.lft and parent.rgt " +
-		"group by node.name, node.lft " +
+		"group by node.name, node.description, node.lft " +
 		"order by node.lft")
 
 	if err != nil {
@@ -97,7 +98,7 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 	for rows.Next() {
 		category := models.NestingCategory{}
 
-		err := rows.Scan(&category.Nesting, &category.Name)
+		err := rows.Scan(&category.Nesting, &category.Name, &category.Description)
 		if err != nil {
 			return nil, err
 		}

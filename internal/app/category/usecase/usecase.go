@@ -37,6 +37,6 @@ func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {
 	return node, nil
 }
 
-func (uc *UseCase) CreateCategory(categoryName string, parentCategoryName string) error {
-	return uc.repositoryCategory.CreateCategory(categoryName, parentCategoryName)
+func (uc *UseCase) CreateCategory(category models.CreateCategory) error {
+	return uc.repositoryCategory.CreateCategory(category)
 }

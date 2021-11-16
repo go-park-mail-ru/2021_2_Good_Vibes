@@ -13,11 +13,11 @@ const (
 
 const (
 	BIND_DESCR           = "can not bind data"
-	VALIDATION_DESCR     = "can not validate data"
+	VALIDATION_DESCR     = "Неправильный формат данных"
 	TOKEN_ERROR_DESCR    = "can not get token"
-	NO_USER_DESCR        = "user does not exist"
-	USER_EXISTS_DESCR    = "user already exists"
-	WRONG_PASSWORD_DESCR = "плохой пароль"
+	NO_USER_DESCR        = "Пользователя не существует"
+	USER_EXISTS_DESCR    = "Пользователь уже существует"
+	WRONG_PASSWORD_DESCR = "Неверный пароль"
 	BD_ERROR_DESCR       = "bd error"
 	BAD_INIT_SECRET_KEY  = "bad init secret key"
 	HASHER_ERROR_DESCR   = "error hash password"
@@ -34,3 +34,4 @@ func NewError(errorCode int, errorDesc string) *Error {
 		ErrorDescription: errorDesc,
 	}
 }
+

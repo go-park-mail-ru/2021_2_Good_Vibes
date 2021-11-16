@@ -41,7 +41,7 @@ func (us *usecase) CheckPassword(user models.UserDataForInput) (int, error) {
 func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 	id, err := us.repository.GetUserDataByName(newUser.Name)
 	if err != nil {
-		return customErrors.SERVER_ERROR, err
+		return customErrors.DB_ERROR, errors.New("db error")
 	}
 
 	if id != nil {
@@ -50,7 +50,7 @@ func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
 
 	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newUser.Password))
 	if err != nil {
-		return customErrors.SERVER_ERROR, err
+		return customErrors.SERVER_ERROR, errors.New("server error")
 	}
 
 	newUser.Password = string(passwordHash)
@@ -95,4 +95,21 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 	}
 
 	return 0, us.repository.UpdateUser(newData)
+}
+
+
+func (us *usecase) UpdatePassword(newData models.UserDataPassword) error {
+	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newData.Password))
+	if err != nil {
+		return err
+	}
+
+	newData.Password = string(passwordHash)
+
+	err = us.repository.UpdatePassword(newData)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
