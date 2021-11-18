@@ -78,8 +78,6 @@ func (oh *OrderHandler)GetAllOrders(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetAllOrders")
 
-
-
 	userId, err := oh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)

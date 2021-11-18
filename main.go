@@ -20,6 +20,9 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	reviewHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
+	reviewRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/repository/postgresql"
+	reviewUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt/manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
@@ -109,13 +112,19 @@ func main() {
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc, sessionManager)
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 
+	storageReview, err := reviewRepoPostgres.NewReviewRepository(GetPostgres())
+	reviewUc := reviewUseCase.NewReviewUseCase(storageReview)
+	reviewHandler := reviewHandlerHttp.NewReviewHandler(reviewUc, sessionManager)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		ProductHandler:  productHandler,
 		UserHandler:     userHandler,
 		OrderHandler:    orderHandler,
 		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
+		ReviewHandler : reviewHandler,
 	}
+
 	serverRouting.ConfigRouting(router)
 	configValidator.ConfigValidator(router)
 

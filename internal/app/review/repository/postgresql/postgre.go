@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"database/sql"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
 type ReviewRepository struct {
@@ -18,31 +19,10 @@ func NewReviewRepository(db *sql.DB, err error) (*ReviewRepository, error) {
 	}, nil
 }
 
-/*
-func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) error {
-	err := tx(sb.db, func(tx *sql.Tx) error {
-		_, err := tx.Exec(
-			"insert into basket (user_id) values ($1) on conflict(user_id) do nothing",
-			basketProduct.UserId,
-		)
-
-		if err != nil {
-			return err
-		}
-
-		_, err = tx.Exec(
-			"insert into basket_products (user_id, product_id, count) values ($1, $2, $3) on conflict(user_id,product_id) do update set count=$3",
-			basketProduct.UserId,
-			basketProduct.ProductId,
-			basketProduct.Number,
-		)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+func (sb *ReviewRepository) AddReview(review models.Review) error {
+	_, err := sb.db.Exec(
+		"insert into reviews(user_id, product_id, rating, text) values ($1, $2, $3, $4)",
+		review.UserId,review.ProductId, review.Rating, review.Text)
 
 	if err != nil {
 		return err
@@ -51,6 +31,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 	return nil
 }
 
+/*
 func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
 	var basketProducts []models.BasketProduct
 	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1 order by product_id", userId)

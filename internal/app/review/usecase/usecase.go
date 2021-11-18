@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
 )
 
@@ -14,16 +15,16 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 	}
 }
 
-/*
-func (uc *UseCase) PutInBasket(basket models.BasketProduct) error {
-	err := uc.repositoryBasket.PutInBasket(basket)
+
+func (uc *UseCase) AddReview(review models.Review) error{
+	err := uc.repositoryReview.AddReview(review)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
+/*
 func (uc *UseCase) GetBasket(userId int) ([]models.BasketProduct, error) {
 	basketProducts, err := uc.repositoryBasket.GetBasket(userId)
 	if err != nil {

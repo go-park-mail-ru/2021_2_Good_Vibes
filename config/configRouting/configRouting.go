@@ -6,6 +6,7 @@ import (
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
 	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
+	reviewHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/labstack/echo/v4"
 )
@@ -16,6 +17,7 @@ type ServerConfigRouting struct {
 	OrderHandler    *orderHttp.OrderHandler
 	BasketHandler   *basketHttp.BasketHandler
 	CategoryHandler *categoryHttp.CategoryHandler
+	ReviewHandler *reviewHttp.ReviewHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -43,5 +45,6 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/category", cr.CategoryHandler.GetCategories)
 	router.GET("/category/:name", cr.CategoryHandler.GetCategoryProducts)
 	router.GET("/profile/orders", cr.OrderHandler.GetAllOrders, middlewareAut.IsLogin)
+	router.POST("/review/add", cr.ReviewHandler.AddReview, middlewareAut.IsLogin)
 
 }
