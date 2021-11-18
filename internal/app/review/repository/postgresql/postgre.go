@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
@@ -56,8 +55,6 @@ func (rb *ReviewRepository) AddReview(review models.Review, productRating float6
 			return err
 		}
 
-		fmt.Println(productRating)
-
 		_, err = rb.db.Exec("update products set rating=$1 where id=$2", productRating, review.ProductId)
 
 		if err != nil {
@@ -66,6 +63,17 @@ func (rb *ReviewRepository) AddReview(review models.Review, productRating float6
 
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rb *ReviewRepository) DeleteReview(userId int, productId int) error {
+	_, err := rb.db.Exec(`delete from reviews where user_id=$1 and product_id=$2`,
+		                        userId, productId)
 
 	if err != nil {
 		return err
@@ -140,6 +148,8 @@ func (rb *ReviewRepository) GetReviewByUserAndProduct(userId int, productId int)
 
 	return review, nil
 }
+
+
 
 
 /*

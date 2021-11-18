@@ -8,4 +8,5 @@ type Repository interface {
 	GetAllRatingsOfProduct(productId int) ([]models.ProductRating, error)
 	GetReviewsByUser(userName string) ([]models.Review, error)
 	GetReviewByUserAndProduct(userId int, productId int) (models.Review, error)
+	DeleteReview(userId int, productId int) error
 }

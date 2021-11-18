@@ -68,6 +68,41 @@ func (rh *ReviewHandler) AddReview (ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newReview)
 }
 
+func (rh *ReviewHandler) DeleteReview(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + " DeleteReview")
+
+	userId, err := rh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusUnauthorized, customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
+	}
+
+	var productId models.ProductId
+
+	if err := ctx.Bind(&productId); err != nil {
+		logger.Error(err)
+		newError := customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&productId); err != nil {
+		logger.Error(err, productId)
+		newError := customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	err = rh.useCase.DeleteReview(int(userId), productId.ProductId)
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	logger.Trace(trace + " success DeleteReview")
+
+	return ctx.JSON(http.StatusOK, productId)
+}
+
 
 func (rh *ReviewHandler) GetReviewsByProductId(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)

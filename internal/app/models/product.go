@@ -25,3 +25,7 @@ type ProductRating struct {
 	Rating int
 	Count int
 }
+
+type ProductId struct {
+	ProductId int `json:"product_id" validate:"required"`
+}

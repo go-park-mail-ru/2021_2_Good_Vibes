@@ -47,6 +47,15 @@ func (uc *UseCase) AddReview(review models.Review) error {
 	return nil
 }
 
+func (uc *UseCase) DeleteReview(userId int, productId int) error {
+	err := uc.repositoryReview.DeleteReview(userId, productId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (uc *UseCase) GetReviewsByProductId(productId int) ([]models.Review, error) {
 	reviews, err := uc.repositoryReview.GetReviewsByProductId(productId)
 	if err != nil {
