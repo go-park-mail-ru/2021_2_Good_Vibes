@@ -20,3 +20,8 @@ type FavouriteProduct struct {
 	Id int `json:"id" validate:"required"`
 	UserId int `json:"user_id,-"`
 }
+
+type ProductRating struct {
+	Rating int
+	Count int
+}

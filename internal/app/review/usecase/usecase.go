@@ -17,7 +17,18 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 
 
 func (uc *UseCase) AddReview(review models.Review) error {
-	err := uc.repositoryReview.AddReview(review)
+	totalRating := review.Rating
+	ratingsCount := 1
+
+	productRatings, err := uc.repositoryReview.GetAllRatingsOfProduct(review.ProductId)
+	for _, rating := range productRatings {
+		totalRating += rating.Rating * rating.Count
+		ratingsCount += rating.Count
+	}
+
+	productRating := float64(totalRating) / float64(ratingsCount)
+
+	err = uc.repositoryReview.AddReview(review, productRating)
 	if err != nil {
 		return err
 	}

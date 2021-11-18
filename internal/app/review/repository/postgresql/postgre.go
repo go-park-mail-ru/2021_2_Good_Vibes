@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
@@ -19,10 +20,52 @@ func NewReviewRepository(db *sql.DB, err error) (*ReviewRepository, error) {
 	}, nil
 }
 
-func (rb *ReviewRepository) AddReview(review models.Review) error {
-	_, err := rb.db.Exec(
-		"insert into reviews(user_id, product_id, rating, text) values ($1, $2, $3, $4)",
-		review.UserId,review.ProductId, review.Rating, review.Text)
+func (rb *ReviewRepository) GetAllRatingsOfProduct(productId int) ([]models.ProductRating, error) {
+	rows, err := rb.db.Query("select rating, count(*) as count from reviews "+
+		                           "where product_id=$1 " +
+		                           "group by rating", productId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ratings []models.ProductRating
+	for rows.Next() {
+		rating := models.ProductRating{}
+		err = rows.Scan(&rating.Rating, &rating.Count)
+		if err != nil {
+			return nil, err
+		}
+		ratings = append(ratings, rating)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return ratings, nil
+}
+
+
+func (rb *ReviewRepository) AddReview(review models.Review, productRating float64) error {
+	err := tx(rb.db, func(tx *sql.Tx) error {
+		_, err := rb.db.Exec(
+			"insert into reviews(user_id, product_id, rating, text) values ($1, $2, $3, $4)",
+			review.UserId,review.ProductId, review.Rating, review.Text)
+
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(productRating)
+
+		_, err = rb.db.Exec("update products set rating=$1 where id=$2", productRating, review.ProductId)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 
 	if err != nil {
 		return err
@@ -30,6 +73,7 @@ func (rb *ReviewRepository) AddReview(review models.Review) error {
 
 	return nil
 }
+
 
 func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Review, error){
 	rows, err := rb.db.Query("select c.name, r.rating, r.text from reviews as r " +
@@ -176,3 +220,13 @@ func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	return nil
 }
 */
+func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
+	trx, _ := db.Begin()
+	err := fb(trx)
+	if err != nil {
+		trx.Rollback()
+		return err
+	}
+	trx.Commit()
+	return nil
+}
