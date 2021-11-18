@@ -124,6 +124,23 @@ func (rb *ReviewRepository) GetReviewsByUser(userName string) ([]models.Review, 
 	return reviews, nil
 }
 
+func (rb *ReviewRepository) GetReviewByUserAndProduct(userId int, productId int) (models.Review, error) {
+	var review models.Review
+	row := rb.db.QueryRow("select user_id, product_id, rating, text from reviews where user_id=$1 and product_id=$2",
+		                         userId, productId)
+	err := row.Scan(&review.UserId, &review.ProductId, &review.Rating, &review.Text)
+
+	if err == sql.ErrNoRows {
+		return models.Review{}, nil
+	}
+
+	if err != nil {
+		return models.Review{}, err
+	}
+
+	return review, nil
+}
+
 
 /*
 func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {

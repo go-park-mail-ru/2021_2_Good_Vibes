@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
@@ -33,27 +33,33 @@ func (rh *ReviewHandler) AddReview (ctx echo.Context) error {
 	userId, err := rh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
-		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+		return ctx.JSON(http.StatusUnauthorized, customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
 	}
 
 	newReview.UserId = int(userId)
 
 	if err := ctx.Bind(&newReview); err != nil {
 		logger.Error(err)
-		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		newError := customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
 	if err := ctx.Validate(&newReview); err != nil {
 		logger.Error(err, newReview)
-		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		newError := customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
 	err = rh.useCase.AddReview(newReview)
+	if err != nil && err.Error() == customErrors.RATING_EXISTS_DESCR {
+		logger.Error(err, newReview)
+		newError := customErrors.NewError(customErrors.RATING_EXISTS_ERROR, customErrors.RATING_EXISTS_DESCR)
+		return ctx.JSON(http.StatusOK, newError)
+	}
+
 	if err != nil {
 		logger.Error(err, newReview)
-		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 
@@ -71,7 +77,7 @@ func (rh *ReviewHandler) GetReviewsByProductId(ctx echo.Context) error {
 
 	if productIdString == "" {
 		logger.Error("bad query param for GetReviewsByProductId")
-		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		newError := customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
@@ -97,7 +103,7 @@ func (rh *ReviewHandler) GetReviewsByUser(ctx echo.Context) error {
 
 	if userName == "" {
 		logger.Error("bad query param for GetReviewsByUser")
-		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		newError := customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 

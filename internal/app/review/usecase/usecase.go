@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"errors"
+	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
 )
@@ -17,6 +19,15 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 
 
 func (uc *UseCase) AddReview(review models.Review) error {
+	oldReview, err := uc.repositoryReview.GetReviewByUserAndProduct(review.UserId, review.ProductId)
+	if err != nil {
+		return err
+	}
+
+	if oldReview.UserId != 0 {
+		return errors.New(customErrors.RATING_EXISTS_DESCR)
+	}
+
 	totalRating := review.Rating
 	ratingsCount := 1
 
