@@ -55,6 +55,32 @@ func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Revie
 	return reviews, nil
 }
 
+
+func (rb *ReviewRepository) GetReviewsByUser(userName string) ([]models.Review, error) {
+	rows, err := rb.db.Query("select product_id, rating, text from reviews as r " +
+		                           "join customers c on c.id = r.user_id "+
+	                          	   "where c.name=$1", userName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var reviews []models.Review
+	for rows.Next() {
+		review := models.Review{}
+		err = rows.Scan(&review.ProductId, &review.Rating, &review.Text)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, review)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return reviews, nil
+}
+
+
 /*
 func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
 	var basketProducts []models.BasketProduct

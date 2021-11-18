@@ -34,6 +34,14 @@ func (uc *UseCase) GetReviewsByProductId(productId int) ([]models.Review, error)
 	return reviews, nil
 }
 
+func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
+	reviews, err := uc.repositoryReview.GetReviewsByUser(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	return reviews, nil
+}
 /*
 func (uc *UseCase) GetBasket(userId int) ([]models.BasketProduct, error) {
 	basketProducts, err := uc.repositoryBasket.GetBasket(userId)

@@ -88,6 +88,30 @@ func (rh *ReviewHandler) GetReviewsByProductId(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, reviews)
 }
 
+
+func (rh *ReviewHandler) GetReviewsByUser(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + " GetReviewsByUser")
+
+	userName:= ctx.QueryParam("name")
+
+	if userName == "" {
+		logger.Error("bad query param for GetReviewsByUser")
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	reviews, err := rh.useCase.GetReviewsByUser(userName)
+
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	logger.Trace(trace + " success GetReviewsByUser")
+	return ctx.JSON(http.StatusOK, reviews)
+}
+
 /*
 func (bh *BasketHandler) PutInBasket(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
