@@ -19,8 +19,8 @@ func NewReviewRepository(db *sql.DB, err error) (*ReviewRepository, error) {
 	}, nil
 }
 
-func (sb *ReviewRepository) AddReview(review models.Review) error {
-	_, err := sb.db.Exec(
+func (rb *ReviewRepository) AddReview(review models.Review) error {
+	_, err := rb.db.Exec(
 		"insert into reviews(user_id, product_id, rating, text) values ($1, $2, $3, $4)",
 		review.UserId,review.ProductId, review.Rating, review.Text)
 
@@ -29,6 +29,30 @@ func (sb *ReviewRepository) AddReview(review models.Review) error {
 	}
 
 	return nil
+}
+
+func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Review, error){
+	rows, err := rb.db.Query("select c.name, r.rating, r.text from reviews as r " +
+		                           "join customers c on c.id = r.user_id "+
+		                           "where r.product_id=$1", productId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var reviews []models.Review
+	for rows.Next() {
+		review := models.Review{}
+		err = rows.Scan(&review.UserName, &review.Rating, &review.Text)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, review)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return reviews, nil
 }
 
 /*

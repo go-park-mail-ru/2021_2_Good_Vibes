@@ -8,6 +8,7 @@ import (
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type ReviewHandler struct {
@@ -61,25 +62,31 @@ func (rh *ReviewHandler) AddReview (ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newReview)
 }
 
-/*
-func (rh *ReviewHandler) GetAllReviews(ctx echo.Context) error {
-	logger := customLogger.TryGetLoggerFromContext(ctx)
-	logger.Trace(trace + " GetAllOrders")
 
-	userId, err := rh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
-	if err != nil {
-		logger.Error(err)
-		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+func (rh *ReviewHandler) GetReviewsByProductId(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + " GetReviewsByProductId")
+
+	productIdString:= ctx.QueryParam("product_id")
+
+	if productIdString == "" {
+		logger.Error("bad query param for GetReviewsByProductId")
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
-	orders, err := rh.useCase.GetAllOrders(int(userId))
+	productId, err := strconv.Atoi(productIdString)
+
+	reviews, err := rh.useCase.GetReviewsByProductId(productId)
+
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(http.StatusOK, orders)
-}*/
+	logger.Trace(trace + " success GetReviewsByProductId")
+	return ctx.JSON(http.StatusOK, reviews)
+}
 
 /*
 func (bh *BasketHandler) PutInBasket(ctx echo.Context) error {

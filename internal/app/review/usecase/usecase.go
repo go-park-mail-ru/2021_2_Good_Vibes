@@ -16,7 +16,7 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 }
 
 
-func (uc *UseCase) AddReview(review models.Review) error{
+func (uc *UseCase) AddReview(review models.Review) error {
 	err := uc.repositoryReview.AddReview(review)
 	if err != nil {
 		return err
@@ -24,6 +24,16 @@ func (uc *UseCase) AddReview(review models.Review) error{
 
 	return nil
 }
+
+func (uc *UseCase) GetReviewsByProductId(productId int) ([]models.Review, error) {
+	reviews, err := uc.repositoryReview.GetReviewsByProductId(productId)
+	if err != nil {
+		return nil, err
+	}
+
+	return reviews, nil
+}
+
 /*
 func (uc *UseCase) GetBasket(userId int) ([]models.BasketProduct, error) {
 	basketProducts, err := uc.repositoryBasket.GetBasket(userId)

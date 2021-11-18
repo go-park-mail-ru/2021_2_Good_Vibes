@@ -46,5 +46,6 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/category/:name", cr.CategoryHandler.GetCategoryProducts)
 	router.GET("/profile/orders", cr.OrderHandler.GetAllOrders, middlewareAut.IsLogin)
 	router.POST("/review/add", cr.ReviewHandler.AddReview, middlewareAut.IsLogin)
+	router.GET("/reviews/get", cr.ReviewHandler.GetReviewsByProductId)
 
 }
