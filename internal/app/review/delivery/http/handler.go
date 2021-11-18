@@ -51,9 +51,9 @@ func (rh *ReviewHandler) AddReview (ctx echo.Context) error {
 	}
 
 	err = rh.useCase.AddReview(newReview)
-	if err != nil && err.Error() == customErrors.RATING_EXISTS_DESCR {
+	if err != nil && err.Error() == customErrors.REVIEW_EXISTS_DESCR {
 		logger.Error(err, newReview)
-		newError := customErrors.NewError(customErrors.RATING_EXISTS_ERROR, customErrors.RATING_EXISTS_DESCR)
+		newError := customErrors.NewError(customErrors.REVIEW_EXISTS_ERROR, customErrors.REVIEW_EXISTS_DESCR)
 		return ctx.JSON(http.StatusOK, newError)
 	}
 
@@ -67,6 +67,51 @@ func (rh *ReviewHandler) AddReview (ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, newReview)
 }
+
+
+func (rh *ReviewHandler) UpdateReview (ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".UpdateReview")
+
+	var newReview models.Review
+	userId, err := rh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusUnauthorized, customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
+	}
+
+	newReview.UserId = int(userId)
+
+	if err := ctx.Bind(&newReview); err != nil {
+		logger.Error(err)
+		newError := customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&newReview); err != nil {
+		logger.Error(err, newReview)
+		newError := customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	err = rh.useCase.UpdateReview(newReview)
+	if err != nil && err.Error() == customErrors.NO_REVIEW_DESCR {
+		logger.Error(err, newReview)
+		newError := customErrors.NewError(customErrors.NO_REVIEW_ERROR, customErrors.NO_REVIEW_DESCR)
+		return ctx.JSON(http.StatusOK, newError)
+	}
+
+	if err != nil {
+		logger.Error(err, newReview)
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
+
+	logger.Trace(trace + " success ReviewHandler")
+
+	return ctx.JSON(http.StatusOK, newReview)
+}
+
 
 func (rh *ReviewHandler) DeleteReview(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
@@ -93,6 +138,12 @@ func (rh *ReviewHandler) DeleteReview(ctx echo.Context) error {
 	}
 
 	err = rh.useCase.DeleteReview(int(userId), productId.ProductId)
+	if err != nil && err.Error() == customErrors.NO_REVIEW_DESCR {
+		logger.Error(err, productId)
+		newError := customErrors.NewError(customErrors.NO_REVIEW_ERROR, customErrors.NO_REVIEW_DESCR)
+		return ctx.JSON(http.StatusOK, newError)
+	}
+
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)

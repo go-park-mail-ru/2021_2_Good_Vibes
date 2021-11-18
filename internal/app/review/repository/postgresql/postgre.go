@@ -71,9 +71,49 @@ func (rb *ReviewRepository) AddReview(review models.Review, productRating float6
 	return nil
 }
 
-func (rb *ReviewRepository) DeleteReview(userId int, productId int) error {
-	_, err := rb.db.Exec(`delete from reviews where user_id=$1 and product_id=$2`,
-		                        userId, productId)
+func (rb *ReviewRepository) UpdateReview(review models.Review, productRating float64) error {
+	err := tx(rb.db, func(tx *sql.Tx) error {
+		_, err := rb.db.Exec(
+			`update reviews set rating=$3, text=$4 where user_id=$1 and product_id=$2`,
+			      review.UserId, review.ProductId, review.Rating, review.Text)
+
+		if err != nil {
+			return err
+		}
+
+		_, err = rb.db.Exec("update products set rating=$1 where id=$2", productRating, review.ProductId)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rb *ReviewRepository) DeleteReview(userId int, productId int, productRating float64) error {
+	err := tx(rb.db, func(tx *sql.Tx) error {
+		_, err := rb.db.Exec(`delete from reviews where user_id=$1 and product_id=$2`,
+			userId, productId)
+
+		if err != nil {
+			return err
+		}
+
+		_, err = rb.db.Exec("update products set rating=$1 where id=$2", productRating, productId)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 
 	if err != nil {
 		return err

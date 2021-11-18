@@ -9,7 +9,8 @@ const (
 	WRONG_PASSWORD_ERROR = -33
 	DB_ERROR             = -40
 	SERVER_ERROR         = -50
-	RATING_EXISTS_ERROR  = -60
+	NO_REVIEW_ERROR  = -60
+	REVIEW_EXISTS_ERROR  = -62
 )
 
 const (
@@ -22,7 +23,8 @@ const (
 	BD_ERROR_DESCR       = "bd error"
 	BAD_INIT_SECRET_KEY  = "bad init secret key"
 	HASHER_ERROR_DESCR   = "error hash password"
-	RATING_EXISTS_DESCR  = "рейтинг уже существует"
+	NO_REVIEW_DESCR      = "отзыв не существует"
+	REVIEW_EXISTS_DESCR  = "отзыв уже существует"
 )
 
 type Error struct {
