@@ -53,6 +53,11 @@ func main() {
 		log.Fatal("cannot load config", err)
 	}
 
+	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
+	if err != nil {
+		logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
+	}
+
 	os.Setenv("AWS_ACCESS_KEY", configApp.ConfigApp.AwsAccessKey)
 	os.Setenv("AWS_SECRET_KEY", configApp.ConfigApp.AwsSecretKey)
 	os.Setenv("DATABASE_URL", fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
@@ -60,12 +65,11 @@ func main() {
 		configApp.ConfigApp.DataBase.Host, configApp.ConfigApp.DataBase.Port,
 		configApp.ConfigApp.DataBase.DBName))
 
+	//------------------user--------------------
 	storage, err = postgresql.NewStorageUserDB(postgre.GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-	hasher := impl.NewHasherBCrypt(bcrypt.DefaultCost)
-
 	authGrpcConn, err := grpc.Dial(
 		"localhost:8081",
 		grpc.WithInsecure(),
@@ -74,14 +78,18 @@ func main() {
 		log.Fatal(err)
 	}
 	defer authGrpcConn.Close()
-	userUс := userUsecase.NewUsecase(authGrpcConn, storage, hasher)
+	userHandler := http2.NewLoginHandler(userUsecase.NewUsecase(authGrpcConn, storage, impl.NewHasherBCrypt(bcrypt.DefaultCost)),
+		sessionManager)
 
+	//------------------product--------------------
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(postgre.GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
-	productUc := productUseCase.NewProductUsecase(storageProd)
+	productHandler := productHandlerHttp.NewProductHandler(productUseCase.NewProductUsecase(storageProd),
+		sessionManager)
 
+	//------------------order--------------------
 	orderGrpcConn, err := grpc.Dial(
 		"localhost:8083",
 		grpc.WithInsecure(),
@@ -89,15 +97,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	orderHandler := orderHandlerHttp.NewOrderHandler(orderUseCase.NewOrderUseCase(orderGrpcConn),
+		sessionManager)
 
-	orderUc := orderUseCase.NewOrderUseCase(orderGrpcConn)
-
-	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
-	if err != nil {
-		logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
-	}
-	userHandler := http2.NewLoginHandler(userUс, sessionManager)
-
+	//------------------basket--------------------
 	BasketGrpcConn, err := grpc.Dial(
 		"localhost:8082",
 		grpc.WithInsecure(),
@@ -105,20 +108,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	basketHandler := basketHandlerHttp.NewBasketHandler(basketUseCase.NewBasketUseCase(BasketGrpcConn),
+		sessionManager)
 
-	basketUc := basketUseCase.NewBasketUseCase(BasketGrpcConn)
-	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc, sessionManager)
-
+	//------------------category--------------------
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(postgre.GetPostgres())
 	if err != nil {
 		panic(err)
 	}
-
-	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
-
-	productHandler := productHandlerHttp.NewProductHandler(productUc, sessionManager)
-	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc, sessionManager)
-	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
+	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUseCase.NewCategoryUseCase(storageCategory,
+		storageProd))
 
 	serverRouting := configRouting.ServerConfigRouting{
 		ProductHandler:  productHandler,

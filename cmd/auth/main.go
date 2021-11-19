@@ -28,9 +28,8 @@ func main() {
 		log.Fatal("cannot connect data base", err)
 	}
 
-	hasher := impl.NewHasherBCrypt(bcrypt.DefaultCost)
-	userUseCase := usecase.NewUsecase(storage, hasher)
-	handler := handler.NewGrpcUserHandler(userUseCase)
+	handler := handler.NewGrpcUserHandler(usecase.NewUsecase(storage,
+		impl.NewHasherBCrypt(bcrypt.DefaultCost)))
 
 	lis, err := net.Listen("tcp", "localhost:8081")
 	if err != nil {
@@ -40,7 +39,6 @@ func main() {
 
 	server := grpc.NewServer()
 	proto.RegisterAuthServiceServer(server, handler)
-
 	if err := server.Serve(lis); err != nil {
 		log.Fatal(err)
 	}

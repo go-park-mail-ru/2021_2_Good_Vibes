@@ -26,8 +26,7 @@ func main() {
 		log.Fatal("cannot connect data base", err)
 	}
 
-	basketUseCase := usecase.NewBasketUseCase(storage)
-	handler := handler.NewGrpcBasketHandler(basketUseCase)
+	handler := handler.NewGrpcBasketHandler(usecase.NewBasketUseCase(storage))
 
 	lis, err := net.Listen("tcp", "localhost:8082")
 	if err != nil {
@@ -37,7 +36,6 @@ func main() {
 
 	server := grpc.NewServer()
 	proto.RegisterBasketServiceServer(server, handler)
-
 	if err := server.Serve(lis); err != nil {
 		log.Fatal(err)
 	}

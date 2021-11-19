@@ -26,8 +26,7 @@ func main() {
 		log.Fatal("cannot connect data base", err)
 	}
 
-	orderUseCase := usecase.NewOrderUseCase(storage)
-	handler := handler.NewGrpcOrderHandler(orderUseCase)
+	handler := handler.NewGrpcOrderHandler(usecase.NewOrderUseCase(storage))
 
 	lis, err := net.Listen("tcp", "localhost:8083")
 	if err != nil {
@@ -37,7 +36,6 @@ func main() {
 
 	server := grpc.NewServer()
 	proto.RegisterOrderServiceServer(server, handler)
-
 	if err := server.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
