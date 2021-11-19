@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase/helpers"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 )
 
 type UseCase struct {
@@ -19,8 +20,8 @@ func NewCategoryUseCase(repositoryCategory category.Repository, repositoryModel 
 	}
 }
 
-func (uc *UseCase) GetProductsByCategory(category string) ([]models.Product, error) {
-	products, err := uc.repositoryProduct.GetByCategory(category)
+func (uc *UseCase) GetProductsByCategory(filter postgre.Filter) ([]models.Product, error) {
+	products, err := uc.repositoryProduct.GetByCategory(filter)
 	if err != nil {
 		return nil, err
 	}

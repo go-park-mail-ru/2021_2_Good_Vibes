@@ -3,6 +3,7 @@ package postgresql
 import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 )
 
 type StorageProductsDB struct {
@@ -57,18 +58,29 @@ func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 	return product, nil
 }
 
-func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, error) {
+func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Product, error) {
 	var products []models.Product
+	if filter.OrderBy != postgre.TypeOrderRating && filter.OrderBy != postgre.TypeOrderPrice {
+		filter.OrderBy = postgre.TypeOrderRating
+	}
+	if filter.TypeOrder != postgre.TypeOrderMin && filter.TypeOrder != postgre.TypeOrderMax {
+		filter.OrderBy = postgre.TypeOrderMin
+	}
+	filter.OrderBy = "p." + filter.OrderBy
+
 	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description from products as p "+
 		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
-		"nc1.rgt <= nc2.rgt where nc2.name = $1 order by nc1.id", category)
+		"nc1.rgt <= nc2.rgt " +
+		"where nc2.name = $1 and p.price >= $2 and p.price <= $3 " +
+		"and p.rating >= $4 and p.rating <= $5 " +
+		"order by " + filter.OrderBy + " " + filter.TypeOrder, filter.NameCategory, filter.MinPrice,
+		filter.MaxPrice, filter.MinRating, filter.MaxRating)
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
-
 	for rows.Next() {
 		product := models.Product{}
 

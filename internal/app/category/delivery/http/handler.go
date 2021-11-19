@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -52,9 +53,16 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategoryProducts")
 
-	nameString := ctx.Param("name")
+	filter, err := postgre.ParseQueryFilter(ctx)
+	if err != nil {
+		logger.Trace(err)
+		return ctx.NoContent(http.StatusBadRequest)
+	}
 
-	products, err := ch.useCase.GetProductsByCategory(nameString)
+	nameString := ctx.Param("name")
+	filter.NameCategory = nameString
+
+	products, err := ch.useCase.GetProductsByCategory(*filter)
 	if err != nil {
 		logger.Error(err)
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, err.Error())
