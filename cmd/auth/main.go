@@ -1,11 +1,10 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/auth"
 	handler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/auth/handler/grpc"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/auth/repository/postgresql"
@@ -24,7 +23,7 @@ func main() {
 		log.Fatal("cannot load config", err)
 	}
 
-	storage, err := postgresql.NewStorageUserDB(GetPostgres())
+	storage, err := postgresql.NewStorageUserDB(postgre.GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -45,21 +44,4 @@ func main() {
 	if err := server.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func GetPostgres() (*sql.DB, error) {
-	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
-		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.DBName,
-		configApp.ConfigApp.DataBase.Password, configApp.ConfigApp.DataBase.Host,
-		configApp.ConfigApp.DataBase.Port)
-	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-	db.SetMaxOpenConns(10)
-	return db, nil
 }

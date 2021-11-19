@@ -2,7 +2,6 @@ package main
 
 //тут надо какой-то порядок с неймингами навести
 import (
-	"database/sql"
 	"fmt"
 	configApp "github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configMiddleware"
@@ -19,6 +18,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt/manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 
@@ -60,7 +60,7 @@ func main() {
 		configApp.ConfigApp.DataBase.Host, configApp.ConfigApp.DataBase.Port,
 		configApp.ConfigApp.DataBase.DBName))
 
-	storage, err = postgresql.NewStorageUserDB(GetPostgres())
+	storage, err = postgresql.NewStorageUserDB(postgre.GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -76,7 +76,7 @@ func main() {
 	defer authGrpcConn.Close()
 	userUс := userUsecase.NewUsecase(authGrpcConn, storage, hasher)
 
-	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
+	storageProd, err = productRepoPostgres.NewStorageProductsDB(postgre.GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -109,7 +109,7 @@ func main() {
 	basketUc := basketUseCase.NewBasketUseCase(BasketGrpcConn)
 	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc, sessionManager)
 
-	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
+	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(postgre.GetPostgres())
 	if err != nil {
 		panic(err)
 	}
@@ -134,21 +134,4 @@ func main() {
 	if err := router.Start(configApp.ConfigApp.MainConfig.ServerAddress); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
-}
-
-func GetPostgres() (*sql.DB, error) {
-	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
-		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.DBName,
-		configApp.ConfigApp.DataBase.Password, configApp.ConfigApp.DataBase.Host,
-		configApp.ConfigApp.DataBase.Port)
-	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-	db.SetMaxOpenConns(10)
-	return db, nil
 }
