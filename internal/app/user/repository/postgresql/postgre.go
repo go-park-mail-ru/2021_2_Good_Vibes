@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"database/sql"
-	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
@@ -35,21 +34,6 @@ func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage
 	}
 
 	return &tmp, nil
-}
-
-func (su *StorageUserDB) InsertUser(newUser models.UserDataForReg) (int, error) {
-	rows := su.db.QueryRow("INSERT INTO customers (name, email, password) VALUES ($1, $2, $3) RETURNING id",
-		newUser.Name,
-		newUser.Email,
-		newUser.Password)
-
-	var id int
-	err := rows.Scan(&id)
-	if err != nil {
-		return customErrors.DB_ERROR, err
-	}
-
-	return id, nil
 }
 
 func (su *StorageUserDB) GetUserDataById(id uint64) (*models.UserDataStorage, error) {

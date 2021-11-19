@@ -75,7 +75,7 @@ func TestOrderUseCase_PutOrder(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:  "error put order",
+			name:  "error put orders",
 			order: order,
 			mockBehaviorRepository: func(s *mock_order.MockRepository, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, errors.New("new error"))

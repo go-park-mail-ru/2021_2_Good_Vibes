@@ -25,7 +25,7 @@ func ConfigMiddleware(router *echo.Echo) {
 		middlewareRequestId.RequestId,
 		middlewareLogger.AccessLog,
 		middleware.CORSWithConfig(middlewareCors.GetCORSConfigStruct()),
-		middleware.CSRFWithConfig(middleware.CSRFConfig{
+		/*middleware.CSRFWithConfig(middleware.CSRFConfig{
 			Skipper: func(context echo.Context) bool {
 				if context.Request().RequestURI == "/login" ||
 					context.Request().RequestURI == "/signup" {
@@ -37,7 +37,7 @@ func ConfigMiddleware(router *echo.Echo) {
 			// CookieSameSite: http.SameSiteNoneMode,
 			// CookieSecure: true,
 		}),
-		CsrfSetHeader,
+		CsrfSetHeader,*/
 		middleware.Secure(),
 	)
 }

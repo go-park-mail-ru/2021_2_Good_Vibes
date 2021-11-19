@@ -1,48 +1,41 @@
 package usecase
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
+	proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/order"
+	"google.golang.org/grpc"
 )
 
 type UseCase struct {
-	repositoryOrder order.Repository
+	orderServiceClient proto.OrderServiceClient
 }
 
-func NewOrderUseCase(repositoryOrder order.Repository) *UseCase {
+func NewOrderUseCase(conn *grpc.ClientConn) *UseCase {
+	c := proto.NewOrderServiceClient(conn)
+
 	return &UseCase{
-		repositoryOrder: repositoryOrder,
+		orderServiceClient: c,
 	}
 }
 
 func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
-	productPrices, err := uc.repositoryOrder.SelectPrices(order.Products)
-
+	orderCost, err := uc.orderServiceClient.PutOrder(context.Background(), models.ModelOrderToGrpc(order))
 	if err != nil {
 		return 0, 0, err
 	}
-
-	productPricesMap := make(map[int]float64, len(productPrices))
-	for _, productPrice := range productPrices {
-		productPricesMap[productPrice.Id] = productPrice.Price
-	}
-
-	var cost float64
-
-	for _, product := range order.Products {
-		cost += float64(product.Number) * productPricesMap[product.ProductId]
-	}
-
-	order.Cost = cost
-
-	orderId, err := uc.repositoryOrder.PutOrder(order)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return orderId, cost, nil
+	return int(orderCost.GetOrderId()), float64(orderCost.GetCost()), nil
 }
 
 func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
-	return uc.repositoryOrder.GetAllOrders(user)
+	ordersGrpc, err := uc.orderServiceClient.GetAllOrders(context.Background(), &proto.UserIdOrder{UserId: int64(user)})
+	if err != nil {
+		return nil, err
+	}
+
+	var ordersModel []models.Order
+	for _, element := range ordersGrpc.GetOrders(){
+		ordersModel = append(ordersModel, models.GrpcOrderToModel(element))
+	}
+	return ordersModel, nil
 }

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "./;basket";
+
+import "google/protobuf/empty.proto";
+
+message BasketProduct {
+  int64 UserId = 1;
+  int64 ProductId = 2;
+  int64 Number = 3;
+}
+
+message UserID {
+  int64 UserId = 1;
+}
+
+message ProductArray {
+  repeated BasketProduct Products = 1;
+}
+
+service BasketService {
+  rpc PutInBasket(BasketProduct) returns(google.protobuf.Empty){}
+  rpc GetBasket(UserID) returns(ProductArray){}
+  rpc DropBasket(UserID) returns(google.protobuf.Empty){}
+  rpc DeleteProduct(BasketProduct) returns(google.protobuf.Empty){}
+}

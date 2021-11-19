@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option go_package = "./;orders";
+
+message OrderProducts {
+  int64 OrderId = 1;
+  int64 ProductId = 2;
+  int64 Number = 3;
+}
+
+message Address {
+  string Country = 1;
+  string Region = 2;
+  string City = 3;
+  string Street = 4;
+  string House = 5;
+  string Flat = 6;
+  string Index = 7;
+}
+
+message Order {
+  int64 OrderId = 1;
+  int64 UserId = 2;
+  string Date = 3;
+  Address Address = 4;
+  float Cost = 5;
+  string status = 6;
+  repeated OrderProducts Products= 7;
+}
+
+message OrderCost {
+  int64 OrderId = 1;
+  float Cost = 2;
+}
+
+message ArrayOrders {
+  repeated Order Orders = 1;
+}
+
+message UserIdOrder {
+  int64 UserId = 1;
+}
+
+service OrderService {
+    rpc PutOrder(Order) returns (OrderCost) {}
+    rpc GetAllOrders(UserIdOrder) returns (ArrayOrders) {}
+}

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "./;auth";
+
+message UserForInput {
+  string Name = 1;
+  string Password = 2;
+}
+
+message UserForReg {
+  string Name = 1;
+  string Email = 2;
+  string Password = 3;
+}
+
+message UserId {
+  int64 Id = 1;
+}
+
+service AuthService {
+  rpc Login(UserForInput) returns (UserId) {}
+  rpc SignUp(UserForReg) returns (UserId) {}
+}

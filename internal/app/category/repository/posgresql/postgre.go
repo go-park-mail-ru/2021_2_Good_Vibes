@@ -87,7 +87,7 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 		"from categories as node, categories as parent " +
 		"where node.lft between parent.lft and parent.rgt " +
 		"group by node.name, node.description, node.lft " +
-		"order by node.lft")
+		"orders by node.lft")
 
 	if err != nil {
 		return nil, err

@@ -8,14 +8,10 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configMiddleware"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configRouting"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
-	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
-	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
-	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/repository/postgresql"
 	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
@@ -24,6 +20,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc"
 
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
@@ -46,14 +43,12 @@ var (
 	router          = echo.New()
 	storage         user.Repository
 	storageProd     product.Repository
-	storageOrder    order.Repository
-	storageBasket   basket.Repository
 	storageCategory category.Repository
 )
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig(".")
+	err := configApp.LoadConfig("../..")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
@@ -70,7 +65,17 @@ func main() {
 		log.Fatal("cannot connect data base", err)
 	}
 	hasher := impl.NewHasherBCrypt(bcrypt.DefaultCost)
-	userUс := userUsecase.NewUsecase(storage, hasher)
+
+	authGrpcConn, err := grpc.Dial(
+		"localhost:8081",
+				grpc.WithInsecure(),
+		)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer authGrpcConn.Close()
+	userUс := userUsecase.NewUsecase(authGrpcConn, storage, hasher)
+
 
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
@@ -79,22 +84,31 @@ func main() {
 	productUc := productUseCase.NewProductUsecase(storageProd)
 
 
-	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
+	orderGrpcConn, err := grpc.Dial(
+		"localhost:8083",
+		grpc.WithInsecure(),
+	)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	orderUc := orderUseCase.NewOrderUseCase(storageOrder)
+	orderUc := orderUseCase.NewOrderUseCase(orderGrpcConn)
 
 	sessionManager, err := manager.NewTokenManager(configApp.ConfigApp.SecretKey)
-	{
-		if err != nil {
-			logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
-		}
+	if err != nil {
+		logger.CustomLogger.LogrusLoggerHandler.Fatal(errors.BAD_INIT_SECRET_KEY)
+	}
+	userHandler := http2.NewLoginHandler(userUс, sessionManager)
+
+	BasketGrpcConn, err := grpc.Dial(
+		"localhost:8082",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	storageBasket, err := basketRepoPostgres.NewBasketRepository(GetPostgres())
-	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
+	basketUc := basketUseCase.NewBasketUseCase(BasketGrpcConn)
 	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc, sessionManager)
 
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
@@ -105,7 +119,6 @@ func main() {
 	categoryUc := categoryUseCase.NewCategoryUseCase(storageCategory, storageProd)
 
 	productHandler := productHandlerHttp.NewProductHandler(productUc, sessionManager)
-	userHandler := http2.NewLoginHandler(userUс, sessionManager)
 	orderHandler := orderHandlerHttp.NewOrderHandler(orderUc, sessionManager)
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUc)
 

@@ -62,7 +62,7 @@ func (ph *StorageProductsDB) GetByCategory(category string) ([]models.Product, e
 	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description from products as p "+
 		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
-		"nc1.rgt <= nc2.rgt where nc2.name = $1 order by nc1.id", category)
+		"nc1.rgt <= nc2.rgt where nc2.name = $1 orders by nc1.id", category)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
                                 "p.count_in_stock, p.description, p.image from products as p "+
                                 "join favourite_prod fp on p.id = fp.product_id "+
                                 "where fp.user_id=$1 "+
-                                "order by name", userId)
+                                "orders by name", userId)
 
 	if err != nil {
 		return nil, err

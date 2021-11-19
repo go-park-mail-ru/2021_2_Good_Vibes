@@ -113,7 +113,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 		},
 		{
 
-			name:  "incorrect put order",
+			name:  "incorrect put orders",
 			order: string(orderJson),
 			mockBehaviorPutOrder: func(s *mock_order.MockUseCase, order models.Order) {
 				s.EXPECT().PutOrder(order).Return(0, 50000.00, errors.New(customErrors.BD_ERROR_DESCR))
