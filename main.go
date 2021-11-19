@@ -78,7 +78,6 @@ func main() {
 	}
 	productUc := productUseCase.NewProductUsecase(storageProd)
 
-
 	storageOrder, err := orderRepoPostgres.NewOrderRepository(GetPostgres())
 	if err != nil {
 		panic(err)

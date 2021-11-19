@@ -71,10 +71,10 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description from products as p "+
 		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
-		"nc1.rgt <= nc2.rgt " +
-		"where nc2.name = $1 and p.price >= $2 and p.price <= $3 " +
-		"and p.rating >= $4 and p.rating <= $5 " +
-		"order by " + filter.OrderBy + " " + filter.TypeOrder, filter.NameCategory, filter.MinPrice,
+		"nc1.rgt <= nc2.rgt "+
+		"where nc2.name = $1 and p.price >= $2 and p.price <= $3 "+
+		"and p.rating >= $4 and p.rating <= $5 "+
+		"order by "+filter.OrderBy+" "+filter.TypeOrder, filter.NameCategory, filter.MinPrice,
 		filter.MaxPrice, filter.MinRating, filter.MaxRating)
 	if err != nil {
 		return nil, err
@@ -130,11 +130,11 @@ func (ph *StorageProductsDB) DeleteFavouriteProduct(product models.FavouriteProd
 func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product, error) {
 	var products []models.Product
 
-	rows, err:= ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, " +
-                                "p.count_in_stock, p.description, p.image from products as p "+
-                                "join favourite_prod fp on p.id = fp.product_id "+
-                                "where fp.user_id=$1 "+
-                                "order by name", userId)
+	rows, err := ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, "+
+		"p.count_in_stock, p.description, p.image from products as p "+
+		"join favourite_prod fp on p.id = fp.product_id "+
+		"where fp.user_id=$1 "+
+		"order by name", userId)
 
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 		product := models.Product{}
 
 		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Rating,
-			             &product.Category, &product.CountInStock, &product.Description, &product.Image)
+			&product.Category, &product.CountInStock, &product.Description, &product.Image)
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +189,6 @@ func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string
 	}
 	return nil
 }
-
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()

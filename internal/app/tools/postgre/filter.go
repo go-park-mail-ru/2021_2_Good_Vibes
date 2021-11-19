@@ -8,34 +8,34 @@ import (
 )
 
 const (
-	maxRatingOnStore = 5
+	maxRatingOnStore       = 5
 	maxPriceProductOnStore = 1000000.0
 )
 
 const (
-	NamePriceMin = "price_min"
-	NamePriceMax = "price_max"
+	NamePriceMin  = "price_min"
+	NamePriceMax  = "price_max"
 	NameRatingMin = "rating_min"
 	NameRatingMax = "number"
-	NameOrder = "order"
+	NameOrder     = "order"
 	NameOrderType = "order_type"
 )
 
 const (
-	TypeOrderPrice = "price"
+	TypeOrderPrice  = "price"
 	TypeOrderRating = "rating"
-	TypeOrderMin = "desc"
-	TypeOrderMax = "asc"
+	TypeOrderMin    = "desc"
+	TypeOrderMax    = "asc"
 )
 
 type Filter struct {
 	NameCategory string
-	MinPrice float64
-	MaxPrice float64
-	MinRating float64
-	MaxRating float64
-	OrderBy string
-	TypeOrder string
+	MinPrice     float64
+	MaxPrice     float64
+	MinRating    float64
+	MaxRating    float64
+	OrderBy      string
+	TypeOrder    string
 }
 
 func ParseQueryFilter(ctx echo.Context) (*Filter, error) {

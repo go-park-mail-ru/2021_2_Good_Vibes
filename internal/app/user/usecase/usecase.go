@@ -97,7 +97,6 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 	return 0, us.repository.UpdateUser(newData)
 }
 
-
 func (us *usecase) UpdatePassword(newData models.UserDataPassword) error {
 	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newData.Password))
 	if err != nil {
