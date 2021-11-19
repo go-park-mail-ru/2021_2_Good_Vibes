@@ -23,3 +23,8 @@ type CreateCategory struct {
 	ParentCategory string `json:"parent_category"`
 	Description string    `json:"description"`
 }
+
+type CategoryForSuggest struct {
+	Name    string `json:"name"`
+	Description string `json:"description"`
+}

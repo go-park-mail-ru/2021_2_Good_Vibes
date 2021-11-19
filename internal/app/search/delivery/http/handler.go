@@ -1,21 +1,43 @@
 package http
 
 import (
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search"
-	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
+	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 type SearchHandler struct {
 	useCase        search.UseCase
-	sessionManager sessionJwt.TokenManager
 }
 
-func NewSearchHandler(useCase search.UseCase, sessionManager sessionJwt.TokenManager) *SearchHandler {
+func NewSearchHandler(useCase search.UseCase) *SearchHandler {
 	return &SearchHandler{
 		useCase:        useCase,
-		sessionManager: sessionManager,
 	}
 }
 
 const trace = "SearchHandler"
 
+func (sh *SearchHandler) GetSuggests(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".GetSuggest")
+
+	searchString := ctx.QueryParam("str")
+	if searchString == "" {
+		logger.Error("bad query param for GetSuggests")
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	suggests, err := sh.useCase.GetSuggests(searchString)
+	if err != nil {
+		logger.Error(err)
+		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	logger.Trace(trace + " success GetSuggest")
+	return ctx.JSON(http.StatusOK, suggests)
+}
