@@ -9,6 +9,6 @@ type Repository interface {
 	GetUserDataByName(name string) (*models.UserDataStorage, error)
 	GetUserDataById(id uint64) (*models.UserDataStorage, error)
 	SaveAvatarName(userId int, fileName string) error
-	UpdateUser (newData models.UserDataProfile) error
+	UpdateUser(newData models.UserDataProfile) error
 	UpdatePassword(newData models.UserDataPassword) error
 }

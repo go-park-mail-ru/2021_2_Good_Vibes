@@ -121,7 +121,7 @@ func (so *OrderRepository) SelectPrices(products []models.OrderProducts) ([]mode
 	return productPrices, nil
 }
 
-func (so *OrderRepository)GetAllOrders(user int) ([]models.Order, error) {
+func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	var orders []models.Order
 
 	err := tx(so.db, func(tx *sql.Tx) error {
@@ -258,4 +258,3 @@ func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx.Commit()
 	return nil
 }
-

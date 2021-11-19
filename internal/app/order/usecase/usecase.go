@@ -34,7 +34,7 @@ func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
 	}
 
 	var ordersModel []models.Order
-	for _, element := range ordersGrpc.GetOrders(){
+	for _, element := range ordersGrpc.GetOrders() {
 		ordersModel = append(ordersModel, models.GrpcOrderToModel(element))
 	}
 	return ordersModel, nil

@@ -68,21 +68,19 @@ func main() {
 
 	authGrpcConn, err := grpc.Dial(
 		"localhost:8081",
-				grpc.WithInsecure(),
-		)
+		grpc.WithInsecure(),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer authGrpcConn.Close()
 	userUс := userUsecase.NewUsecase(authGrpcConn, storage, hasher)
 
-
 	storageProd, err = productRepoPostgres.NewStorageProductsDB(GetPostgres())
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
 	productUc := productUseCase.NewProductUsecase(storageProd)
-
 
 	orderGrpcConn, err := grpc.Dial(
 		"localhost:8083",

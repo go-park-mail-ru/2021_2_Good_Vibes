@@ -23,9 +23,9 @@ func TestPutInBasket(t *testing.T) {
 	}
 
 	basketProduct := models.BasketProduct{
-		UserId: 1,
+		UserId:    1,
 		ProductId: 3,
-		Number: 5,
+		Number:    5,
 	}
 
 	//ok query
@@ -35,7 +35,7 @@ func TestPutInBasket(t *testing.T) {
 	mock.
 		ExpectExec("insert into basket").
 		WithArgs(
-		basketProduct.UserId).
+			basketProduct.UserId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	mock.
@@ -105,7 +105,6 @@ func TestPutInBasket(t *testing.T) {
 	}
 }
 
-
 func TestGetBasket(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -124,9 +123,9 @@ func TestGetBasket(t *testing.T) {
 		NewRows([]string{"product_id", "count"})
 
 	expect := []models.BasketProduct{
-		{ ProductId: 1, Number: 1},
-		{ ProductId: 2, Number: 3},
-		{ ProductId: 3, Number: 5},
+		{ProductId: 1, Number: 1},
+		{ProductId: 2, Number: 3},
+		{ProductId: 3, Number: 5},
 	}
 
 	for _, item := range expect {
@@ -188,7 +187,6 @@ func TestGetBasket(t *testing.T) {
 		return
 	}
 }
-
 
 func TestDropBasket(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -279,7 +277,6 @@ func TestDropBasket(t *testing.T) {
 	}
 }
 
-
 func TestDeleteProduct(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -313,7 +310,6 @@ func TestDeleteProduct(t *testing.T) {
 		ExpectQuery("select ...").
 		WithArgs(product.ProductId).
 		WillReturnRows(rows)
-
 
 	mock.ExpectCommit()
 
@@ -391,7 +387,6 @@ func TestDeleteProduct(t *testing.T) {
 		WithArgs(product.UserId, product.ProductId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-
 	mock.
 		ExpectQuery("select ...").
 		WithArgs(product.ProductId).
@@ -420,7 +415,6 @@ func TestDeleteProduct(t *testing.T) {
 		WithArgs(product.UserId, product.ProductId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-
 	mock.
 		ExpectQuery("select ...").
 		WithArgs(product.ProductId).
@@ -446,7 +440,6 @@ func TestDeleteProduct(t *testing.T) {
 		WithArgs(product.UserId, product.ProductId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-
 	rows = sqlmock.
 		NewRows([]string{"user_id", "product_id", "count"})
 
@@ -471,7 +464,6 @@ func TestDeleteProduct(t *testing.T) {
 		return
 	}
 }
-
 
 func TestNewStorageBasketDB_Fail(t *testing.T) {
 	db, _, err := sqlmock.New()

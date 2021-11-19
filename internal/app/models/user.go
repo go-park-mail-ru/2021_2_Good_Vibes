@@ -11,10 +11,10 @@ type UserDataForInput struct {
 }
 
 type UserDataStorage struct {
-	Id       int    `json:"id"`
-	Name     string `json:"username" validate:"required"`
-	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required"`
+	Id       int            `json:"id"`
+	Name     string         `json:"username" validate:"required"`
+	Email    string         `json:"email"    validate:"required,email"`
+	Password string         `json:"password" validate:"required"`
 	Avatar   sql.NullString `json:"avatar"`
 }
 
@@ -29,27 +29,27 @@ type UserID struct {
 }
 
 type UserDataProfile struct {
-	Id	uint64 `json:"id,omitempty"`
-	Name  string `json:"username"`
-	Email string `json:"email" validate:"email"`
+	Id     uint64 `json:"id,omitempty"`
+	Name   string `json:"username"`
+	Email  string `json:"email" validate:"email"`
 	Avatar string `json:"avatar,omitempty"`
 }
 
 type UserDataPassword struct {
-	Id uint64 `json:"id,omitempty"`
+	Id       uint64 `json:"id,omitempty"`
 	Password string `json:"password"`
 }
 
-func GrpcUserDataForInputToModel (grpcData *proto.UserForInput) UserDataForInput {
+func GrpcUserDataForInputToModel(grpcData *proto.UserForInput) UserDataForInput {
 	return UserDataForInput{
-		Name: grpcData.GetName(),
+		Name:     grpcData.GetName(),
 		Password: grpcData.GetPassword(),
 	}
 }
 
-func ModelUserDataForInputToGrpc (model UserDataForInput) *proto.UserForInput{
+func ModelUserDataForInputToGrpc(model UserDataForInput) *proto.UserForInput {
 	return &proto.UserForInput{
-		Name: model.Name,
+		Name:     model.Name,
 		Password: model.Password,
 	}
 }
@@ -66,18 +66,18 @@ func ModelUserIdToGrpc(modelUserId UserID) *proto.UserId {
 	}
 }
 
-func GrpcUserDataForRegToModel (grpcData *proto.UserForReg) UserDataForReg {
+func GrpcUserDataForRegToModel(grpcData *proto.UserForReg) UserDataForReg {
 	return UserDataForReg{
-		Name: grpcData.GetName(),
+		Name:     grpcData.GetName(),
 		Password: grpcData.GetPassword(),
-		Email: grpcData.GetEmail(),
+		Email:    grpcData.GetEmail(),
 	}
 }
 
-func ModelUserDataForRegToGrpc (model UserDataForReg) *proto.UserForReg {
+func ModelUserDataForRegToGrpc(model UserDataForReg) *proto.UserForReg {
 	return &proto.UserForReg{
-		Name: model.Name,
-		Email: model.Email,
+		Name:     model.Name,
+		Email:    model.Email,
 		Password: model.Password,
 	}
 }

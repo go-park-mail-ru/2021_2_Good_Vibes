@@ -12,23 +12,23 @@ type BasketStorage struct {
 	UserId int `json:"user_id"`
 }
 
-func ModelBasketProductToGrpc (model BasketProduct) *proto.BasketProduct{
+func ModelBasketProductToGrpc(model BasketProduct) *proto.BasketProduct {
 	return &proto.BasketProduct{
-		UserId: int64(model.UserId),
+		UserId:    int64(model.UserId),
 		ProductId: int64(model.ProductId),
-		Number: int64(model.Number),
+		Number:    int64(model.Number),
 	}
 }
 
 func GrpcBasketProductToModel(grpcData *proto.BasketProduct) BasketProduct {
 	return BasketProduct{
-		UserId: int(grpcData.GetUserId()),
+		UserId:    int(grpcData.GetUserId()),
 		ProductId: int(grpcData.GetProductId()),
-		Number: int(grpcData.GetNumber()),
+		Number:    int(grpcData.GetNumber()),
 	}
 }
 
-func ModelBasketStorageToGrpc (model BasketStorage) *proto.UserID{
+func ModelBasketStorageToGrpc(model BasketStorage) *proto.UserID {
 	return &proto.UserID{
 		UserId: int64(model.UserId),
 	}

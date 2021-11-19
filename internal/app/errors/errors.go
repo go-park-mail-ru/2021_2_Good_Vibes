@@ -34,4 +34,3 @@ func NewError(errorCode int, errorDesc string) *Error {
 		ErrorDescription: errorDesc,
 	}
 }
-

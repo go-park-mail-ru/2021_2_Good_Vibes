@@ -64,7 +64,7 @@ func (su *StorageUserDB) SaveAvatarName(userId int, fileName string) error {
 	return nil
 }
 
-func (su *StorageUserDB) UpdateUser (newData models.UserDataProfile) error {
+func (su *StorageUserDB) UpdateUser(newData models.UserDataProfile) error {
 	_, err := su.db.Exec(`UPDATE customers SET name = $1, email = $2 WHERE id = $3`, newData.Name,
 		newData.Email, newData.Id)
 
@@ -74,7 +74,7 @@ func (su *StorageUserDB) UpdateUser (newData models.UserDataProfile) error {
 	return nil
 }
 
-func (su *StorageUserDB) UpdatePassword (newData models.UserDataPassword) error {
+func (su *StorageUserDB) UpdatePassword(newData models.UserDataPassword) error {
 	_, err := su.db.Exec(`UPDATE customers SET password = $1 WHERE id = $2`, newData.Password,
 		newData.Id)
 

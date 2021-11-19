@@ -47,7 +47,6 @@ func main() {
 	}
 }
 
-
 func GetPostgres() (*sql.DB, error) {
 	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable",
 		configApp.ConfigApp.DataBase.User, configApp.ConfigApp.DataBase.DBName,

@@ -26,7 +26,7 @@ func (handler *grpcOrderHandler) PutOrder(ctx context.Context, order *proto.Orde
 	return &proto.OrderCost{OrderId: int64(orderId), Cost: float32(cost)}, nil
 }
 
-func (handler *grpcOrderHandler) GetAllOrders (ctx context.Context, userId *proto.UserIdOrder) (*proto.ArrayOrders, error) {
+func (handler *grpcOrderHandler) GetAllOrders(ctx context.Context, userId *proto.UserIdOrder) (*proto.ArrayOrders, error) {
 	ordersModel, err := handler.orderUseCase.GetAllOrders(int(userId.GetUserId()))
 	if err != nil {
 		return nil, err

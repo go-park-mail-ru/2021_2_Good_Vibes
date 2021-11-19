@@ -8,4 +8,3 @@ type UseCase interface {
 	DropBasket(userId int) error
 	DeleteProduct(product models.BasketProduct) error
 }
-

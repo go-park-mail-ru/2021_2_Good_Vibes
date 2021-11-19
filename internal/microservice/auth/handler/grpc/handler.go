@@ -18,7 +18,7 @@ func NewGrpcUserHandler(userUseCase auth.UseCase) *grpcUserHandler {
 	}
 }
 
-func (handler *grpcUserHandler) Login(ctx context.Context, userInput *proto.UserForInput) (*proto.UserId, error){
+func (handler *grpcUserHandler) Login(ctx context.Context, userInput *proto.UserForInput) (*proto.UserId, error) {
 	userID, err := handler.userUseCase.Login(models.GrpcUserDataForInputToModel(userInput))
 	if err != nil {
 		return models.ModelUserIdToGrpc(models.UserID{UserId: userID}), err
@@ -26,7 +26,7 @@ func (handler *grpcUserHandler) Login(ctx context.Context, userInput *proto.User
 	return models.ModelUserIdToGrpc(models.UserID{UserId: userID}), err
 }
 
-func (handler *grpcUserHandler) SignUp(ctx context.Context, userInput *proto.UserForReg) (*proto.UserId, error){
+func (handler *grpcUserHandler) SignUp(ctx context.Context, userInput *proto.UserForReg) (*proto.UserId, error) {
 	userID, err := handler.userUseCase.SignUp(models.GrpcUserDataForRegToModel(userInput))
 	if err != nil {
 		return models.ModelUserIdToGrpc(models.UserID{UserId: userID}), err

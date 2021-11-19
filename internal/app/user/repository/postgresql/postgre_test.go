@@ -91,8 +91,6 @@ func TestGetUserDataByName(t *testing.T) {
 	}
 }
 
-
-
 func TestInsertUser(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -132,7 +130,7 @@ func TestInsertUser(t *testing.T) {
 		return
 	}
 
-	if  result != 1 {
+	if result != 1 {
 		t.Errorf("results not match, want %v, have %v", 1, result)
 		return
 	}
@@ -172,7 +170,6 @@ func TestInsertUser(t *testing.T) {
 		return
 	}
 }
-
 
 func TestGetUserDataById(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -255,8 +252,6 @@ func TestGetUserDataById(t *testing.T) {
 	}
 }
 
-
-
 func TestSaveAvatarName(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -310,7 +305,6 @@ func TestSaveAvatarName(t *testing.T) {
 	}
 }
 
-
 func TestUpdateUser(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -325,7 +319,7 @@ func TestUpdateUser(t *testing.T) {
 	}
 
 	user := models.UserDataProfile{
-		Id: 1, Name: "BUSH", Email: "BUSH@mail.ru", Avatar:"avatar",
+		Id: 1, Name: "BUSH", Email: "BUSH@mail.ru", Avatar: "avatar",
 	}
 
 	//ok query
@@ -364,7 +358,6 @@ func TestUpdateUser(t *testing.T) {
 		return
 	}
 }
-
 
 func TestNewStorageUserDB_Fail(t *testing.T) {
 	db, _, err := sqlmock.New()

@@ -118,11 +118,11 @@ func (ph *StorageProductsDB) DeleteFavouriteProduct(product models.FavouriteProd
 func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product, error) {
 	var products []models.Product
 
-	rows, err:= ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, " +
-                                "p.count_in_stock, p.description, p.image from products as p "+
-                                "join favourite_prod fp on p.id = fp.product_id "+
-                                "where fp.user_id=$1 "+
-                                "orders by name", userId)
+	rows, err := ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, "+
+		"p.count_in_stock, p.description, p.image from products as p "+
+		"join favourite_prod fp on p.id = fp.product_id "+
+		"where fp.user_id=$1 "+
+		"orders by name", userId)
 
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 		product := models.Product{}
 
 		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Rating,
-			             &product.Category, &product.CountInStock, &product.Description, &product.Image)
+			&product.Category, &product.CountInStock, &product.Description, &product.Image)
 		if err != nil {
 			return nil, err
 		}
@@ -177,7 +177,6 @@ func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string
 	}
 	return nil
 }
-
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()

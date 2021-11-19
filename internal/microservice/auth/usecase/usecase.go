@@ -10,7 +10,7 @@ import (
 
 type usecase struct {
 	repository auth.Repository
-	hasher hasher.Hasher
+	hasher     hasher.Hasher
 }
 
 func NewUsecase(repositoryUser auth.Repository, hasher hasher.Hasher) *usecase {
@@ -36,7 +36,6 @@ func (us *usecase) Login(user models.UserDataForInput) (int, error) {
 
 	return userFromDb.Id, nil
 }
-
 
 func (us *usecase) SignUp(newUser models.UserDataForReg) (int, error) {
 	id, err := us.repository.GetUserDataByName(newUser.Name)

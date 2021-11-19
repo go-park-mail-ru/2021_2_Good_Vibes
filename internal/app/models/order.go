@@ -28,58 +28,58 @@ type Order struct {
 	Products []OrderProducts `json:"products" validate:"required"`
 }
 
-func GrpcAddressToModel (grpcData *proto.Address) Address {
+func GrpcAddressToModel(grpcData *proto.Address) Address {
 	return Address{
 		Country: grpcData.GetCountry(),
-		Region: grpcData.GetRegion(),
-		City: grpcData.GetCity(),
-		Street: grpcData.GetStreet(),
-		House: grpcData.GetHouse(),
-		Flat:  grpcData.GetFlat(),
-		Index: grpcData.GetIndex(),
+		Region:  grpcData.GetRegion(),
+		City:    grpcData.GetCity(),
+		Street:  grpcData.GetStreet(),
+		House:   grpcData.GetHouse(),
+		Flat:    grpcData.GetFlat(),
+		Index:   grpcData.GetIndex(),
 	}
 }
 
-func ModelAddressToGrpc (model Address) *proto.Address {
+func ModelAddressToGrpc(model Address) *proto.Address {
 	return &proto.Address{
 		Country: model.Country,
-		Region: model.Region,
-		City: model.City,
-		Street: model.Street,
-		House: model.House,
-		Flat: model.Flat,
-		Index: model.Index,
+		Region:  model.Region,
+		City:    model.City,
+		Street:  model.Street,
+		House:   model.House,
+		Flat:    model.Flat,
+		Index:   model.Index,
 	}
 }
 
-func GrpcOrderProductsToModel (grpcData *proto.OrderProducts) OrderProducts {
+func GrpcOrderProductsToModel(grpcData *proto.OrderProducts) OrderProducts {
 	return OrderProducts{
-		OrderId: int(grpcData.GetOrderId()),
+		OrderId:   int(grpcData.GetOrderId()),
 		ProductId: int(grpcData.GetProductId()),
-		Number: int(grpcData.GetNumber()),
+		Number:    int(grpcData.GetNumber()),
 	}
 }
 
-func ModelOrderProductsToGrpc (model OrderProducts) *proto.OrderProducts {
+func ModelOrderProductsToGrpc(model OrderProducts) *proto.OrderProducts {
 	return &proto.OrderProducts{
-		OrderId: int64(model.OrderId),
+		OrderId:   int64(model.OrderId),
 		ProductId: int64(model.ProductId),
-		Number: int64(model.Number),
+		Number:    int64(model.Number),
 	}
 }
 
-func GrpcOrderToModel (grpcData *proto.Order) Order {
+func GrpcOrderToModel(grpcData *proto.Order) Order {
 	var productsModel []OrderProducts
 	for _, element := range grpcData.GetProducts() {
 		productsModel = append(productsModel, GrpcOrderProductsToModel(element))
 	}
 
 	return Order{
-		OrderId: int(grpcData.GetOrderId()),
-		UserId: int(grpcData.GetUserId()),
-		Date: grpcData.GetDate(),
-		Address: GrpcAddressToModel(grpcData.GetAddress()),
-		Cost: float64(grpcData.GetCost()),
+		OrderId:  int(grpcData.GetOrderId()),
+		UserId:   int(grpcData.GetUserId()),
+		Date:     grpcData.GetDate(),
+		Address:  GrpcAddressToModel(grpcData.GetAddress()),
+		Cost:     float64(grpcData.GetCost()),
 		Products: productsModel,
 	}
 }
@@ -91,11 +91,11 @@ func ModelOrderToGrpc(model Order) *proto.Order {
 	}
 
 	return &proto.Order{
-		OrderId: int64(model.OrderId),
-		UserId: int64(model.UserId),
-		Date: model.Date,
-		Address: ModelAddressToGrpc(model.Address),
-		Cost: float32(model.Cost),
+		OrderId:  int64(model.OrderId),
+		UserId:   int64(model.UserId),
+		Date:     model.Date,
+		Address:  ModelAddressToGrpc(model.Address),
+		Cost:     float32(model.Cost),
 		Products: productsProto,
 	}
 }

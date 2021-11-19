@@ -41,4 +41,3 @@ func ConfigMiddleware(router *echo.Echo) {
 		middleware.Secure(),
 	)
 }
-

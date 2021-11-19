@@ -14,16 +14,16 @@ import (
 
 type usecase struct {
 	authServiceClient auth.AuthServiceClient
-	repository user.Repository
-	hasher     hasher.Hasher
+	repository        user.Repository
+	hasher            hasher.Hasher
 }
 
 func NewUsecase(conn *grpc.ClientConn, repositoryUser user.Repository, hasher hasher.Hasher) *usecase {
 	c := auth.NewAuthServiceClient(conn)
 	return &usecase{
 		authServiceClient: c,
-		repository: repositoryUser,
-		hasher:     hasher,
+		repository:        repositoryUser,
+		hasher:            hasher,
 	}
 }
 
@@ -81,7 +81,6 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 
 	return 0, us.repository.UpdateUser(newData)
 }
-
 
 func (us *usecase) UpdatePassword(newData models.UserDataPassword) error {
 	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newData.Password))
