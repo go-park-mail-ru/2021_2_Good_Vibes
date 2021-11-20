@@ -32,14 +32,14 @@ func (uc *UseCase) GetSearchResults(searchString []string) ([]models.Product, er
 	var products []models.Product
 
 	productMap := make(map[models.Product] int)
-	for _, str := range searchString {
-		fmt.Println(str)
-		products, err := uc.repositorySearch.GetSearchResults(str)
-		if err != nil {
-			return nil, err
-		}
-		fmt.Println(len(products))
 
+	resultProducts, err := uc.repositorySearch.GetSearchResults(searchString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, products := range resultProducts {
 		for _, product := range products {
 			productMap[product] += 1
 		}

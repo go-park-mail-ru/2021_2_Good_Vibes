@@ -82,7 +82,29 @@ func (sr *SearchRepository) GetSuggests(str string) (models.Suggest, error) {
 	return suggests, nil
 }
 
-func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, error) {
+func (sr *SearchRepository) GetSearchResults(searchArray []string) ([][]models.Product, error) {
+	var resultProducts [][]models.Product
+	err := tx(sr.db, func(tx *sql.Tx) error {
+		for _, str := range searchArray {
+			products, err := sr.getSearchResultLocal(str)
+			if err != nil {
+				return err
+			}
+
+			resultProducts = append(resultProducts, products)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resultProducts, nil
+}
+
+func (sr *SearchRepository) getSearchResultLocal(str string) ([]models.Product, error) {
 	var searchStr strings.Builder
 	searchStr.WriteRune('%')
 	searchStr.WriteString(str)
@@ -92,9 +114,9 @@ func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, erro
 
 	rows, err := sr.db.Query(
 		"select p.id, p.image, p.name, p.price, p.rating, c.name, " +
-			  "p.count_in_stock, p.description from products as p " +
-	          "join categories as c on c.id=p.category_id " +
-			  "where p.name ilike $1", searchStr.String())
+			"p.count_in_stock, p.description from products as p " +
+			"join categories as c on c.id=p.category_id " +
+			"where p.name ilike $1", searchStr.String())
 
 	if err != nil {
 		return nil, err
@@ -106,8 +128,8 @@ func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, erro
 
 	for rows.Next() {
 		err := rows.Scan(&product.Id, &product.Image, &product.Name,
-			             &product.Price, &product.Rating, &product.Category,
-			             &product.CountInStock, &product.Description)
+			&product.Price, &product.Rating, &product.Category,
+			&product.CountInStock, &product.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -117,11 +139,6 @@ func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, erro
 
 	return products, nil
 }
-/*
-func (sr *SearchRepository) getSearchResultLocal()
-*/
-
-
 
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
