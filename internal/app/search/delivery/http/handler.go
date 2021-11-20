@@ -6,6 +6,7 @@ import (
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strings"
 )
 
 type SearchHandler struct {
@@ -54,7 +55,9 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
-	suggests, err := sh.useCase.GetSearchResults(searchString)
+	searchArray := strings.Split(searchString, " ")
+
+	suggests, err := sh.useCase.GetSearchResults(searchArray)
 	if err != nil {
 		logger.Error(err)
 		newError := errors.NewError(errors.SERVER_ERROR, err.Error())

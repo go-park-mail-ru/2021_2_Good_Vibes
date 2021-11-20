@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search"
+	"math"
 )
+
 
 type UseCase struct {
 	repositorySearch search.Repository
@@ -25,10 +28,36 @@ func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 	return suggests, nil
 }
 
-func (uc *UseCase) GetSearchResults(str string) ([]models.Product, error) {
-	products, err := uc.repositorySearch.GetSearchResults(str)
-	if err != nil {
-		return nil, err
+func (uc *UseCase) GetSearchResults(searchString []string) ([]models.Product, error) {
+	var products []models.Product
+
+	productMap := make(map[models.Product] int)
+	for _, str := range searchString {
+		fmt.Println(str)
+		products, err := uc.repositorySearch.GetSearchResults(str)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(len(products))
+
+		for _, product := range products {
+			productMap[product] += 1
+		}
+	}
+
+	var maxValue int
+
+	for _, value := range productMap {
+		maxValue = int(math.Max(float64(maxValue), float64(value)))
+	}
+	fmt.Println(maxValue)
+
+	for i := 0; i < maxValue; i++ {
+		for key, value := range productMap {
+			if value == maxValue - i {
+				products = append(products, key)
+			}
+		}
 	}
 
 	return products, nil

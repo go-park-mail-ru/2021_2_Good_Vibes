@@ -117,6 +117,11 @@ func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, erro
 
 	return products, nil
 }
+/*
+func (sr *SearchRepository) getSearchResultLocal()
+*/
+
+
 
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
