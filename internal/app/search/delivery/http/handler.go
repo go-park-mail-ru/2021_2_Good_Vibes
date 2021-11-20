@@ -41,3 +41,26 @@ func (sh *SearchHandler) GetSuggests(ctx echo.Context) error {
 	logger.Trace(trace + " success GetSuggest")
 	return ctx.JSON(http.StatusOK, suggests)
 }
+
+
+func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".GetSearchResults")
+
+	searchString := ctx.QueryParam("str")
+	if searchString == "" {
+		logger.Error("bad query param for GetSearchResults")
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	suggests, err := sh.useCase.GetSearchResults(searchString)
+	if err != nil {
+		logger.Error(err)
+		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	logger.Trace(trace + " success GetSearchResults")
+	return ctx.JSON(http.StatusOK, suggests)
+}

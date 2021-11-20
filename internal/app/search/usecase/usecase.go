@@ -24,3 +24,12 @@ func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 
 	return suggests, nil
 }
+
+func (uc *UseCase) GetSearchResults(str string) ([]models.Product, error) {
+	products, err := uc.repositorySearch.GetSearchResults(str)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}

@@ -82,6 +82,42 @@ func (sr *SearchRepository) GetSuggests(str string) (models.Suggest, error) {
 	return suggests, nil
 }
 
+func (sr *SearchRepository) GetSearchResults(str string) ([]models.Product, error) {
+	var searchStr strings.Builder
+	searchStr.WriteRune('%')
+	searchStr.WriteString(str)
+	searchStr.WriteRune('%')
+
+	var products []models.Product
+
+	rows, err := sr.db.Query(
+		"select p.id, p.image, p.name, p.price, p.rating, c.name, " +
+			  "p.count_in_stock, p.description from products as p " +
+	          "join categories as c on c.id=p.category_id " +
+			  "where p.name ilike $1", searchStr.String())
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var product models.Product
+
+	for rows.Next() {
+		err := rows.Scan(&product.Id, &product.Image, &product.Name,
+			             &product.Price, &product.Rating, &product.Category,
+			             &product.CountInStock, &product.Description)
+		if err != nil {
+			return nil, err
+		}
+
+		products = append(products, product)
+	}
+
+	return products, nil
+}
+
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()
