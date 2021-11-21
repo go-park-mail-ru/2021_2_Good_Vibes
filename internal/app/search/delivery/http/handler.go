@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
@@ -26,17 +27,20 @@ func (sh *SearchHandler) GetSuggests(ctx echo.Context) error {
 	logger.Trace(trace + ".GetSuggest")
 
 	searchString := ctx.QueryParam("str")
-	if searchString == "" {
-		logger.Error("bad query param for GetSuggests")
-		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
-		return ctx.JSON(http.StatusBadRequest, newError)
-	}
 
 	suggests, err := sh.useCase.GetSuggests(searchString)
 	if err != nil {
 		logger.Error(err)
 		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if suggests.Products == nil {
+		suggests.Products = make([]models.ProductForSuggest, 0)
+	}
+
+	if suggests.Categories == nil {
+		suggests.Categories = make([]models.CategoryForSuggest, 0)
 	}
 
 	logger.Trace(trace + " success GetSuggest")
@@ -62,6 +66,10 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 		logger.Error(err)
 		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if suggests == nil {
+		suggests = make([]models.Product, 0)
 	}
 
 	logger.Trace(trace + " success GetSearchResults")
