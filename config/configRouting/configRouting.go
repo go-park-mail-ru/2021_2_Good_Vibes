@@ -7,6 +7,7 @@ import (
 	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	reviewHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
+	searchHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/labstack/echo/v4"
 )
@@ -18,6 +19,7 @@ type ServerConfigRouting struct {
 	BasketHandler   *basketHttp.BasketHandler
 	CategoryHandler *categoryHttp.CategoryHandler
 	ReviewHandler *reviewHttp.ReviewHandler
+	SearchHandler   *searchHttp.SearchHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -50,4 +52,6 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.DELETE("/review/delete", cr.ReviewHandler.DeleteReview, middlewareAut.IsLogin)
 	router.GET("/reviews", cr.ReviewHandler.GetReviewsByProductId)
 	router.GET("/user/reviews", cr.ReviewHandler.GetReviewsByUser)
+	router.GET("/search/suggest", cr.SearchHandler.GetSuggests)
+	router.GET("/search", cr.SearchHandler.GetSearchResults)
 }

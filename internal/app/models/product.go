@@ -29,3 +29,9 @@ type ProductRating struct {
 type ProductId struct {
 	ProductId int `json:"product_id" validate:"required"`
 }
+
+type ProductForSuggest struct {
+	Id           int     `json:"id"`
+	Name         string  `json:"name"`
+	Image        string  `json:"image"`
+}

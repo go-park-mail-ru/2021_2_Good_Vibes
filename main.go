@@ -12,6 +12,9 @@ import (
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/repository/postgresql"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
+	searchHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
+	searchRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/repository/postgresql"
+	searchUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
@@ -100,6 +103,10 @@ func main() {
 	basketUc := basketUseCase.NewBasketUseCase(storageBasket)
 	basketHandler := basketHandlerHttp.NewBasketHandler(basketUc, sessionManager)
 
+	storageSearch, err := searchRepoPostgres.NewSearchRepository(GetPostgres())
+	searchUc := searchUseCase.NewSearchUseCase(storageSearch)
+	searchHandler := searchHandlerHttp.NewSearchHandler(searchUc)
+
 	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(GetPostgres())
 	if err != nil {
 		panic(err)
@@ -123,6 +130,7 @@ func main() {
 		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
 		ReviewHandler : reviewHandler,
+		SearchHandler : searchHandler,
 	}
 
 	serverRouting.ConfigRouting(router)
