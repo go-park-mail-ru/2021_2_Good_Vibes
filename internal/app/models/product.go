@@ -17,7 +17,7 @@ type ProductPrice struct {
 }
 
 type FavouriteProduct struct {
-	Id int `json:"id" validate:"required"`
+	Id     int `json:"id" validate:"required"`
 	UserId int `json:"user_id,-"`
 }
 

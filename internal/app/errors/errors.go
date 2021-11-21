@@ -11,6 +11,7 @@ const (
 	SERVER_ERROR         = -50
 	NO_REVIEW_ERROR  = -60
 	REVIEW_EXISTS_ERROR  = -62
+	BAD_QUERY_PARAM      = -5
 )
 
 const (
@@ -25,7 +26,10 @@ const (
 	HASHER_ERROR_DESCR   = "error hash password"
 	NO_REVIEW_DESCR      = "отзыв не существует"
 	REVIEW_EXISTS_DESCR  = "отзыв уже существует"
+	BAD_QUERY_PARAM_DESCR = "bad query param"
+
 )
+
 
 type Error struct {
 	ErrorCode        int    `json:"error code"`
@@ -38,4 +42,3 @@ func NewError(errorCode int, errorDesc string) *Error {
 		ErrorDescription: errorDesc,
 	}
 }
-

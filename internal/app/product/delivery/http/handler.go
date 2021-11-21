@@ -19,13 +19,13 @@ import (
 const BucketUrl = ""
 
 type ProductHandler struct {
-	useCase product.UseCase
+	useCase        product.UseCase
 	SessionManager sessionJwt.TokenManager
 }
 
 func NewProductHandler(useCase product.UseCase, sessionManager sessionJwt.TokenManager) *ProductHandler {
 	return &ProductHandler{
-		useCase: useCase,
+		useCase:        useCase,
 		SessionManager: sessionManager,
 	}
 }
@@ -153,7 +153,6 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, answer)
 }
 
-
 func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetFavouriteProducts")
@@ -177,7 +176,6 @@ func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, products)
 }
-
 
 func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
@@ -254,10 +252,10 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = ph.useCase.SaveProductImageName(productId, BucketUrl + fileName)
+	err = ph.useCase.SaveProductImageName(productId, BucketUrl+fileName)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	return ctx.HTML(http.StatusOK, BucketUrl + fileName)
+	return ctx.HTML(http.StatusOK, BucketUrl+fileName)
 }

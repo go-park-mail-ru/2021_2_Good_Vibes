@@ -8,10 +8,10 @@ type UserDataForInput struct {
 }
 
 type UserDataStorage struct {
-	Id       int    `json:"id"`
-	Name     string `json:"username" validate:"required"`
-	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required"`
+	Id       int            `json:"id"`
+	Name     string         `json:"username" validate:"required"`
+	Email    string         `json:"email"    validate:"required,email"`
+	Password string         `json:"password" validate:"required"`
 	Avatar   sql.NullString `json:"avatar"`
 }
 
@@ -26,13 +26,13 @@ type UserID struct {
 }
 
 type UserDataProfile struct {
-	Id	uint64 `json:"id,omitempty"`
-	Name  string `json:"username"`
-	Email string `json:"email" validate:"email"`
+	Id     uint64 `json:"id,omitempty"`
+	Name   string `json:"username"`
+	Email  string `json:"email" validate:"email"`
 	Avatar string `json:"avatar,omitempty"`
 }
 
 type UserDataPassword struct {
-	Id uint64 `json:"id,omitempty"`
+	Id       uint64 `json:"id,omitempty"`
 	Password string `json:"password"`
 }

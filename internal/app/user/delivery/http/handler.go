@@ -200,7 +200,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 	}
 
 	logger.Trace("success upload avatar")
-	return ctx.HTML(http.StatusOK, BucketUrl + fileName)
+	return ctx.HTML(http.StatusOK, BucketUrl+fileName)
 }
 
 func (handler *UserHandler) Profile(ctx echo.Context) error {
@@ -269,8 +269,6 @@ func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, UserDataForUpdate)
 }
 
-
-
 func (handler *UserHandler) UpdatePassword(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".UpdatePassword")
@@ -307,7 +305,6 @@ func (handler *UserHandler) UpdatePassword(ctx echo.Context) error {
 
 	return ctx.NoContent(http.StatusOK)
 }
-
 
 func (handler *UserHandler) Logout(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
