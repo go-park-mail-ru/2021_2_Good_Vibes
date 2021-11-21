@@ -176,6 +176,10 @@ func (rh *ReviewHandler) GetReviewsByProductId(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
+	if reviews == nil {
+		reviews = make([]models.Review, 0)
+	}
+
 	logger.Trace(trace + " success GetReviewsByProductId")
 	return ctx.JSON(http.StatusOK, reviews)
 }
@@ -198,6 +202,10 @@ func (rh *ReviewHandler) GetReviewsByUser(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	if reviews == nil {
+		reviews = make([]models.Review, 0)
 	}
 
 	logger.Trace(trace + " success GetReviewsByUser")
