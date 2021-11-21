@@ -122,7 +122,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 		"p.count_in_stock, p.description, p.image from products as p "+
 		"join favourite_prod fp on p.id = fp.product_id "+
 		"where fp.user_id=$1 "+
-		"orders by name", userId)
+		"order by name", userId)
 
 	if err != nil {
 		return nil, err
