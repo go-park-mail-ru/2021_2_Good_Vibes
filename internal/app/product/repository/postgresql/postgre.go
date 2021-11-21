@@ -64,7 +64,7 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 		filter.OrderBy = postgre.TypeOrderRating
 	}
 	if filter.TypeOrder != postgre.TypeOrderMin && filter.TypeOrder != postgre.TypeOrderMax {
-		filter.OrderBy = postgre.TypeOrderMin
+		filter.TypeOrder = postgre.TypeOrderMin
 	}
 	filter.OrderBy = "p." + filter.OrderBy
 

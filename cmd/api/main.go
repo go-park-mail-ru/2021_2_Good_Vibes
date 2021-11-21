@@ -9,33 +9,33 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
-	searchHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
-	searchRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/repository/postgresql"
-	searchUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/usecase"
+	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
+	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
+	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
+	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	reviewHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
 	reviewRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/repository/postgresql"
 	reviewUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/usecase"
+	searchHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
+	searchRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/repository/postgresql"
+	searchUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt/manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher/impl"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
-	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/grpc"
-	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
-	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
-	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
-	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
 	userUsecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/usecase"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
@@ -48,7 +48,7 @@ var (
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig("/home/ubuntu/Ozon/2021_2_Good_Vibes")
+	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}

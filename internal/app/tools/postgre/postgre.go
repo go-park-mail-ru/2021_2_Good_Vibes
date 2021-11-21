@@ -6,7 +6,7 @@ import (
 )
 
 func GetPostgres() (*sql.DB, error) {
-	dsn := "Oops"
+	dsn := ""
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
