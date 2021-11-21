@@ -53,7 +53,7 @@ func (sb *BasketRepository) PutInBasket(basketProduct models.BasketProduct) erro
 
 func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
 	var basketProducts []models.BasketProduct
-	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1 order by product_id", userId)
+	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1 orders by product_id", userId)
 	if err != nil {
 		return nil, err
 	}

@@ -1,61 +1,46 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/hasher"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/auth"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	guuid "github.com/google/uuid"
+	"google.golang.org/grpc"
 )
 
 type usecase struct {
-	repository user.Repository
-	hasher     hasher.Hasher
+	authServiceClient auth.AuthServiceClient
+	repository        user.Repository
+	hasher            hasher.Hasher
 }
 
-func NewUsecase(repositoryUser user.Repository, hasher hasher.Hasher) *usecase {
+func NewUsecase(conn *grpc.ClientConn, repositoryUser user.Repository, hasher hasher.Hasher) *usecase {
+	c := auth.NewAuthServiceClient(conn)
 	return &usecase{
-		repository: repositoryUser,
-		hasher:     hasher,
+		authServiceClient: c,
+		repository:        repositoryUser,
+		hasher:            hasher,
 	}
 }
 
 func (us *usecase) CheckPassword(user models.UserDataForInput) (int, error) {
-	userFromDb, err := us.repository.GetUserDataByName(user.Name)
+	userFromDb, err := us.authServiceClient.Login(context.Background(), models.ModelUserDataForInputToGrpc(user))
 	if err != nil {
 		return customErrors.USER_EXISTS_ERROR, err
 	}
-
-	if userFromDb == nil {
-		return customErrors.NO_USER_ERROR, nil
-	}
-
-	if err = us.hasher.CompareHashAndPassword([]byte(userFromDb.Password), []byte(user.Password)); err != nil {
-		return customErrors.WRONG_PASSWORD_ERROR, nil
-	}
-
-	return userFromDb.Id, nil
+	return models.GrpcUserIdToModel(userFromDb).UserId, nil
 }
 
 func (us *usecase) AddUser(newUser models.UserDataForReg) (int, error) {
-	id, err := us.repository.GetUserDataByName(newUser.Name)
+	userFromDb, err := us.authServiceClient.SignUp(context.Background(), models.ModelUserDataForRegToGrpc(newUser))
 	if err != nil {
-		return customErrors.DB_ERROR, errors.New("db error")
+		return customErrors.USER_EXISTS_ERROR, err
 	}
-
-	if id != nil {
-		return customErrors.USER_EXISTS_ERROR, nil
-	}
-
-	passwordHash, err := us.hasher.GenerateFromPassword([]byte(newUser.Password))
-	if err != nil {
-		return customErrors.SERVER_ERROR, errors.New("server error")
-	}
-
-	newUser.Password = string(passwordHash)
-
-	return us.repository.InsertUser(newUser)
+	return models.GrpcUserIdToModel(userFromDb).UserId, nil
 }
 
 func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataProfile, error) {

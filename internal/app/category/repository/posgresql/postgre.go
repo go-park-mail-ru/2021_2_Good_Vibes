@@ -92,7 +92,7 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 	if err != nil {
 		return nil, err
 	}
-
+	
 	defer rows.Close()
 
 	for rows.Next() {

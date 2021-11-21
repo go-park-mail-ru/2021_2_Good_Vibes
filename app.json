@@ -6,7 +6,7 @@
 
   "MAIN_CONFIG": {
     "SECRET_KEY": "QWEWERTRWEGFDSGDFS",
-    "ADDRESS_SERVER": "127.0.0.1: 8080"
+    "ADDRESS_SERVER": "localhost:8080"
   },
 
   "DATA_BASE_CONFIG": {

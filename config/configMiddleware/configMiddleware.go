@@ -7,6 +7,7 @@ import (
 	middlewareRequestId "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/requestId"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"net/http"
 )
 
 func CsrfSetHeader(next echo.HandlerFunc) echo.HandlerFunc {
@@ -34,8 +35,8 @@ func ConfigMiddleware(router *echo.Echo) {
 				return false
 			},
 			CookiePath: "/",
-			// CookieSameSite: http.SameSiteNoneMode,
-			// CookieSecure: true,
+			CookieSameSite: http.SameSiteNoneMode,
+			CookieSecure: true,
 		}),
 		CsrfSetHeader,
 		middleware.Secure(),
