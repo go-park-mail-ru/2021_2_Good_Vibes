@@ -17,6 +17,8 @@ const _ = grpc.SupportPackageIsVersion7
 // OrderServiceClient is the client API for OrderService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+
+//go:generate mockgen -source=order_grpc.pb.go -destination=../../../order/mocks/client_mock.go -package=mock_order
 type OrderServiceClient interface {
 	PutOrder(ctx context.Context, in *Order, opts ...grpc.CallOption) (*OrderCost, error)
 	GetAllOrders(ctx context.Context, in *UserIdOrder, opts ...grpc.CallOption) (*ArrayOrders, error)
