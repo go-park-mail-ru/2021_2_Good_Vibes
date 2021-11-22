@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
@@ -61,7 +62,13 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 
 	searchArray := strings.Split(searchString, " ")
 
-	suggests, err := sh.useCase.GetSearchResults(searchArray)
+	filter, err := postgre.ParseQueryFilter(ctx)
+	if err != nil {
+		logger.Trace(err)
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	suggests, err := sh.useCase.GetSearchResults(searchArray, *filter)
 	if err != nil {
 		logger.Error(err)
 		newError := errors.NewError(errors.SERVER_ERROR, err.Error())

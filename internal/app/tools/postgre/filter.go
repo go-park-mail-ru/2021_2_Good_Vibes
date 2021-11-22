@@ -19,6 +19,7 @@ const (
 	NameRatingMax = "number"
 	NameOrder     = "order"
 	NameOrderType = "order_type"
+	NameCategory  = "category"
 )
 
 const (
@@ -26,6 +27,7 @@ const (
 	TypeOrderRating = "rating"
 	TypeOrderMin    = "desc"
 	TypeOrderMax    = "asc"
+	TypeCategoryDefault = "ALL_THINGS"
 )
 
 type Filter struct {
@@ -102,5 +104,11 @@ func ParseQueryFilter(ctx echo.Context) (*Filter, error) {
 		result.TypeOrder = orderByTypeString
 	}
 
+	category := queryParam.Get(NameCategory)
+	if category == "" {
+		result.NameCategory = TypeCategoryDefault
+	} else {
+		result.NameCategory = category
+	}
 	return &result, nil
 }

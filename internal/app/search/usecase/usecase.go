@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"math"
 )
 
@@ -28,12 +29,12 @@ func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 	return suggests, nil
 }
 
-func (uc *UseCase) GetSearchResults(searchString []string) ([]models.Product, error) {
+func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter) ([]models.Product, error) {
 	var products []models.Product
 
 	productMap := make(map[models.Product] int)
 
-	resultProducts, err := uc.repositorySearch.GetSearchResults(searchString)
+	resultProducts, err := uc.repositorySearch.GetSearchResults(searchString, filter)
 
 	if err != nil {
 		return nil, err
