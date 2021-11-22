@@ -31,7 +31,7 @@ func (sr *SearchRepository) GetSuggests(str string) (models.Suggest, error) {
 	var categories []models.CategoryForSuggest
 
 	err := tx(sr.db, func(tx *sql.Tx) error {
-		productRows, err := sr.db.Query(`select id, name, image from products where name ilike $1 limit 5`, searchStr.String())
+		productRows, err := sr.db.Query(`select id, name, image from products where name ilike $1 order by  rating desc limit 5`, searchStr.String())
 		if err != nil {
 			return err
 		}

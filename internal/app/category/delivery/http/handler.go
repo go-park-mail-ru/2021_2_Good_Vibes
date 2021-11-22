@@ -73,6 +73,10 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
 	}
 
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
 	logger.Debug(products)
 	return ctx.JSON(http.StatusOK, products)
 }
