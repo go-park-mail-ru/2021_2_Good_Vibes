@@ -9,7 +9,6 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 const NewOrder = "новый"
@@ -57,7 +56,6 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 	newOrder = sanitizer.SanitizeData(&newOrder).(models.Order)
 
 	newOrder.Status = NewOrder
-	newOrder.Date = time.Now().Format(time.RFC3339)
 
 	orderId, orderCost, err := oh.useCase.PutOrder(newOrder)
 	if err != nil {

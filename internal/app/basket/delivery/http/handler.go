@@ -80,7 +80,7 @@ func (bh *BasketHandler) GetBasket(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	if basketProducts == nil {
@@ -121,7 +121,7 @@ func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err, user)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success DropBasket")
@@ -158,7 +158,7 @@ func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err, product)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newBasketError)
+		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success DeleteProduct")

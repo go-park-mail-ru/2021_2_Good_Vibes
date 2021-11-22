@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/order"
 	"google.golang.org/grpc"
+	"time"
 )
 
 type UseCase struct {
@@ -20,6 +21,7 @@ func NewOrderUseCase(conn *grpc.ClientConn) *UseCase {
 }
 
 func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
+	order.Date = time.Now().Format(time.RFC3339)
 	orderCost, err := uc.orderServiceClient.PutOrder(context.Background(), models.ModelOrderToGrpc(order))
 	if err != nil {
 		return 0, 0, err

@@ -62,10 +62,10 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 	order := models.Order{
 		OrderId:  1,
 		UserId:   3,
-		Date:     "28-10-2021 03:03:59",
+		Date:     "2021-11-23T00:33:46+03:00",
 		Address:  address,
 		Cost:     50000.00,
-		Status:   "new",
+		Status:   "новый",
 		Products: products,
 	}
 
@@ -75,7 +75,6 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 		Address:  address,
 		Cost:     50000.00,
 		Status:   "new",
-		Products: products,
 	}
 
 	badOrderJson, _ := json.Marshal(badOrder)
