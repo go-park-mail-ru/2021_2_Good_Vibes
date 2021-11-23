@@ -16,6 +16,7 @@ var errGetting = errors.New("grpc error")
 func TestUseCase_PutInBasket(t *testing.T) {
 	type mockBehaviorClientGRPC func (s *mock_basket.MockBasketServiceClient,
 		ctx context.Context, product *basket.BasketProduct)
+
 	testTable := []struct{
 		name string
 		inputData models.BasketProduct

@@ -181,3 +181,66 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 		})
 	}
 }
+
+func TestCategoryHandler_GetCategories(t *testing.T) {
+	type mockBehaviorUseCase func(s *mock_category.MockUseCase)
+
+	categories := models.CategoryNode{
+		Name:     "CLOTHES",
+		Nesting:  0,
+		Children: nil,
+	}
+	error1 := errors.New("bdError")
+	categoriesJson, _ := json.Marshal(categories)
+	error1Json, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, error1.Error()))
+
+	tests := [] struct{
+		name string
+		mockBehaviorUseCase mockBehaviorUseCase
+		expectedStatusCode int
+		expectedStatusBody string
+	} {
+		{
+			name: "ok",
+			mockBehaviorUseCase: func(s *mock_category.MockUseCase) {
+				s.EXPECT().GetAllCategories().Return(categories, nil)
+			},
+			expectedStatusCode: 200,
+			expectedStatusBody: string(categoriesJson) + "\n",
+		},
+		{
+			name: "bd_error",
+			mockBehaviorUseCase: func(s *mock_category.MockUseCase) {
+				s.EXPECT().GetAllCategories().Return(categories, error1)
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusBody: string(error1Json) + "\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			newCategoryUseCase := mock_category.NewMockUseCase(c)
+			tt.mockBehaviorUseCase(newCategoryUseCase)
+			categoryHandler := NewCategoryHandler(newCategoryUseCase)
+
+			router := echo.New()
+			router.GET("/category", categoryHandler.GetCategories)
+
+			req := httptest.NewRequest("GET", "/category", bytes.NewBufferString(""))
+
+			val := validator.New()
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, tt.expectedStatusCode, recorder.Code)
+			assert.Equal(t, tt.expectedStatusBody, recorder.Body.String())
+		})
+	}
+}

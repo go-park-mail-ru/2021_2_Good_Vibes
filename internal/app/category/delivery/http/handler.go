@@ -33,14 +33,12 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err)
 		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newCategoryError)
+		return ctx.JSON(http.StatusInternalServerError, newCategoryError)
 	}
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	// AllCategoriesJson = categories
 
-	//logger.Debug(AllCategoriesJson)
 	return ctx.JSON(http.StatusOK, categories)
 }
 
