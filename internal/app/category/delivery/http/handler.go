@@ -29,11 +29,6 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
-	/*if AllCategoriesJson.Name != "" {
-		logger.Debug(AllCategoriesJson)
-		return ctx.JSON(http.StatusOK, AllCategoriesJson)
-	}*/
-
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
 		logger.Error(err)
