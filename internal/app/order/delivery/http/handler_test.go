@@ -135,6 +135,7 @@ func TestOrderHandler_PutOrder(t *testing.T) {
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(validErrorJson) + "\n",
 		},
+
 	}
 
 	for _, tt := range tests {
