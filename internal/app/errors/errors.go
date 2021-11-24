@@ -30,6 +30,19 @@ const (
 
 )
 
+var ErrorsMap = map[string]int {
+	BIND_DESCR : BIND_ERROR,
+	VALIDATION_DESCR : VALIDATION_ERROR,
+	TOKEN_ERROR_DESCR : TOKEN_ERROR,
+	NO_USER_DESCR : NO_USER_ERROR,
+	USER_EXISTS_DESCR : USER_EXISTS_ERROR,
+	WRONG_PASSWORD_DESCR : WRONG_PASSWORD_ERROR,
+	BD_ERROR_DESCR : SERVER_ERROR,
+	NO_REVIEW_DESCR : NO_REVIEW_ERROR,
+	REVIEW_EXISTS_DESCR : REVIEW_EXISTS_ERROR,
+	BAD_QUERY_PARAM_DESCR : BAD_QUERY_PARAM,
+}
+
 
 type Error struct {
 	ErrorCode        int    `json:"error code"`
@@ -41,4 +54,12 @@ func NewError(errorCode int, errorDesc string) *Error {
 		ErrorCode:        errorCode,
 		ErrorDescription: errorDesc,
 	}
+}
+
+func ErrorStringToCode(str string) int {
+	code, ok := ErrorsMap[str]
+	if !ok {
+		return SERVER_ERROR
+	}
+	return code
 }
