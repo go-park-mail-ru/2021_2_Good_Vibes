@@ -13,6 +13,7 @@ import (
 	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/metrics"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
@@ -133,6 +134,13 @@ func main() {
 	}
 	reviewHandler := reviewHandlerHttp.NewReviewHandler(reviewUseCase.NewReviewUseCase(storageReview),
 		sessionManager)
+
+	m, err := metrics.CreateNewMetric("main")
+	if err != nil {
+		panic(err)
+	}
+
+	router.Use(m.CollectMetrics)
 
 	serverRouting := configRouting.ServerConfigRouting{
 		ProductHandler:  productHandler,
