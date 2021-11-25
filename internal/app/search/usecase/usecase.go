@@ -8,7 +8,6 @@ import (
 	"math"
 )
 
-
 type UseCase struct {
 	repositorySearch search.Repository
 }
@@ -18,7 +17,6 @@ func NewSearchUseCase(repositorySearch search.Repository) *UseCase {
 		repositorySearch: repositorySearch,
 	}
 }
-
 
 func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 	suggests, err := uc.repositorySearch.GetSuggests(str)
@@ -32,7 +30,7 @@ func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter) ([]models.Product, error) {
 	var products []models.Product
 
-	productMap := make(map[models.Product] int)
+	productMap := make(map[models.Product]int)
 
 	resultProducts, err := uc.repositorySearch.GetSearchResults(searchString, filter)
 
@@ -55,7 +53,7 @@ func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter
 
 	for i := 0; i < maxValue; i++ {
 		for key, value := range productMap {
-			if value == maxValue - i {
+			if value == maxValue-i {
 				products = append(products, key)
 			}
 		}

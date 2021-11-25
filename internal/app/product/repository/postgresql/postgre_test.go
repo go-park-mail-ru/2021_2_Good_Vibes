@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"github.com/pkg/errors"
 	"reflect"
 	"testing"
@@ -200,7 +201,15 @@ func TestGetByCategory(t *testing.T) {
 		return
 	}
 
-	category := "ALL"
+	category := postgre.Filter{
+		NameCategory: "ALL",
+		MinPrice:     100,
+		MaxPrice:     1000,
+		MinRating:    2,
+		MaxRating:    5,
+		OrderBy:      "p.rating",
+		TypeOrder:    "desc",
+	}
 
 	// good query
 	rows := sqlmock.
@@ -218,7 +227,7 @@ func TestGetByCategory(t *testing.T) {
 
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnRows(rows)
 
 	result, err := storage.GetByCategory(category)
@@ -239,7 +248,7 @@ func TestGetByCategory(t *testing.T) {
 	// query error
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnError(fmt.Errorf("db_error"))
 
 	_, err = storage.GetByCategory(category)
@@ -268,7 +277,7 @@ func TestGetByCategory(t *testing.T) {
 
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnRows(rows)
 
 	_, err = storage.GetByCategory(category)
@@ -296,7 +305,6 @@ func TestInsert(t *testing.T) {
 	}
 
 	product := models.Product{
-		Image:        "product",
 		Name:         "product",
 		Price:        1000.0,
 		Rating:       5.0,
@@ -311,7 +319,7 @@ func TestInsert(t *testing.T) {
 
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnRows(rows)
 
 	_, err = storage.Insert(product)
@@ -327,7 +335,7 @@ func TestInsert(t *testing.T) {
 	// query error
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnError(fmt.Errorf("db_error"))
 
 	_, err = storage.Insert(product)
@@ -346,7 +354,7 @@ func TestInsert(t *testing.T) {
 
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnRows(rows)
 
 	_, err = storage.Insert(product)
@@ -379,7 +387,7 @@ func TestSaveProductImageName(t *testing.T) {
 	//ok query
 
 	mock.
-		ExpectExec("update products").
+		ExpectExec("UPDATE products").
 		WithArgs(productId, fileName).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -397,7 +405,7 @@ func TestSaveProductImageName(t *testing.T) {
 	// query error 1
 
 	mock.
-		ExpectExec("update products").
+		ExpectExec("UPDATE products").
 		WithArgs(productId, fileName).
 		WillReturnError(errors.Errorf("db error"))
 

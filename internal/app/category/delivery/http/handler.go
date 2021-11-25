@@ -29,23 +29,15 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
-	/*if AllCategoriesJson.Name != "" {
-		logger.Debug(AllCategoriesJson)
-		return ctx.JSON(http.StatusOK, AllCategoriesJson)
-	}*/
-
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
 		logger.Error(err)
 		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newCategoryError)
+		return ctx.JSON(http.StatusInternalServerError, newCategoryError)
 	}
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	// AllCategoriesJson = categories
-
-	//logger.Debug(AllCategoriesJson)
 	return ctx.JSON(http.StatusOK, categories)
 }
 

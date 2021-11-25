@@ -43,8 +43,8 @@ import (
 )
 
 var (
-	router          = echo.New()
-	storage         user.Repository
+	router  = echo.New()
+	storage user.Repository
 )
 
 func main() {
@@ -148,8 +148,8 @@ func main() {
 		OrderHandler:    orderHandler,
 		BasketHandler:   basketHandler,
 		CategoryHandler: categoryHandler,
-		ReviewHandler : reviewHandler,
-		SearchHandler : searchHandler,
+		ReviewHandler:   reviewHandler,
+		SearchHandler:   searchHandler,
 	}
 
 	serverRouting.ConfigRouting(router)

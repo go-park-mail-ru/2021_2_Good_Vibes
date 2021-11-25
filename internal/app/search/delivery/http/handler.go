@@ -12,12 +12,12 @@ import (
 )
 
 type SearchHandler struct {
-	useCase        search.UseCase
+	useCase search.UseCase
 }
 
 func NewSearchHandler(useCase search.UseCase) *SearchHandler {
 	return &SearchHandler{
-		useCase:        useCase,
+		useCase: useCase,
 	}
 }
 
@@ -47,7 +47,6 @@ func (sh *SearchHandler) GetSuggests(ctx echo.Context) error {
 	logger.Trace(trace + " success GetSuggest")
 	return ctx.JSON(http.StatusOK, suggests)
 }
-
 
 func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)

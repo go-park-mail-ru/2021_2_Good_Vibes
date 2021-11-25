@@ -38,7 +38,6 @@ func main() {
 	}
 	interceptor := metrics.NewInterceptor(m)
 
-
 	lis, err := net.Listen("tcp", "localhost:8082")
 	if err != nil {
 		log.Fatal("can't listen auth microservice")
@@ -47,7 +46,7 @@ func main() {
 
 	go func() {
 		r := echo.New()
-		r.GET("/metrics",echo.WrapHandler(promhttp.Handler()))
+		r.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 		lis, err := net.Listen("tcp", "localhost:7001")
 		if err != nil {
 			log.Fatal(err)

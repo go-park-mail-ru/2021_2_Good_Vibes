@@ -18,7 +18,7 @@ type ServerConfigRouting struct {
 	OrderHandler    *orderHttp.OrderHandler
 	BasketHandler   *basketHttp.BasketHandler
 	CategoryHandler *categoryHttp.CategoryHandler
-	ReviewHandler *reviewHttp.ReviewHandler
+	ReviewHandler   *reviewHttp.ReviewHandler
 	SearchHandler   *searchHttp.SearchHandler
 }
 

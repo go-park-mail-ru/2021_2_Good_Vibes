@@ -346,7 +346,7 @@ func TestBasketHandler_DeleteProduct(t *testing.T) {
 func TestBasketHandler_DropBasket(t *testing.T) {
 	type mockBehaviorUseCase func(s *mocks.MockUseCase, id int)
 	type mockBehaviorSession func(s *mockJwt.MockTokenManager)
-
+	userOk, _ := json.Marshal(models.UserID{UserId: 0})
 	errorGet2, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
 	errorGet3, _ := json.Marshal(customErrors.NewError(customErrors.SERVER_ERROR, customErrors.BD_ERROR_DESCR))
 
@@ -366,7 +366,7 @@ func TestBasketHandler_DropBasket(t *testing.T) {
 				s.EXPECT().DropBasket(id).Return(nil)
 			},
 			expectedStatusCode:  http.StatusOK,
-			expectedRequestBody: "",
+			expectedRequestBody: string(userOk) + "\n",
 		},
 		{
 			name: "Unauthorized",

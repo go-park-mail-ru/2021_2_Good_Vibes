@@ -21,7 +21,6 @@ func NewSearchRepository(db *sql.DB, err error) (*SearchRepository, error) {
 	}, nil
 }
 
-
 func (sr *SearchRepository) GetSuggests(str string) (models.Suggest, error) {
 	var searchStr strings.Builder
 	searchStr.WriteRune('%')
@@ -122,19 +121,19 @@ func (sr *SearchRepository) getSearchResultLocal(str string, filter postgre.Filt
 	var products []models.Product
 
 	/*rows, err := sr.db.Query(
-		"select p.id, p.image, p.name, p.price, p.rating, c.name, " +
-			"p.count_in_stock, p.description from products as p " +
-			"join categories as c on c.id=p.category_id " +
-			"where p.name ilike $1 and p.price >= $2 and p.price <= $3 " +
-			"and p.rating >= $4 and p.rating <= $5 " +
-			"order by "+filter.OrderBy+" "+filter.TypeOrder, searchStr.String(), filter.MinPrice,
-		filter.MaxPrice, filter.MinRating, filter.MaxRating)*/
+	"select p.id, p.image, p.name, p.price, p.rating, c.name, " +
+		"p.count_in_stock, p.description from products as p " +
+		"join categories as c on c.id=p.category_id " +
+		"where p.name ilike $1 and p.price >= $2 and p.price <= $3 " +
+		"and p.rating >= $4 and p.rating <= $5 " +
+		"order by "+filter.OrderBy+" "+filter.TypeOrder, searchStr.String(), filter.MinPrice,
+	filter.MaxPrice, filter.MinRating, filter.MaxRating)*/
 
 	rows, err := sr.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description from products as p "+
 		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
 		"nc1.rgt <= nc2.rgt "+
-		"where nc2.name = $1 and p.name ilike $6 " +
+		"where nc2.name = $1 and p.name ilike $6 "+
 		"and p.price >= $2 and p.price <= $3 "+
 		"and p.rating >= $4 and p.rating <= $5 "+
 		"order by "+filter.OrderBy+" "+filter.TypeOrder, filter.NameCategory, filter.MinPrice,
@@ -161,7 +160,6 @@ func (sr *SearchRepository) getSearchResultLocal(str string, filter postgre.Filt
 
 	return products, nil
 }
-
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()

@@ -17,7 +17,6 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 	}
 }
 
-
 func (uc *UseCase) AddReview(review models.Review) error {
 	oldReview, err := uc.repositoryReview.GetReviewByUserAndProduct(review.UserId, review.ProductId)
 	if err != nil {
@@ -31,12 +30,15 @@ func (uc *UseCase) AddReview(review models.Review) error {
 	var totalRating, ratingsCount int
 
 	productRatings, err := uc.repositoryReview.GetAllRatingsOfProduct(review.ProductId)
+	if err != nil {
+		return err
+	}
 	for _, rating := range productRatings {
 		totalRating += rating.Rating * rating.Count
 		ratingsCount += rating.Count
 	}
 
-	productRating := float64(totalRating + review.Rating) / float64(ratingsCount + 1)
+	productRating := float64(totalRating+review.Rating) / float64(ratingsCount+1)
 
 	err = uc.repositoryReview.AddReview(review, productRating)
 	if err != nil {
@@ -59,12 +61,15 @@ func (uc *UseCase) UpdateReview(review models.Review) error {
 	var totalRating, ratingsCount int
 
 	productRatings, err := uc.repositoryReview.GetAllRatingsOfProduct(review.ProductId)
+	if err != nil {
+		return err
+	}
 	for _, rating := range productRatings {
 		totalRating += rating.Rating * rating.Count
 		ratingsCount += rating.Count
 	}
 
-	productRating := float64(totalRating - oldReview.Rating + review.Rating) / float64(ratingsCount)
+	productRating := float64(totalRating-oldReview.Rating+review.Rating) / float64(ratingsCount)
 
 	err = uc.repositoryReview.UpdateReview(review, productRating)
 	if err != nil {
@@ -87,13 +92,18 @@ func (uc *UseCase) DeleteReview(userId int, productId int) error {
 	var totalRating, ratingsCount int
 
 	productRatings, err := uc.repositoryReview.GetAllRatingsOfProduct(productId)
+	if err != nil {
+		return err
+	}
 	for _, rating := range productRatings {
 		totalRating += rating.Rating * rating.Count
 		ratingsCount += rating.Count
 	}
 
-	productRating := float64(totalRating - oldReview.Rating) / float64(ratingsCount - 1)
-
+	productRating := float64(0)
+	if ratingsCount > 1 {
+		productRating = float64(totalRating-oldReview.Rating) / float64(ratingsCount-1)
+	}
 	err = uc.repositoryReview.DeleteReview(userId, productId, productRating)
 	if err != nil {
 		return err
@@ -119,31 +129,3 @@ func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
 
 	return reviews, nil
 }
-/*
-func (uc *UseCase) GetBasket(userId int) ([]models.BasketProduct, error) {
-	basketProducts, err := uc.repositoryBasket.GetBasket(userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return basketProducts, nil
-}
-
-func (uc *UseCase) DropBasket(userId int) error {
-	err := uc.repositoryBasket.DropBasket(userId)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (uc *UseCase) DeleteProduct(product models.BasketProduct) error {
-	err := uc.repositoryBasket.DeleteProduct(product)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-*/

@@ -4,7 +4,7 @@ import proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/pr
 
 type BasketProduct struct {
 	UserId    int `json:"user_id,omitempty"`
-	ProductId int `json:"product_id"`
+	ProductId int `json:"product_id" validate:"required"`
 	Number    int `json:"number,omitempty"`
 }
 

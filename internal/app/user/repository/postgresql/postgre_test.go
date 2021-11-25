@@ -34,7 +34,7 @@ func TestGetUserDataByName(t *testing.T) {
 	rows.AddRow(expect.Id, expect.Name, expect.Email, expect.Password)
 
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Name).
 		WillReturnRows(rows)
 
@@ -55,7 +55,7 @@ func TestGetUserDataByName(t *testing.T) {
 
 	// query error
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Name).
 		WillReturnError(fmt.Errorf("db_error"))
 
@@ -76,7 +76,7 @@ func TestGetUserDataByName(t *testing.T) {
 	rows.AddRow(expect.Id, expect.Name, expect.Email)
 
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Name).
 		WillReturnRows(rows)
 
@@ -90,86 +90,6 @@ func TestGetUserDataByName(t *testing.T) {
 		return
 	}
 }
-
-//func TestInsertUser(t *testing.T) {
-//	db, mock, err := sqlmock.New()
-//	if err != nil {
-//		t.Fatalf("cant create mock: %s", err)
-//	}
-//	defer db.Close()
-//
-//	storage, err := NewStorageUserDB(db, nil)
-//	if err != nil {
-//		t.Errorf("unexpected err: %s", err)
-//		return
-//	}
-//
-//	newUser := models.UserDataForReg{
-//		Name:     "BUSH",
-//		Email:    "BUSH@mail.ru",
-//		Password: "12345",
-//	}
-//
-//	// good query
-//
-//	rows := sqlmock.
-//		NewRows([]string{"id"}).AddRow(1)
-//
-//	mock.
-//		ExpectQuery("insert into customers").
-//		WithArgs(newUser.Name, newUser.Email, newUser.Password).
-//		WillReturnRows(rows)
-//
-//	result, err := storage.InsertUser(newUser)
-//	if err != nil {
-//		t.Errorf("unexpected err: %s", err)
-//		return
-//	}
-//	if err := mock.ExpectationsWereMet(); err != nil {
-//		t.Errorf("there were unfulfilled expectations: %s", err)
-//		return
-//	}
-//
-//	if result != 1 {
-//		t.Errorf("results not match, want %v, have %v", 1, result)
-//		return
-//	}
-//
-//	// query error
-//	mock.
-//		ExpectQuery("insert into customers").
-//		WithArgs(newUser.Name, newUser.Email, newUser.Password).
-//		WillReturnError(fmt.Errorf("db_error"))
-//
-//	_, err = storage.InsertUser(newUser)
-//	if err := mock.ExpectationsWereMet(); err != nil {
-//		t.Errorf("there were unfulfilled expectations: %s", err)
-//		return
-//	}
-//	if err == nil {
-//		t.Errorf("expected error, got nil")
-//		return
-//	}
-//
-//	// row scan error
-//	rows = sqlmock.
-//		NewRows([]string{"id", "number"}).AddRow(1, 1)
-//
-//	mock.
-//		ExpectQuery("insert into customers").
-//		WithArgs(newUser.Name, newUser.Email, newUser.Password).
-//		WillReturnRows(rows)
-//
-//	_, err = storage.InsertUser(newUser)
-//	if err := mock.ExpectationsWereMet(); err != nil {
-//		t.Errorf("there were unfulfilled expectations: %s", err)
-//		return
-//	}
-//	if err == nil {
-//		t.Errorf("expected error, got nil")
-//		return
-//	}
-//}
 
 func TestGetUserDataById(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -195,7 +115,7 @@ func TestGetUserDataById(t *testing.T) {
 	rows.AddRow(expect.Id, expect.Name, expect.Email, expect.Password, expect.Avatar)
 
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Id).
 		WillReturnRows(rows)
 
@@ -216,7 +136,7 @@ func TestGetUserDataById(t *testing.T) {
 
 	// query error
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Id).
 		WillReturnError(fmt.Errorf("db_error"))
 
@@ -237,7 +157,7 @@ func TestGetUserDataById(t *testing.T) {
 	rows.AddRow(expect.Id, expect.Name, expect.Email)
 
 	mock.
-		ExpectQuery("select ...").
+		ExpectQuery("SELECT ...").
 		WithArgs(expect.Id).
 		WillReturnRows(rows)
 
@@ -271,7 +191,7 @@ func TestSaveAvatarName(t *testing.T) {
 	//ok query
 
 	mock.
-		ExpectExec("update customers").
+		ExpectExec("UPDATE customers").
 		WithArgs(userId, fileName).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -289,7 +209,7 @@ func TestSaveAvatarName(t *testing.T) {
 	// query error 1
 
 	mock.
-		ExpectExec("update customers").
+		ExpectExec("UPDATE customers").
 		WithArgs(userId, fileName).
 		WillReturnError(errors.Errorf("db error"))
 
@@ -325,7 +245,7 @@ func TestUpdateUser(t *testing.T) {
 	//ok query
 
 	mock.
-		ExpectExec("update customers").
+		ExpectExec("UPDATE customers").
 		WithArgs(user.Name, user.Email, user.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -343,7 +263,7 @@ func TestUpdateUser(t *testing.T) {
 	// query error 1
 
 	mock.
-		ExpectExec("update customers").
+		ExpectExec("UPDATE customers").
 		WithArgs(user.Name, user.Email, user.Id).
 		WillReturnError(errors.Errorf("db error"))
 

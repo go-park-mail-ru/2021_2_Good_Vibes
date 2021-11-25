@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	postgre "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -34,6 +35,34 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
+// AddFavouriteProduct mocks base method.
+func (m *MockRepository) AddFavouriteProduct(product models.FavouriteProduct) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddFavouriteProduct", product)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddFavouriteProduct indicates an expected call of AddFavouriteProduct.
+func (mr *MockRepositoryMockRecorder) AddFavouriteProduct(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFavouriteProduct", reflect.TypeOf((*MockRepository)(nil).AddFavouriteProduct), product)
+}
+
+// DeleteFavouriteProduct mocks base method.
+func (m *MockRepository) DeleteFavouriteProduct(product models.FavouriteProduct) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFavouriteProduct", product)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFavouriteProduct indicates an expected call of DeleteFavouriteProduct.
+func (mr *MockRepositoryMockRecorder) DeleteFavouriteProduct(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFavouriteProduct", reflect.TypeOf((*MockRepository)(nil).DeleteFavouriteProduct), product)
+}
+
 // GetAll mocks base method.
 func (m *MockRepository) GetAll() ([]models.Product, error) {
 	m.ctrl.T.Helper()
@@ -50,18 +79,18 @@ func (mr *MockRepositoryMockRecorder) GetAll() *gomock.Call {
 }
 
 // GetByCategory mocks base method.
-func (m *MockRepository) GetByCategory(category string) ([]models.Product, error) {
+func (m *MockRepository) GetByCategory(filter postgre.Filter) ([]models.Product, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByCategory", category)
+	ret := m.ctrl.Call(m, "GetByCategory", filter)
 	ret0, _ := ret[0].([]models.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByCategory indicates an expected call of GetByCategory.
-func (mr *MockRepositoryMockRecorder) GetByCategory(category interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) GetByCategory(filter interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCategory", reflect.TypeOf((*MockRepository)(nil).GetByCategory), category)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCategory", reflect.TypeOf((*MockRepository)(nil).GetByCategory), filter)
 }
 
 // GetById mocks base method.
@@ -77,6 +106,21 @@ func (m *MockRepository) GetById(id int) (models.Product, error) {
 func (mr *MockRepositoryMockRecorder) GetById(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockRepository)(nil).GetById), id)
+}
+
+// GetFavouriteProducts mocks base method.
+func (m *MockRepository) GetFavouriteProducts(userId int) ([]models.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFavouriteProducts", userId)
+	ret0, _ := ret[0].([]models.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFavouriteProducts indicates an expected call of GetFavouriteProducts.
+func (mr *MockRepositoryMockRecorder) GetFavouriteProducts(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFavouriteProducts", reflect.TypeOf((*MockRepository)(nil).GetFavouriteProducts), userId)
 }
 
 // Insert mocks base method.

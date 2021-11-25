@@ -27,12 +27,12 @@ func TestUserHandler_SignUp(t *testing.T) {
 
 	user1, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
 		Email: "test@gmail.com", Password: "Qwerty123."})
-	user2, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
-		Email: "test@gmail.com", Password: "123"})
+	/*user2, _ := json.Marshal(models.UserDataForReg{Name: "Test1",
+	Email: "test@gmail.com", Password: "123"})*/
 
 	user1get, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
 		Email: "test@gmail.com", Avatar: CustomAvatar})
-	error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
+	//error2get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
 	error4get, _ := json.Marshal(customErrors.NewError(customErrors.VALIDATION_ERROR, customErrors.VALIDATION_DESCR))
 	error5get, _ := json.Marshal(customErrors.NewError(customErrors.USER_EXISTS_ERROR, customErrors.USER_EXISTS_DESCR))
@@ -65,7 +65,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: string(user1get) + "\n",
 		},
-		{
+		/*{
 			name:      "SimplePassword",
 			inputBody: string(user2),
 			inputUser: models.UserDataForReg{
@@ -79,7 +79,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			},
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedRequestBody: string(error2get) + "\n",
-		},
+		},*/
 		{
 			name:      "BadJson",
 			inputBody: `"username":"Test2","email":"test@gmail.com","password":"Qwerty123."}`,
@@ -511,9 +511,8 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 		Id:    1,
 		Name:  "Test1",
 		Email: "test@gmail.com"})
-	//user2, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
-	//	Email: "test@gmail.com"})
-	//
+	user1get, _ := json.Marshal(models.UserDataProfile{Name: "Test1",
+		Email: "test@gmail.com"})
 
 	error2get, _ := json.Marshal(customErrors.NewError(customErrors.TOKEN_ERROR, customErrors.TOKEN_ERROR_DESCR))
 	error3get, _ := json.Marshal(customErrors.NewError(customErrors.BIND_ERROR, customErrors.BIND_DESCR))
@@ -546,7 +545,7 @@ func TestUserHandler_UpdateProfile(t *testing.T) {
 				s.EXPECT().ParseTokenFromContext(context.Background()).Return(uint64(1), nil)
 			},
 			expectedStatusCode:  http.StatusOK,
-			expectedRequestBody: "",
+			expectedRequestBody: string(user1get) + "\n",
 		},
 		{
 			name:      "unauthorized",

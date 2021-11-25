@@ -3,7 +3,7 @@ package models
 type Product struct {
 	Id           int     `json:"id,omitempty"`
 	Image        string  `json:"image,omitempty"`
-	Name         string  `json:"name"`
+	Name         string  `json:"name" validate:"required"`
 	Price        float64 `json:"price"`
 	Rating       float32 `json:"rating"`
 	Category     string  `json:"category"`
@@ -23,7 +23,7 @@ type FavouriteProduct struct {
 
 type ProductRating struct {
 	Rating int
-	Count int
+	Count  int
 }
 
 type ProductId struct {
@@ -31,7 +31,7 @@ type ProductId struct {
 }
 
 type ProductForSuggest struct {
-	Id           int     `json:"id"`
-	Name         string  `json:"name"`
-	Image        string  `json:"image"`
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }

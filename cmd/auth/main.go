@@ -49,7 +49,7 @@ func main() {
 
 	go func() {
 		r := echo.New()
-		r.GET("/metrics",echo.WrapHandler(promhttp.Handler()))
+		r.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 		lis, err := net.Listen("tcp", "localhost:7000")
 		if err != nil {
 			log.Fatal(err)

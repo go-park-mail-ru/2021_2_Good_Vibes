@@ -25,6 +25,6 @@ type CreateCategory struct {
 }
 
 type CategoryForSuggest struct {
-	Name    string `json:"name"`
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }

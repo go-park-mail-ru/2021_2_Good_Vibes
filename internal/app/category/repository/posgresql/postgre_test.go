@@ -3,8 +3,8 @@ package posgresql
 import (
 	"errors"
 	"fmt"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"reflect"
 	"testing"
 )
@@ -24,18 +24,18 @@ func TestSelectAllCategories(t *testing.T) {
 
 	// good query
 	rows := sqlmock.
-		NewRows([]string{"nesting", "name"})
+		NewRows([]string{"nesting", "name", "description"})
 
 	expect := []models.NestingCategory{
-		{0, "ALL_THINGS"},
-		{1, "CLOTHES"},
-		{2, "CLOTHES_MEN"},
-		{3, "CLOTHES_UP_MEN"},
-		{3, "SHOES_MEN"},
+		{0, "ALL_THINGS", "Все товары"},
+		{1, "CLOTHES", "Одежда"},
+		{2, "CLOTHES_MEN", "Мужская одежда"},
+		{3, "CLOTHES_UP_MEN", "Верхняя одежда"},
+		{3, "SHOES_MEN", "Обувь"},
 	}
 
 	for _, item := range expect {
-		rows = rows.AddRow(item.Nesting, item.Name)
+		rows = rows.AddRow(item.Nesting, item.Name, item.Description)
 	}
 
 	mock.

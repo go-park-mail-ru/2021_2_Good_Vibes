@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 )
+
 type Interceptor struct {
 	m *Metric
 }

@@ -23,10 +23,10 @@ const (
 )
 
 const (
-	TypeOrderPrice  = "price"
-	TypeOrderRating = "rating"
-	TypeOrderMin    = "desc"
-	TypeOrderMax    = "asc"
+	TypeOrderPrice      = "price"
+	TypeOrderRating     = "rating"
+	TypeOrderMin        = "desc"
+	TypeOrderMax        = "asc"
 	TypeCategoryDefault = "ALL_THINGS"
 )
 
@@ -99,7 +99,7 @@ func ParseQueryFilter(ctx echo.Context) (*Filter, error) {
 		return nil, errors.New(customErrors.BAD_QUERY_PARAM_DESCR)
 	}
 	if orderByTypeString == "" {
-		result.TypeOrder = TypeOrderRating
+		result.TypeOrder = TypeOrderMin
 	} else {
 		result.TypeOrder = orderByTypeString
 	}

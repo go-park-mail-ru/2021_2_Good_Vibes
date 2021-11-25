@@ -34,9 +34,9 @@ func ConfigMiddleware(router *echo.Echo) {
 				}
 				return false
 			},
-			CookiePath: "/",
+			CookiePath:     "/",
 			CookieSameSite: http.SameSiteNoneMode,
-			CookieSecure: true,
+			CookieSecure:   true,
 		}),
 		CsrfSetHeader,
 		middleware.Secure(),
