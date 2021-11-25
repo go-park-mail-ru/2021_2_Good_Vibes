@@ -107,6 +107,20 @@ func (mr *MockUsecaseMockRecorder) SaveAvatarName(userId, fileName interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAvatarName", reflect.TypeOf((*MockUsecase)(nil).SaveAvatarName), userId, fileName)
 }
 
+// UpdatePassword mocks base method.
+func (m *MockUsecase) UpdatePassword(newData models.UserDataPassword) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", newData)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockUsecaseMockRecorder) UpdatePassword(newData interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockUsecase)(nil).UpdatePassword), newData)
+}
+
 // UpdateProfile mocks base method.
 func (m *MockUsecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 	m.ctrl.T.Helper()

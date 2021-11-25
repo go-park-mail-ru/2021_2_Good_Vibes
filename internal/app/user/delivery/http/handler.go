@@ -177,7 +177,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 
 	fileName := handler.Usecase.GenerateAvatarName()
 
-	bucket := "products-bucket-ozon-good-vibes"
+	bucket := ""
 
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("eu-west-1")})
 	uploader := s3manager.NewUploader(sess)
@@ -193,14 +193,14 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	err = handler.Usecase.SaveAvatarName(int(idNum), BucketUrl + fileName)
+	err = handler.Usecase.SaveAvatarName(int(idNum), BucketUrl+fileName)
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
 	logger.Trace("success upload avatar")
-	return ctx.HTML(http.StatusOK, BucketUrl + fileName)
+	return ctx.HTML(http.StatusOK, BucketUrl+fileName)
 }
 
 func (handler *UserHandler) Profile(ctx echo.Context) error {
@@ -264,6 +264,45 @@ func (handler *UserHandler) UpdateProfile(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
+	UserDataForUpdate.Id = 0
+
+	return ctx.JSON(http.StatusOK, UserDataForUpdate)
+}
+
+func (handler *UserHandler) UpdatePassword(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + ".UpdatePassword")
+	var newUserDataPassword models.UserDataPassword
+
+	idNum, err := handler.SessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+	}
+
+	if err := ctx.Bind(&newUserDataPassword); err != nil {
+		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&newUserDataPassword); err != nil {
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	newUserDataPassword = sanitizer.SanitizeData(&newUserDataPassword).(models.UserDataPassword)
+
+	newUserDataPassword.Id = idNum
+
+	err = handler.Usecase.UpdatePassword(newUserDataPassword)
+	if err != nil {
+		newError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
+
 	return ctx.NoContent(http.StatusOK)
 }
 
@@ -276,7 +315,7 @@ func (handler *UserHandler) Logout(ctx echo.Context) error {
 		HttpOnly: true,
 		MaxAge:   -1,
 		SameSite: http.SameSiteNoneMode,
-		//Secure:   true,
+		Secure:   true,
 	}
 	ctx.SetCookie(cookie)
 	return ctx.NoContent(http.StatusOK)
@@ -292,7 +331,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
 		SameSite: http.SameSiteNoneMode,
-		//Secure:   true,
+		Secure:   true,
 	}
 
 	ctx.SetCookie(cookie)

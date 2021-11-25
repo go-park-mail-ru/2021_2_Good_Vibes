@@ -5,12 +5,13 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
-var AllCategoriesJson models.CategoryNode
+// var AllCategoriesJson models.CategoryNode
 
 type CategoryHandler struct {
 	useCase category.UseCase
@@ -28,23 +29,15 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategories")
 
-	if AllCategoriesJson.Name != "" {
-		logger.Debug(AllCategoriesJson)
-		return ctx.JSON(http.StatusOK, AllCategoriesJson)
-	}
-
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
 		logger.Error(err)
 		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newCategoryError)
+		return ctx.JSON(http.StatusInternalServerError, newCategoryError)
 	}
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	AllCategoriesJson = categories
-
-	logger.Debug(AllCategoriesJson)
 	return ctx.JSON(http.StatusOK, categories)
 }
 
@@ -52,9 +45,16 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + " GetCategoryProducts")
 
-	nameString := ctx.Param("name")
+	filter, err := postgre.ParseQueryFilter(ctx)
+	if err != nil {
+		logger.Trace(err)
+		return ctx.NoContent(http.StatusBadRequest)
+	}
 
-	products, err := ch.useCase.GetProductsByCategory(nameString)
+	nameString := ctx.Param("name")
+	filter.NameCategory = nameString
+
+	products, err := ch.useCase.GetProductsByCategory(*filter)
 	if err != nil {
 		logger.Error(err)
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, err.Error())
@@ -63,6 +63,10 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 
 	for i, _ := range products {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	if products == nil {
+		products = make([]models.Product, 0)
 	}
 
 	logger.Debug(products)
@@ -84,7 +88,7 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 
 	newCategory = sanitizer.SanitizeData(&newCategory).(models.CreateCategory)
 
-	err := ch.useCase.CreateCategory(newCategory.Category, newCategory.ParentCategory)
+	err := ch.useCase.CreateCategory(newCategory)
 	if err != nil {
 		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
@@ -98,7 +102,7 @@ func (ch *CategoryHandler) CreateCategory(ctx echo.Context) error {
 
 	categories = sanitizer.SanitizeData(&categories).(models.CategoryNode)
 
-	AllCategoriesJson = categories
+	// AllCategoriesJson = categories
 
 	return ctx.JSON(http.StatusOK, categories)
 }

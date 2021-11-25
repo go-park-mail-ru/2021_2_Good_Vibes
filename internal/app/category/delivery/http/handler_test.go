@@ -6,6 +6,7 @@ import (
 	mock_category "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/mocks"
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	validator2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/validator"
 	"github.com/go-playground/validator"
 	"github.com/golang/mock/gomock"
@@ -17,77 +18,19 @@ import (
 	"testing"
 )
 
-func TestCategoryHandler_GetCategories(t *testing.T) {
-	categories := models.CategoryNode{
-		Name:     "CLOTHES",
-		Nesting:  0,
-		Children: nil,
-	}
-
-	categoriesJson, _ := json.Marshal(categories)
-
-	err := customErrors.NewError(customErrors.DB_ERROR, customErrors.BD_ERROR_DESCR)
-	errJson, _ := json.Marshal(err)
-
-	c := gomock.NewController(t)
-	defer c.Finish()
-
-	newCategoryUseCase := mock_category.NewMockUseCase(c)
-
-	categoryHandler := NewCategoryHandler(newCategoryUseCase)
-
-	newCategoryUseCase.EXPECT().GetAllCategories().Return(categories, nil)
-
-	router := echo.New()
-
-	router.GET("/category", categoryHandler.GetCategories)
-
-	req := httptest.NewRequest("GET", "/category", nil)
-
-	// correct
-	AllCategoriesJson.Name = ""
-
-	recorder := httptest.NewRecorder()
-
-	expectedStatusCode := http.StatusOK
-	expectedRequestBody := string(categoriesJson) + "\n"
-
-	router.ServeHTTP(recorder, req)
-
-	assert.Equal(t, expectedStatusCode, recorder.Code)
-	assert.Equal(t, expectedRequestBody, recorder.Body.String())
-
-	// AllCategoriesJson.Name != ""
-
-	expectedStatusCode = http.StatusOK
-	expectedRequestBody = string(categoriesJson) + "\n"
-
-	recorder = httptest.NewRecorder()
-	router.ServeHTTP(recorder, req)
-
-	assert.Equal(t, expectedStatusCode, recorder.Code)
-	assert.Equal(t, expectedRequestBody, recorder.Body.String())
-
-	// error
-	newCategoryUseCase.EXPECT().GetAllCategories().Return(models.CategoryNode{}, errors.New(customErrors.BD_ERROR_DESCR))
-	expectedStatusCode = http.StatusBadRequest
-	expectedRequestBody = string(errJson) + "\n"
-
-	AllCategoriesJson.Name = ""
-
-	recorder = httptest.NewRecorder()
-	router.ServeHTTP(recorder, req)
-
-	assert.Equal(t, expectedStatusCode, recorder.Code)
-	assert.Equal(t, expectedRequestBody, recorder.Body.String())
-}
-
 func TestOrderHandler_GetCategoryProducts(t *testing.T) {
 	type mockBehaviorGetProductsByCategory func(s *mock_category.MockUseCase)
 
 	err := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.BD_ERROR_DESCR)
 	errJson, _ := json.Marshal(err)
 
+	defaultFilter := postgre.Filter{
+		NameCategory: "clothes",
+		MaxPrice:     1000000,
+		MaxRating:    5,
+		OrderBy:      "rating",
+		TypeOrder:    "desc",
+	}
 	products := []models.Product{
 		{
 			Id:           1,
@@ -112,7 +55,7 @@ func TestOrderHandler_GetCategoryProducts(t *testing.T) {
 		{
 			name: "correct",
 			mockBehaviorGetProductsByCategory: func(s *mock_category.MockUseCase) {
-				s.EXPECT().GetProductsByCategory("clothes").Return(products, nil)
+				s.EXPECT().GetProductsByCategory(defaultFilter).Return(products, nil)
 			},
 
 			expectedStatusCode:  http.StatusOK,
@@ -121,7 +64,7 @@ func TestOrderHandler_GetCategoryProducts(t *testing.T) {
 		{
 			name: "error",
 			mockBehaviorGetProductsByCategory: func(s *mock_category.MockUseCase) {
-				s.EXPECT().GetProductsByCategory("clothes").Return(nil, errors.New(customErrors.BD_ERROR_DESCR))
+				s.EXPECT().GetProductsByCategory(defaultFilter).Return(nil, errors.New(customErrors.BD_ERROR_DESCR))
 			},
 
 			expectedStatusCode:  http.StatusBadRequest,
@@ -186,7 +129,7 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 		{
 			name: "correct",
 			mockBehaviorCreateCategory: func(s *mock_category.MockUseCase) {
-				s.EXPECT().CreateCategory("MEN_CLOTHES", "CLOTHES").Return(nil)
+				s.EXPECT().CreateCategory(newCategory).Return(nil)
 			},
 			mockBehaviorGetAllCategories: func(s *mock_category.MockUseCase) {
 				s.EXPECT().GetAllCategories().Return(categories, nil)
@@ -198,7 +141,7 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 		{
 			name: "error create",
 			mockBehaviorCreateCategory: func(s *mock_category.MockUseCase) {
-				s.EXPECT().CreateCategory("MEN_CLOTHES", "CLOTHES").Return(errors.New(customErrors.BD_ERROR_DESCR))
+				s.EXPECT().CreateCategory(newCategory).Return(errors.New(customErrors.BD_ERROR_DESCR))
 			},
 			mockBehaviorGetAllCategories: func(s *mock_category.MockUseCase) {
 			},
@@ -234,6 +177,69 @@ func TestCategoryHandler_CreateCategory(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatusCode, recorder.Code)
 			assert.Equal(t, tt.expectedRequestBody, recorder.Body.String())
+		})
+	}
+}
+
+func TestCategoryHandler_GetCategories(t *testing.T) {
+	type mockBehaviorUseCase func(s *mock_category.MockUseCase)
+
+	categories := models.CategoryNode{
+		Name:     "CLOTHES",
+		Nesting:  0,
+		Children: nil,
+	}
+	error1 := errors.New("bdError")
+	categoriesJson, _ := json.Marshal(categories)
+	error1Json, _ := json.Marshal(customErrors.NewError(customErrors.DB_ERROR, error1.Error()))
+
+	tests := []struct {
+		name                string
+		mockBehaviorUseCase mockBehaviorUseCase
+		expectedStatusCode  int
+		expectedStatusBody  string
+	}{
+		{
+			name: "ok",
+			mockBehaviorUseCase: func(s *mock_category.MockUseCase) {
+				s.EXPECT().GetAllCategories().Return(categories, nil)
+			},
+			expectedStatusCode: 200,
+			expectedStatusBody: string(categoriesJson) + "\n",
+		},
+		{
+			name: "bd_error",
+			mockBehaviorUseCase: func(s *mock_category.MockUseCase) {
+				s.EXPECT().GetAllCategories().Return(categories, error1)
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusBody: string(error1Json) + "\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			newCategoryUseCase := mock_category.NewMockUseCase(c)
+			tt.mockBehaviorUseCase(newCategoryUseCase)
+			categoryHandler := NewCategoryHandler(newCategoryUseCase)
+
+			router := echo.New()
+			router.GET("/category", categoryHandler.GetCategories)
+
+			req := httptest.NewRequest("GET", "/category", bytes.NewBufferString(""))
+
+			val := validator.New()
+			router.Validator = &validator2.CustomValidator{Validator: val}
+
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			assert.Equal(t, tt.expectedStatusCode, recorder.Code)
+			assert.Equal(t, tt.expectedStatusBody, recorder.Body.String())
 		})
 	}
 }

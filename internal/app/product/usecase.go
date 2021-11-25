@@ -7,7 +7,10 @@ type UseCase interface {
 	AddProduct(prod models.Product) (int, error)
 	GetAllProducts() ([]models.Product, error)
 	// GetProductsOnPage(page int) ([]product.Product, error)
+	GetFavouriteProducts(userId int) ([]models.Product, error)
 	GetProductById(id int) (models.Product, error)
 	GenerateProductImageName() string
 	SaveProductImageName(productId int, fileName string) error
+	AddFavouriteProduct(product models.FavouriteProduct) error
+	DeleteFavouriteProduct(product models.FavouriteProduct) error
 }

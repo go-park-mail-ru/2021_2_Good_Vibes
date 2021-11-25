@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-const NewOrder = "new"
+const NewOrder = "новый"
 
 type OrderHandler struct {
 	useCase        order.UseCase
@@ -69,4 +69,23 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 
 	logger.Trace(trace + " success PutOrder")
 	return ctx.JSON(http.StatusOK, newOrder)
+}
+
+func (oh *OrderHandler) GetAllOrders(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + " GetAllOrders")
+
+	userId, err := oh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
+	}
+
+	orders, err := oh.useCase.GetAllOrders(int(userId))
+	if err != nil {
+		logger.Error(err)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, orders)
 }

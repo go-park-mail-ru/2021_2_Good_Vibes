@@ -34,6 +34,20 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 	return m.recorder
 }
 
+// AddFavouriteProduct mocks base method.
+func (m *MockUseCase) AddFavouriteProduct(product models.FavouriteProduct) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddFavouriteProduct", product)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddFavouriteProduct indicates an expected call of AddFavouriteProduct.
+func (mr *MockUseCaseMockRecorder) AddFavouriteProduct(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFavouriteProduct", reflect.TypeOf((*MockUseCase)(nil).AddFavouriteProduct), product)
+}
+
 // AddProduct mocks base method.
 func (m *MockUseCase) AddProduct(prod models.Product) (int, error) {
 	m.ctrl.T.Helper()
@@ -47,6 +61,20 @@ func (m *MockUseCase) AddProduct(prod models.Product) (int, error) {
 func (mr *MockUseCaseMockRecorder) AddProduct(prod interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProduct", reflect.TypeOf((*MockUseCase)(nil).AddProduct), prod)
+}
+
+// DeleteFavouriteProduct mocks base method.
+func (m *MockUseCase) DeleteFavouriteProduct(product models.FavouriteProduct) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFavouriteProduct", product)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFavouriteProduct indicates an expected call of DeleteFavouriteProduct.
+func (mr *MockUseCaseMockRecorder) DeleteFavouriteProduct(product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFavouriteProduct", reflect.TypeOf((*MockUseCase)(nil).DeleteFavouriteProduct), product)
 }
 
 // GenerateProductImageName mocks base method.
@@ -76,6 +104,21 @@ func (m *MockUseCase) GetAllProducts() ([]models.Product, error) {
 func (mr *MockUseCaseMockRecorder) GetAllProducts() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllProducts", reflect.TypeOf((*MockUseCase)(nil).GetAllProducts))
+}
+
+// GetFavouriteProducts mocks base method.
+func (m *MockUseCase) GetFavouriteProducts(userId int) ([]models.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFavouriteProducts", userId)
+	ret0, _ := ret[0].([]models.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFavouriteProducts indicates an expected call of GetFavouriteProducts.
+func (mr *MockUseCaseMockRecorder) GetFavouriteProducts(userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFavouriteProducts", reflect.TypeOf((*MockUseCase)(nil).GetFavouriteProducts), userId)
 }
 
 // GetProductById mocks base method.

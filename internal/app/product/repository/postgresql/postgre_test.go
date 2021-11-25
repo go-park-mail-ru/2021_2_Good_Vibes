@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"github.com/pkg/errors"
 	"reflect"
 	"testing"
@@ -27,9 +28,9 @@ func TestGetAll(t *testing.T) {
 		NewRows([]string{"id", "image", "name", "price", "rating", "category_id", "count_in_stock", "description"})
 
 	expect := []models.Product{
-		{ Id: 1, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "1", CountInStock: 1, Description: "product"},
-		{ Id: 2, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "2", CountInStock: 1, Description: "product"},
-		{ Id: 3, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "3", CountInStock: 1, Description: "product"},
+		{Id: 1, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "1", CountInStock: 1, Description: "product"},
+		{Id: 2, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "2", CountInStock: 1, Description: "product"},
+		{Id: 3, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "3", CountInStock: 1, Description: "product"},
 	}
 
 	for _, item := range expect {
@@ -77,9 +78,9 @@ func TestGetAll(t *testing.T) {
 		NewRows([]string{"id", "image", "name"})
 
 	expect = []models.Product{
-		{ Id: 1, Image: "product", Name: "Phone"},
-		{ Id: 2, Image: "product", Name: "Phone"},
-	    { Id: 3, Image: "product", Name: "Phone"},
+		{Id: 1, Image: "product", Name: "Phone"},
+		{Id: 2, Image: "product", Name: "Phone"},
+		{Id: 3, Image: "product", Name: "Phone"},
 	}
 
 	for _, item := range expect {
@@ -101,7 +102,6 @@ func TestGetAll(t *testing.T) {
 		return
 	}
 }
-
 
 func TestGetById(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -172,7 +172,6 @@ func TestGetById(t *testing.T) {
 
 	rows.AddRow(expect.Id, expect.Image, expect.Name)
 
-
 	mock.
 		ExpectQuery("select ...").
 		WithArgs().
@@ -189,7 +188,6 @@ func TestGetById(t *testing.T) {
 	}
 }
 
-
 func TestGetByCategory(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -203,16 +201,24 @@ func TestGetByCategory(t *testing.T) {
 		return
 	}
 
-	category := "ALL"
+	category := postgre.Filter{
+		NameCategory: "ALL",
+		MinPrice:     100,
+		MaxPrice:     1000,
+		MinRating:    2,
+		MaxRating:    5,
+		OrderBy:      "p.rating",
+		TypeOrder:    "desc",
+	}
 
 	// good query
 	rows := sqlmock.
 		NewRows([]string{"id", "image", "name", "price", "rating", "category_id", "count_in_stock", "description"})
 
 	expect := []models.Product{
-		{ Id: 1, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "1", CountInStock: 1, Description: "product"},
-		{ Id: 2, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "2", CountInStock: 1, Description: "product"},
-		{ Id: 3, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "3", CountInStock: 1, Description: "product"},
+		{Id: 1, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "1", CountInStock: 1, Description: "product"},
+		{Id: 2, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "2", CountInStock: 1, Description: "product"},
+		{Id: 3, Image: "product", Name: "Phone", Price: 1000.00, Rating: 5.0, Category: "3", CountInStock: 1, Description: "product"},
 	}
 
 	for _, item := range expect {
@@ -221,7 +227,7 @@ func TestGetByCategory(t *testing.T) {
 
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnRows(rows)
 
 	result, err := storage.GetByCategory(category)
@@ -242,7 +248,7 @@ func TestGetByCategory(t *testing.T) {
 	// query error
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnError(fmt.Errorf("db_error"))
 
 	_, err = storage.GetByCategory(category)
@@ -260,9 +266,9 @@ func TestGetByCategory(t *testing.T) {
 		NewRows([]string{"id", "image", "name"})
 
 	expect = []models.Product{
-		{ Id: 1, Image: "product", Name: "Phone"},
-		{ Id: 2, Image: "product", Name: "Phone"},
-		{ Id: 3, Image: "product", Name: "Phone"},
+		{Id: 1, Image: "product", Name: "Phone"},
+		{Id: 2, Image: "product", Name: "Phone"},
+		{Id: 3, Image: "product", Name: "Phone"},
 	}
 
 	for _, item := range expect {
@@ -271,7 +277,7 @@ func TestGetByCategory(t *testing.T) {
 
 	mock.
 		ExpectQuery("select ...").
-		WithArgs(category).
+		WithArgs(category.NameCategory, category.MinPrice, category.MaxPrice, category.MinRating, category.MaxRating, category.OrderBy, category.TypeOrder).
 		WillReturnRows(rows)
 
 	_, err = storage.GetByCategory(category)
@@ -284,8 +290,6 @@ func TestGetByCategory(t *testing.T) {
 		return
 	}
 }
-
-
 
 func TestInsert(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -301,7 +305,6 @@ func TestInsert(t *testing.T) {
 	}
 
 	product := models.Product{
-		Image:        "product",
 		Name:         "product",
 		Price:        1000.0,
 		Rating:       5.0,
@@ -316,7 +319,7 @@ func TestInsert(t *testing.T) {
 
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnRows(rows)
 
 	_, err = storage.Insert(product)
@@ -332,7 +335,7 @@ func TestInsert(t *testing.T) {
 	// query error
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnError(fmt.Errorf("db_error"))
 
 	_, err = storage.Insert(product)
@@ -349,10 +352,9 @@ func TestInsert(t *testing.T) {
 	rows = sqlmock.
 		NewRows([]string{"id", "name"}).AddRow(1, "product")
 
-
 	mock.
 		ExpectQuery("insert into products").
-		WithArgs(product.Image, product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
+		WithArgs(product.Name, product.Price, product.Rating, product.Category, product.CountInStock, product.Description).
 		WillReturnRows(rows)
 
 	_, err = storage.Insert(product)
@@ -365,7 +367,6 @@ func TestInsert(t *testing.T) {
 		return
 	}
 }
-
 
 func TestSaveProductImageName(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -386,7 +387,7 @@ func TestSaveProductImageName(t *testing.T) {
 	//ok query
 
 	mock.
-		ExpectExec("update products").
+		ExpectExec("UPDATE products").
 		WithArgs(productId, fileName).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -404,7 +405,7 @@ func TestSaveProductImageName(t *testing.T) {
 	// query error 1
 
 	mock.
-		ExpectExec("update products").
+		ExpectExec("UPDATE products").
 		WithArgs(productId, fileName).
 		WillReturnError(errors.Errorf("db error"))
 
@@ -419,7 +420,6 @@ func TestSaveProductImageName(t *testing.T) {
 		return
 	}
 }
-
 
 func TestNewStorageProductDB_Fail(t *testing.T) {
 	db, _, err := sqlmock.New()

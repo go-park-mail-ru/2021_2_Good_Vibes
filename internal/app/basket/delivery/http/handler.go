@@ -83,6 +83,10 @@ func (bh *BasketHandler) GetBasket(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
+	if basketProducts == nil {
+		basketProducts = make([]models.BasketProduct, 0)
+	}
+
 	logger.Trace(trace + " success GetBasket")
 	return ctx.JSON(http.StatusOK, basketProducts)
 }
@@ -91,21 +95,37 @@ func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + ".DropBasket")
 
+	var user models.UserID
+
 	userId, err := bh.sessionManager.ParseTokenFromContext(ctx.Request().Context())
 	if err != nil {
 		logger.Error(err)
 		return ctx.JSON(http.StatusUnauthorized, errors.NewError(errors.TOKEN_ERROR, errors.TOKEN_ERROR_DESCR))
 	}
 
-	err = bh.useCase.DropBasket(int(userId))
+	user.UserId = int(userId)
+
+	if err := ctx.Bind(&user); err != nil {
+		logger.Error(err)
+		newBasketError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newBasketError)
+	}
+
+	if err := ctx.Validate(&user); err != nil {
+		logger.Error(err, user)
+		newBasketError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newBasketError)
+	}
+
+	err = bh.useCase.DropBasket(user.UserId)
 	if err != nil {
-		logger.Error(err, userId)
+		logger.Error(err, user)
 		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
 	logger.Trace(trace + " success DropBasket")
-	return ctx.NoContent(http.StatusOK)
+	return ctx.JSON(http.StatusOK, user)
 }
 
 func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {

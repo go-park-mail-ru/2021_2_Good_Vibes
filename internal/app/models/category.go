@@ -6,17 +6,25 @@ type Category struct {
 }
 
 type NestingCategory struct {
-	Nesting int    `json:"nesting"`
-	Name    string `json:"name"`
+	Nesting     int    `json:"nesting"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type CategoryNode struct {
-	Name     string         `json:"name"`
-	Nesting  int            `json:"-"`
-	Children []CategoryNode `json:"children,omitempty"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Nesting     int            `json:"-"`
+	Children    []CategoryNode `json:"children,omitempty"`
 }
 
 type CreateCategory struct {
-	Category       string `json:"category" validate:"required"`
-	ParentCategory string `json:"parent_category" validate:"required"`
+	Category       string `json:"category"`
+	ParentCategory string `json:"parent_category"`
+	Description    string `json:"description"`
+}
+
+type CategoryForSuggest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }

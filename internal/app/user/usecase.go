@@ -10,4 +10,5 @@ type Usecase interface {
 	GenerateAvatarName() string
 	SaveAvatarName(userId int, fileName string) error
 	UpdateProfile(newData models.UserDataProfile) (int, error)
+	UpdatePassword(newData models.UserDataPassword) error
 }

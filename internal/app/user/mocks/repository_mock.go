@@ -64,21 +64,6 @@ func (mr *MockRepositoryMockRecorder) GetUserDataByName(name interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserDataByName", reflect.TypeOf((*MockRepository)(nil).GetUserDataByName), name)
 }
 
-// InsertUser mocks base method.
-func (m *MockRepository) InsertUser(newUser models.UserDataForReg) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertUser", newUser)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// InsertUser indicates an expected call of InsertUser.
-func (mr *MockRepositoryMockRecorder) InsertUser(newUser interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUser", reflect.TypeOf((*MockRepository)(nil).InsertUser), newUser)
-}
-
 // SaveAvatarName mocks base method.
 func (m *MockRepository) SaveAvatarName(userId int, fileName string) error {
 	m.ctrl.T.Helper()
@@ -91,6 +76,20 @@ func (m *MockRepository) SaveAvatarName(userId int, fileName string) error {
 func (mr *MockRepositoryMockRecorder) SaveAvatarName(userId, fileName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveAvatarName", reflect.TypeOf((*MockRepository)(nil).SaveAvatarName), userId, fileName)
+}
+
+// UpdatePassword mocks base method.
+func (m *MockRepository) UpdatePassword(newData models.UserDataPassword) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", newData)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockRepositoryMockRecorder) UpdatePassword(newData interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockRepository)(nil).UpdatePassword), newData)
 }
 
 // UpdateUser mocks base method.
