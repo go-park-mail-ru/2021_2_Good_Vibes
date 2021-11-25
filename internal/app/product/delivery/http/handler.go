@@ -128,7 +128,7 @@ func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
 	if err != nil {
 		logger.Error(err, deleteProduct)
 		newProductError := errors.NewError(errors.SERVER_ERROR, err.Error())
-		return ctx.JSON(http.StatusBadRequest, newProductError)
+		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 
 	logger.Trace(trace + " success DeleteFavouriteProduct")
