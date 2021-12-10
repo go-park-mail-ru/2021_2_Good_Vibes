@@ -6,6 +6,7 @@ message OrderProducts {
   int64 OrderId = 1;
   int64 ProductId = 2;
   int64 Number = 3;
+  float Price = 4;
 }
 
 message Address {

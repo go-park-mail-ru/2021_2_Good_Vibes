@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	FieldsNum = 3
+	FieldsNum = 4
 )
 
 type OrderRepository struct {
@@ -149,7 +149,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 
 		for i, _ := range orders {
 			var products []models.OrderProducts
-			rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orders[i].OrderId)
+			rows, err := so.db.Query("select order_id, product_id, count, price from order_products where order_id = $1", orders[i].OrderId)
 			if err != nil {
 				return err
 			}
@@ -159,7 +159,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 			for rows.Next() {
 				product := models.OrderProducts{}
 
-				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number, &product.Price)
 				if err != nil {
 					return err
 				}
@@ -223,13 +223,14 @@ func makeSelectPricesQuery(products []models.OrderProducts) string {
 
 func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 	query := strings.Builder{}
-	query.WriteString("insert into order_products (order_id, product_id, count) values")
+	query.WriteString("insert into order_products (order_id, product_id, count, price) values")
 
 	values := make([]interface{}, FieldsNum*len(order.Products))
 	for i, s := range order.Products {
 		values[i*FieldsNum] = s.OrderId
 		values[i*FieldsNum+1] = s.ProductId
 		values[i*FieldsNum+2] = s.Number
+		values[i*FieldsNum+3] = s.Price
 
 		n := i * FieldsNum
 
