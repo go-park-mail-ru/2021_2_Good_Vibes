@@ -3,6 +3,7 @@ package postgresql
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"strconv"
 	"strings"
@@ -34,11 +35,12 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 
 	err := tx(so.db, func(tx *sql.Tx) error {
 		err := tx.QueryRow(
-			`insert into orders (user_id, date, cost, status) values ($1, $2, $3, $4) returning id`,
+			`insert into orders (user_id, date, cost, status, email) values ($1, $2, $3, $4, $5) returning id`,
 			order.UserId,
 			order.Date,
 			order.Cost,
 			order.Status,
+			"lol@mail.ru",
 		).Scan(&order.OrderId)
 
 		if err != nil {
@@ -117,7 +119,7 @@ func (so *OrderRepository) SelectPrices(products []models.OrderProducts) ([]mode
 	if rows.Err() != nil {
 		return nil, rows.Err()
 	}
-
+	fmt.Println(productPrices)
 	return productPrices, nil
 }
 
@@ -204,6 +206,32 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	return orders, nil
 }
 
+func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, error){
+	var promoReturn models.PromoCode
+
+	err := tx(so.db, func(tx *sql.Tx) error {
+		rows, err := so.db.Query("select type, code, value, category_id, product_id, uses_left"+
+			" from promocode where code = $1", promoCode)
+		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		err = rows.Scan(&promoReturn.Type, &promoReturn.Code, &promoReturn.Value,
+			&promoReturn.CategoryId, &promoReturn.ProductId, &promoReturn.UsesLeft)
+		if err != nil {
+			return err
+		}
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &promoReturn, nil
+}
+
 func makeSelectPricesQuery(products []models.OrderProducts) string {
 	query := strings.Builder{}
 	query.WriteString("select id, price from products where id in ")
@@ -231,7 +259,7 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 		values[i*FieldsNum+1] = s.ProductId
 		values[i*FieldsNum+2] = s.Number
 		values[i*FieldsNum+3] = s.Price
-
+		fmt.Println(s.Price)
 		n := i * FieldsNum
 
 		query.WriteString(`(`)

@@ -6,4 +6,5 @@ type Repository interface {
 	PutOrder(order models.Order) (int, error)
 	SelectPrices(products []models.OrderProducts) ([]models.ProductPrice, error)
 	GetAllOrders(user int) ([]models.Order, error)
+	CheckPromoCode(promoCode string) (*models.PromoCode, error)
 }

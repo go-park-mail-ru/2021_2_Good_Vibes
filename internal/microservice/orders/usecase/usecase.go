@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders"
 )
@@ -27,10 +28,17 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		productPricesMap[productPrice.Id] = productPrice.Price
 	}
 
+	if order.Promocode != "" {
+		promoCode, err := uc.repositoryOrder.CheckPromoCode(order.Promocode)
+		fmt.Println(promoCode, err)
+	}
+	fmt.Println("without promocode")
 	var cost float64
 
-	for _, product := range order.Products {
-		cost += float64(product.Number) * productPricesMap[product.ProductId]
+	for index, product := range order.Products {
+		TotalPriceProduct := float64(product.Number) * productPricesMap[product.ProductId]
+		order.Products[index].Price = TotalPriceProduct
+		cost += TotalPriceProduct
 	}
 
 	order.Cost = cost

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "./;orders";
+option go_package = "./;order";
 
 message OrderProducts {
   int64 OrderId = 1;
@@ -26,7 +26,8 @@ message Order {
   Address Address = 4;
   float Cost = 5;
   string status = 6;
-  repeated OrderProducts Products= 7;
+  string Promocode = 7;
+  repeated OrderProducts Products = 8;
 }
 
 message OrderCost {

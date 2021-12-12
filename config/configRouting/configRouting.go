@@ -8,13 +8,13 @@ import (
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	reviewHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
 	searchHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
-	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
+	userHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type ServerConfigRouting struct {
-	UserHandler     *http2.UserHandler
+	UserHandler     *userHttp.UserHandler
 	ProductHandler  *handler2.ProductHandler
 	OrderHandler    *orderHttp.OrderHandler
 	BasketHandler   *basketHttp.BasketHandler
