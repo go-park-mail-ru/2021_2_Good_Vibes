@@ -41,3 +41,14 @@ func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
 	}
 	return ordersModel, nil
 }
+
+func (uc *UseCase) GetOrderPriceWithPromo(order models.Order) (*models.Order, error){
+	orderGrpc, err := uc.orderServiceClient.GetProductsPriceWithPromo(context.Background(),
+		models.ModelOrderToGrpc(order))
+
+	if err != nil {
+		return nil, err
+	}
+	result := models.GrpcOrderToModel(orderGrpc)
+	return &result, nil
+}

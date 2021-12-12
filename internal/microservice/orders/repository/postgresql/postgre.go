@@ -209,23 +209,24 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, error){
 	var promoReturn models.PromoCode
 
-	err := tx(so.db, func(tx *sql.Tx) error {
-		rows, err := so.db.Query("select type, code, value, category_id, product_id, uses_left"+
-			" from promocode where code = $1", promoCode)
-		if err != nil {
-			return err
-		}
+	row := so.db.QueryRow("select type, code, value, category_id, product_id, uses_left"+
+		" from promocode where code = $1", promoCode)
+	var categoryId, productId sql.NullInt32
+	err := row.Scan(&promoReturn.Type, &promoReturn.Code, &promoReturn.Value,
+		&categoryId, &productId, &promoReturn.UsesLeft)
 
-		defer rows.Close()
+	promoReturn.ProductId = -1
+	promoReturn.CategoryId = -1
+	if productId.Valid {
+		promoReturn.ProductId = int(productId.Int32)
+	}
+	if categoryId.Valid {
+		promoReturn.CategoryId = int(categoryId.Int32)
+	}
 
-		err = rows.Scan(&promoReturn.Type, &promoReturn.Code, &promoReturn.Value,
-			&promoReturn.CategoryId, &promoReturn.ProductId, &promoReturn.UsesLeft)
-		if err != nil {
-			return err
-		}
-		return err
-	})
-
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -275,6 +276,14 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 	str := query.String()
 
 	return str[:len(str)-1], values
+}
+
+func (so *OrderRepository) GetProductCategory(productId int) (int, error) {
+	row := so.db.QueryRow("select category_id "+
+		" from products where id = $1", productId)
+	var categoryId int
+	err := row.Scan(&categoryId)
+	return categoryId, err
 }
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {

@@ -7,8 +7,12 @@ message OrderProducts {
   int64 ProductId = 2;
   int64 Number = 3;
   float Price = 4;
+  float PriceWithPromo = 5;
 }
 
+message ArrayOrderProducts {
+  repeated OrderProducts Products = 1;
+}
 message Address {
   string Country = 1;
   string Region = 2;
@@ -46,4 +50,5 @@ message UserIdOrder {
 service OrderService {
     rpc PutOrder(Order) returns (OrderCost) {}
     rpc GetAllOrders(UserIdOrder) returns (ArrayOrders) {}
+    rpc GetProductsPriceWithPromo (Order) returns (Order) {}
 }

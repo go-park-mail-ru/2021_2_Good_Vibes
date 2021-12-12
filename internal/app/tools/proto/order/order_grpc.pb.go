@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type OrderServiceClient interface {
 	PutOrder(ctx context.Context, in *Order, opts ...grpc.CallOption) (*OrderCost, error)
 	GetAllOrders(ctx context.Context, in *UserIdOrder, opts ...grpc.CallOption) (*ArrayOrders, error)
+	GetProductsPriceWithPromo(ctx context.Context, in *Order, opts ...grpc.CallOption) (*Order, error)
 }
 
 type orderServiceClient struct {
@@ -48,12 +49,22 @@ func (c *orderServiceClient) GetAllOrders(ctx context.Context, in *UserIdOrder, 
 	return out, nil
 }
 
+func (c *orderServiceClient) GetProductsPriceWithPromo(ctx context.Context, in *Order, opts ...grpc.CallOption) (*Order, error) {
+	out := new(Order)
+	err := c.cc.Invoke(ctx, "/OrderService/GetProductsPriceWithPromo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
 	PutOrder(context.Context, *Order) (*OrderCost, error)
 	GetAllOrders(context.Context, *UserIdOrder) (*ArrayOrders, error)
+	GetProductsPriceWithPromo(context.Context, *Order) (*Order, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedOrderServiceServer) PutOrder(context.Context, *Order) (*Order
 }
 func (UnimplementedOrderServiceServer) GetAllOrders(context.Context, *UserIdOrder) (*ArrayOrders, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllOrders not implemented")
+}
+func (UnimplementedOrderServiceServer) GetProductsPriceWithPromo(context.Context, *Order) (*Order, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductsPriceWithPromo not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 
@@ -116,6 +130,24 @@ func _OrderService_GetAllOrders_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetProductsPriceWithPromo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Order)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetProductsPriceWithPromo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/OrderService/GetProductsPriceWithPromo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetProductsPriceWithPromo(ctx, req.(*Order))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +162,10 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllOrders",
 			Handler:    _OrderService_GetAllOrders_Handler,
+		},
+		{
+			MethodName: "GetProductsPriceWithPromo",
+			Handler:    _OrderService_GetProductsPriceWithPromo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

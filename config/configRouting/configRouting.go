@@ -44,6 +44,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("/cart/drop", cr.BasketHandler.DropBasket, middlewareAut.IsLogin)
 	router.POST("/cart/delete", cr.BasketHandler.DeleteProduct, middlewareAut.IsLogin)
 	router.POST("/cart/confirm", cr.OrderHandler.PutOrder, middlewareAut.IsLogin)
+	router.POST("/cart/check", cr.OrderHandler.PutOrder, middlewareAut.IsLogin)
 	router.POST("/category/create", cr.CategoryHandler.CreateCategory)
 	router.GET("/category", cr.CategoryHandler.GetCategories)
 	router.GET("/category/:name", cr.CategoryHandler.GetCategoryProducts)
