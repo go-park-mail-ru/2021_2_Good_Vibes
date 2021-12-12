@@ -26,6 +26,7 @@ message Order {
   float Cost = 5;
   string status = 6;
   repeated OrderProducts Products= 7;
+  string Email = 8;
 }
 
 message OrderCost {

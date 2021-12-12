@@ -34,11 +34,12 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 
 	err := tx(so.db, func(tx *sql.Tx) error {
 		err := tx.QueryRow(
-			`insert into orders (user_id, date, cost, status) values ($1, $2, $3, $4) returning id`,
+			`insert into orders (user_id, date, cost, status, email) values ($1, $2, $3, $4, $5) returning id`,
 			order.UserId,
 			order.Date,
 			order.Cost,
 			order.Status,
+			order.Email,
 		).Scan(&order.OrderId)
 
 		if err != nil {
@@ -125,7 +126,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	var orders []models.Order
 
 	err := tx(so.db, func(tx *sql.Tx) error {
-		rows, err := so.db.Query("select id, user_id, date, cost, status from orders where user_id = $1", user)
+		rows, err := so.db.Query("select id, user_id, date, cost, status, email from orders where user_id = $1", user)
 		if err != nil {
 			return err
 		}
@@ -135,7 +136,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 		for rows.Next() {
 			order := models.Order{}
 
-			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status)
+			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Email)
 			if err != nil {
 				return err
 			}

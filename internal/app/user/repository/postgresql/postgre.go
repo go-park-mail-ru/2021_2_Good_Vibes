@@ -83,3 +83,13 @@ func (su *StorageUserDB) UpdatePassword(newData models.UserDataPassword) error {
 	}
 	return nil
 }
+
+func (su *StorageUserDB) InsertUserToken(email string, token string) error {
+	_, err := su.db.Exec(`INSERT INTO email_confirm (email, status, token) VALUES ($1, 0, $2)`, email, token)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

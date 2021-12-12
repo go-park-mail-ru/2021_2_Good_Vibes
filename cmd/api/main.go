@@ -14,6 +14,9 @@ import (
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/metrics"
+	notification "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications"
+	notificationRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications/repository/postgres"
+	notificationUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications/usecase"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
@@ -49,7 +52,7 @@ var (
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig("/home/ubuntu/Ozon/2021_2_Good_Vibes")
+	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
@@ -67,7 +70,9 @@ func main() {
 		configApp.ConfigApp.DataBase.DBName))
 
 	//------------------user--------------------
-	storage, err = postgresql.NewStorageUserDB(postgre.GetPostgres())
+	dbConn, dbErr := postgre.GetPostgres()
+
+	storage, err = postgresql.NewStorageUserDB(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -83,7 +88,7 @@ func main() {
 		sessionManager)
 
 	//------------------product--------------------
-	storageProd, err := productRepoPostgres.NewStorageProductsDB(postgre.GetPostgres())
+	storageProd, err := productRepoPostgres.NewStorageProductsDB(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -113,14 +118,14 @@ func main() {
 		sessionManager)
 
 	//------------------search--------------------
-	storageSearch, err := searchRepoPostgres.NewSearchRepository(postgre.GetPostgres())
+	storageSearch, err := searchRepoPostgres.NewSearchRepository(dbConn, dbErr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	searchHandler := searchHandlerHttp.NewSearchHandler(searchUseCase.NewSearchUseCase(storageSearch))
 
 	//------------------category--------------------
-	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(postgre.GetPostgres())
+	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(dbConn, dbErr)
 	if err != nil {
 		panic(err)
 	}
@@ -128,12 +133,24 @@ func main() {
 		storageProd))
 
 	//------------------reviews--------------------
-	storageReview, err := reviewRepoPostgres.NewReviewRepository(postgre.GetPostgres())
+	storageReview, err := reviewRepoPostgres.NewReviewRepository(dbConn, dbErr)
 	if err != nil {
 		panic(err)
 	}
 	reviewHandler := reviewHandlerHttp.NewReviewHandler(reviewUseCase.NewReviewUseCase(storageReview),
 		sessionManager)
+
+	notifyRepository, err := notificationRepoPostgres.NewStorageNotifyDB(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+	notifyUseCase := notificationUseCase.NewNotifyUseCase(notifyRepository, storage)
+	notifyD := notification.NewNotifier(notifyUseCase)
+
+	err = notifyD.Run()
+	if err != nil {
+		panic(err)
+	}
 
 	m, err := metrics.CreateNewMetric("main")
 	if err != nil {

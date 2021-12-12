@@ -11,4 +11,5 @@ type Repository interface {
 	SaveAvatarName(userId int, fileName string) error
 	UpdateUser(newData models.UserDataProfile) error
 	UpdatePassword(newData models.UserDataPassword) error
+	InsertUserToken(email string, token string) error
 }

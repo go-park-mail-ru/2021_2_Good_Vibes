@@ -22,7 +22,7 @@ import (
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig("../..")
+	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
