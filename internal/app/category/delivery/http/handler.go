@@ -61,12 +61,12 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
-	for i, _ := range products {
-		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	for i, _ := range products.Products {
+		products.Products[i] = sanitizer.SanitizeData(&products.Products[i]).(models.Product)
 	}
 
-	if products == nil {
-		products = make([]models.Product, 0)
+	if products.Products == nil {
+		products.Products = make([]models.Product, 0)
 	}
 
 	logger.Debug(products)

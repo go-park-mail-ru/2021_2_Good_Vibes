@@ -74,7 +74,8 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 		"nc1.rgt <= nc2.rgt "+
 		"where nc2.name = $1 and p.price >= $2 and p.price <= $3 "+
 		"and p.rating >= $4 and p.rating <= $5 "+
-		"order by $6 $7", filter.NameCategory, filter.MinPrice, filter.MaxPrice, filter.MinRating, filter.MaxRating, filter.OrderBy, filter.TypeOrder)
+		"order by "+filter.OrderBy+" "+filter.TypeOrder, filter.NameCategory, filter.MinPrice,
+		filter.MaxPrice, filter.MinRating, filter.MaxRating)
 	if err != nil {
 		return nil, err
 	}

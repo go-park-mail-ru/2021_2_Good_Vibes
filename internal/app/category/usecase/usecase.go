@@ -20,12 +20,23 @@ func NewCategoryUseCase(repositoryCategory category.Repository, repositoryModel 
 	}
 }
 
-func (uc *UseCase) GetProductsByCategory(filter postgre.Filter) ([]models.Product, error) {
+func (uc *UseCase) GetProductsByCategory(filter postgre.Filter) (*models.ProductsCategory, error) {
+	var result models.ProductsCategory
+
 	products, err := uc.repositoryProduct.GetByCategory(filter)
 	if err != nil {
 		return nil, err
 	}
-	return products, nil
+	result.Products = products
+
+	minPrice, maxPrice, err := uc.repositoryCategory.GetMinMaxPriceCategory(filter.NameCategory)
+	if err != nil {
+		return nil, err
+	}
+	result.MinPrice = minPrice
+	result.MaxPrice = maxPrice
+
+	return &result, nil
 }
 
 func (uc *UseCase) GetAllCategories() (models.CategoryNode, error) {

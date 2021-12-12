@@ -112,6 +112,14 @@ func (sc *StorageCategoryPostgres) SelectAllCategories() ([]models.NestingCatego
 	return nestingCategory, nil
 }
 
+func (sc *StorageCategoryPostgres) GetMinMaxPriceCategory(category string) (float64,float64,error) {
+	row := sc.db.QueryRow("SELECT min(price), max(price) FROM products join "+
+		" categories c on c.id = products.category_id  WHERE c.name = $1", category)
+	var priceMin, priceMax float64
+	err := row.Scan(&priceMin, &priceMax)
+	return priceMin, priceMax, err
+}
+
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()
 	err := fb(trx)
