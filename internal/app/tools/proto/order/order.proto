@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option go_package = "./;orders";
+option go_package = "./;order";
 
 message OrderProducts {
   int64 OrderId = 1;
   int64 ProductId = 2;
   int64 Number = 3;
+  float Price = 4;
+  float PriceWithPromo = 5;
 }
 
+message ArrayOrderProducts {
+  repeated OrderProducts Products = 1;
+}
 message Address {
   string Country = 1;
   string Region = 2;
@@ -25,7 +30,8 @@ message Order {
   Address Address = 4;
   float Cost = 5;
   string status = 6;
-  repeated OrderProducts Products= 7;
+  string Promocode = 7;
+  repeated OrderProducts Products = 8;
 }
 
 message OrderCost {
@@ -44,4 +50,5 @@ message UserIdOrder {
 service OrderService {
     rpc PutOrder(Order) returns (OrderCost) {}
     rpc GetAllOrders(UserIdOrder) returns (ArrayOrders) {}
+    rpc GetProductsPriceWithPromo (Order) returns (Order) {}
 }
