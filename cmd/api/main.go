@@ -67,7 +67,9 @@ func main() {
 		configApp.ConfigApp.DataBase.DBName))
 
 	//------------------user--------------------
-	storage, err = postgresql.NewStorageUserDB(postgre.GetPostgres())
+	dbConn, dbErr := postgre.GetPostgres()
+
+	storage, err = postgresql.NewStorageUserDB(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -83,7 +85,8 @@ func main() {
 		sessionManager)
 
 	//------------------product--------------------
-	storageProd, err := productRepoPostgres.NewStorageProductsDB(postgre.GetPostgres())
+
+	storageProd, err := productRepoPostgres.NewStorageProductsDB(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
@@ -113,14 +116,14 @@ func main() {
 		sessionManager)
 
 	//------------------search--------------------
-	storageSearch, err := searchRepoPostgres.NewSearchRepository(postgre.GetPostgres())
+	storageSearch, err := searchRepoPostgres.NewSearchRepository(dbConn, dbErr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	searchHandler := searchHandlerHttp.NewSearchHandler(searchUseCase.NewSearchUseCase(storageSearch))
 
 	//------------------category--------------------
-	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(postgre.GetPostgres())
+	storageCategory, err := categoryRepoPostgres.NewStorageCategoryDB(dbConn, dbErr)
 	if err != nil {
 		panic(err)
 	}
@@ -128,7 +131,7 @@ func main() {
 		storageProd))
 
 	//------------------reviews--------------------
-	storageReview, err := reviewRepoPostgres.NewReviewRepository(postgre.GetPostgres())
+	storageReview, err := reviewRepoPostgres.NewReviewRepository(dbConn, dbErr)
 	if err != nil {
 		panic(err)
 	}
