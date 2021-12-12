@@ -1,4 +1,5 @@
 package http
+
 import (
 	"bytes"
 	"github.com/aws/aws-sdk-go/aws"

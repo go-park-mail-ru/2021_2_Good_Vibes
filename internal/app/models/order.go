@@ -3,10 +3,10 @@ package models
 import proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/order"
 
 type OrderProducts struct {
-	OrderId   int `json:"order_id,omitempty"`
-	ProductId int `json:"product_id" validate:"required"`
-	Number    int `json:"number" validate:"required"`
-	Price     float64 `json:"price" validate:"required"`
+	OrderId        int     `json:"order_id,omitempty"`
+	ProductId      int     `json:"product_id" validate:"required"`
+	Number         int     `json:"number" validate:"required"`
+	Price          float64 `json:"price" validate:"required"`
 	PriceWithPromo float64 `json:"price_with_promo,omitempty"`
 }
 
@@ -21,14 +21,14 @@ type Address struct {
 }
 
 type Order struct {
-	OrderId  int             `json:"order_id,omitempty"`
-	UserId   int             `json:"user_id,omitempty"`
-	Date     string          `json:"date,omitempty"`
-	Address  Address         `json:"address" validate:"required"`
-	Cost     float64         `json:"cost,omitempty"`
-	Status   string          `json:"status,omitempty"`
-	Products []OrderProducts `json:"products" validate:"required"`
-	Promocode string		 `json:"promocode,omitempty"`
+	OrderId   int             `json:"order_id,omitempty"`
+	UserId    int             `json:"user_id,omitempty"`
+	Date      string          `json:"date,omitempty"`
+	Address   Address         `json:"address" validate:"required"`
+	Cost      float64         `json:"cost,omitempty"`
+	Status    string          `json:"status,omitempty"`
+	Products  []OrderProducts `json:"products" validate:"required"`
+	Promocode string          `json:"promocode,omitempty"`
 }
 
 func GrpcAddressToModel(grpcData *proto.Address) Address {
@@ -57,20 +57,20 @@ func ModelAddressToGrpc(model Address) *proto.Address {
 
 func GrpcOrderProductsToModel(grpcData *proto.OrderProducts) OrderProducts {
 	return OrderProducts{
-		OrderId:   int(grpcData.GetOrderId()),
-		ProductId: int(grpcData.GetProductId()),
-		Number:    int(grpcData.GetNumber()),
-		Price:     float64(grpcData.GetPrice()),
+		OrderId:        int(grpcData.GetOrderId()),
+		ProductId:      int(grpcData.GetProductId()),
+		Number:         int(grpcData.GetNumber()),
+		Price:          float64(grpcData.GetPrice()),
 		PriceWithPromo: float64(grpcData.GetPriceWithPromo()),
 	}
 }
 
 func ModelOrderProductsToGrpc(model OrderProducts) *proto.OrderProducts {
 	return &proto.OrderProducts{
-		OrderId:   int64(model.OrderId),
-		ProductId: int64(model.ProductId),
-		Number:    int64(model.Number),
-		Price:     float32(model.Price),
+		OrderId:        int64(model.OrderId),
+		ProductId:      int64(model.ProductId),
+		Number:         int64(model.Number),
+		Price:          float32(model.Price),
 		PriceWithPromo: float32(model.PriceWithPromo),
 	}
 }
@@ -82,12 +82,12 @@ func GrpcOrderToModel(grpcData *proto.Order) Order {
 	}
 
 	return Order{
-		OrderId:  int(grpcData.GetOrderId()),
-		UserId:   int(grpcData.GetUserId()),
-		Date:     grpcData.GetDate(),
-		Address:  GrpcAddressToModel(grpcData.GetAddress()),
-		Cost:     float64(grpcData.GetCost()),
-		Products: productsModel,
+		OrderId:   int(grpcData.GetOrderId()),
+		UserId:    int(grpcData.GetUserId()),
+		Date:      grpcData.GetDate(),
+		Address:   GrpcAddressToModel(grpcData.GetAddress()),
+		Cost:      float64(grpcData.GetCost()),
+		Products:  productsModel,
 		Promocode: grpcData.GetPromocode(),
 	}
 }
@@ -99,12 +99,12 @@ func ModelOrderToGrpc(model Order) *proto.Order {
 	}
 
 	return &proto.Order{
-		OrderId:  int64(model.OrderId),
-		UserId:   int64(model.UserId),
-		Date:     model.Date,
-		Address:  ModelAddressToGrpc(model.Address),
-		Cost:     float32(model.Cost),
-		Products: productsProto,
+		OrderId:   int64(model.OrderId),
+		UserId:    int64(model.UserId),
+		Date:      model.Date,
+		Address:   ModelAddressToGrpc(model.Address),
+		Cost:      float32(model.Cost),
+		Products:  productsProto,
 		Promocode: model.Promocode,
 	}
 }

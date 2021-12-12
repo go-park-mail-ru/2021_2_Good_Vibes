@@ -103,11 +103,11 @@ func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
 	return uc.repositoryOrder.GetAllOrders(user)
 }
 
-func (uc *UseCase) ParsePromoCode (code models.PromoCode, prices map[int]float64) int{
+func (uc *UseCase) ParsePromoCode(code models.PromoCode, prices map[int]float64) int {
 	if code.CategoryId == -1 && code.ProductId == -1 &&
 		code.Type == models.TypePromoInterest {
 		for key, value := range prices {
-			prices[key] = value - value / 100 * float64(code.Value)
+			prices[key] = value - value/100*float64(code.Value)
 		}
 		return 0
 	}
@@ -120,7 +120,7 @@ func (uc *UseCase) ParsePromoCode (code models.PromoCode, prices map[int]float64
 	if code.CategoryId == -1 && code.ProductId != -1 &&
 		code.Type == models.TypePromoInterest {
 		if value, ok := prices[code.ProductId]; ok {
-			prices[code.ProductId] = value - value / 100 * float64(code.Value)
+			prices[code.ProductId] = value - value/100*float64(code.Value)
 		} else {
 			return -1
 		}
@@ -147,7 +147,7 @@ func (uc *UseCase) ParsePromoCode (code models.PromoCode, prices map[int]float64
 			categoryProduct, err := uc.repositoryOrder.GetProductCategory(key)
 			fmt.Println(err)
 			if categoryProduct == code.CategoryId {
-				prices[key] = value - value / 100 * float64(code.Value)
+				prices[key] = value - value/100*float64(code.Value)
 			}
 		}
 		return 0

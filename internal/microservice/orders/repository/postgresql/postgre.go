@@ -206,7 +206,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	return orders, nil
 }
 
-func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, error){
+func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, error) {
 	var promoReturn models.PromoCode
 
 	row := so.db.QueryRow("select type, code, value, category_id, product_id, uses_left"+
