@@ -5,6 +5,7 @@ import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
+	"time"
 )
 
 type UseCase struct {
@@ -18,6 +19,7 @@ func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
 }
 
 func (uc *UseCase) AddReview(review models.Review) error {
+	review.Date = time.Now().Format(time.RFC3339)
 	oldReview, err := uc.repositoryReview.GetReviewByUserAndProduct(review.UserId, review.ProductId)
 	if err != nil {
 		return err

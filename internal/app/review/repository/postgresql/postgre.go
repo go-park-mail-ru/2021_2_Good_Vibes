@@ -47,8 +47,8 @@ func (rb *ReviewRepository) GetAllRatingsOfProduct(productId int) ([]models.Prod
 func (rb *ReviewRepository) AddReview(review models.Review, productRating float64) error {
 	err := tx(rb.db, func(tx *sql.Tx) error {
 		_, err := rb.db.Exec(
-			"insert into reviews(user_id, product_id, rating, text) values ($1, $2, $3, $4)",
-			review.UserId, review.ProductId, review.Rating, review.Text)
+			"insert into reviews(user_id, product_id, rating, text, date) values ($1, $2, $3, $4, $5)",
+			review.UserId, review.ProductId, review.Rating, review.Text, review.Date)
 
 		if err != nil {
 			return err
@@ -122,7 +122,7 @@ func (rb *ReviewRepository) DeleteReview(userId int, productId int, productRatin
 }
 
 func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Review, error) {
-	rows, err := rb.db.Query("select c.name, r.rating, r.text from reviews as r "+
+	rows, err := rb.db.Query("select c.name, r.rating, r.text, r.date from reviews as r "+
 		"join customers c on c.id = r.user_id "+
 		"where r.product_id=$1", productId)
 	if err != nil {
@@ -132,7 +132,7 @@ func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Revie
 	var reviews []models.Review
 	for rows.Next() {
 		review := models.Review{}
-		err = rows.Scan(&review.UserName, &review.Rating, &review.Text)
+		err = rows.Scan(&review.UserName, &review.Rating, &review.Text, &review.Date)
 		if err != nil {
 			return nil, err
 		}
