@@ -1,26 +1,35 @@
 package usecase
 
 import (
-	"bufio"
-	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/flosch/pongo2/v4"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders"
 	gomail "gopkg.in/mail.v2"
-	"os"
 	"time"
 )
+
+var templateMap map[string] string
+
+func init()  {
+	templateMap = make(map[string]string, 3)
+	templateMap["новый"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/new_status.html"
+	templateMap["в обработке"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/processing_status.html"
+	templateMap["передан курьеру"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/courier_status.html"
+}
 
 type UseCase struct {
 	notifyRepository notifications.Repository
 	userRepository user.Repository
+	orderRepository orders.Repository
 }
 
-func NewNotifyUseCase(notifyRepository notifications.Repository, userRepository user.Repository) *UseCase {
-	return &UseCase{notifyRepository: notifyRepository, userRepository: userRepository}
+func NewNotifyUseCase(notifyRepository notifications.Repository, userRepository user.Repository, orderRepository orders.Repository) *UseCase {
+	return &UseCase{notifyRepository: notifyRepository, userRepository: userRepository, orderRepository: orderRepository}
 }
 
 func (uc *UseCase) SearchStatusChanges() error {
@@ -29,22 +38,30 @@ func (uc *UseCase) SearchStatusChanges() error {
 		return err
 	}
 
+	if changes == nil {
+		return nil
+	}
+
 	for _, change := range changes {
-		if change.Status == "новый" {
-			go func() {
-				err := uc.ServeNewStatuses(change)
-				if err != nil {
-					// TODO: -_-
-					panic(err)
-				}
-			}()
-		}
+		change := change
+		go func() {
+			err := uc.ServeStatus(change)
+			if err != nil {
+				// TODO: -_-
+				panic(err)
+			}
+		}()
+	}
+
+	err = uc.notifyRepository.StableStatuses(changes)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (uc *UseCase) ServeNewStatuses(change models.ChangedStatus) error {
+func (uc *UseCase) ServeStatus(change models.ChangedStatus) error {
 	notifyInfo, err := uc.GetNotifyInfo(change)
 	if err != nil {
 		return err
@@ -52,15 +69,13 @@ func (uc *UseCase) ServeNewStatuses(change models.ChangedStatus) error {
 
 	err = uc.SendEmail(notifyInfo)
 	for err != nil {
-		panic(err)
 		time.Sleep(10 * time.Second)
 		err = uc.SendEmail(notifyInfo)
 	}
 	fmt.Println("Письмо отослал")
-	fmt.Println(change.Email)
+
 	return nil
 }
-
 
 func (uc *UseCase) GetNotifyInfo(change models.ChangedStatus) (models.NotifyInfo, error) {
 	var notifyInfo models.NotifyInfo
@@ -73,8 +88,9 @@ func (uc *UseCase) GetNotifyInfo(change models.ChangedStatus) (models.NotifyInfo
 	notifyInfo.UserName = userData.Name
 	notifyInfo.UserEmail = change.Email
 	notifyInfo.OrderStatus = change.Status
+	notifyInfo.OrderId = change.OrderId
 
-	if change.Status == "доставлен" {
+	if change.Status == "передан курьеру" {
 		address, err := uc.notifyRepository.GetAddressInfo(change.OrderId)
 		if err != nil {
 			return models.NotifyInfo{}, err
@@ -83,28 +99,31 @@ func (uc *UseCase) GetNotifyInfo(change models.ChangedStatus) (models.NotifyInfo
 		notifyInfo.Address = notifications.FromModelAddressToString(address)
 	}
 
+	if change.Status == "новый" {
+		order, err := uc.orderRepository.GetOrderById(change.OrderId)
+		if err != nil {
+			return models.NotifyInfo{}, err
+		}
+
+		notifyInfo.OrderData = order
+	}
+
 	return notifyInfo, nil
 }
 
 func (uc *UseCase) SendEmail(notifyInfo models.NotifyInfo) error {
-	file, err := os.Open("/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/new_status.html")
-	if err != nil{
-		panic(err)
-	}
-	defer file.Close()
+	tmp := pongo2.Must(pongo2.FromFile(templateMap[notifyInfo.OrderStatus]))
 
-	wr := bytes.Buffer{}
-	sc := bufio.NewScanner(file)
-	for sc.Scan() {
-		wr.WriteString(sc.Text())
+	out, err := uc.putContext(tmp, notifyInfo)
+	if err != nil {
+		return err
 	}
 
 	message := gomail.NewMessage()
 	message.SetHeader("From", config.ConfigApp.Email.Address)
 	message.SetHeader("To", notifyInfo.UserEmail)
 	message.SetHeader("Subject", "Обновление статуса заказа")
-	// body := fmt.Sprintf(`Здравствуйте %s! Вы сделали заказ в магазине Azot! Информация об обновлении статуса заказа будет приходить вам на почту.`, notifyInfo.UserName)
-	message.SetBody("text/html", wr.String())
+	message.SetBody("text/html", out)
 	dialer := gomail.NewDialer(config.ConfigApp.Email.Server,
 		config.ConfigApp.Email.ServerPort,
 		config.ConfigApp.Email.Address,
@@ -119,4 +138,24 @@ func (uc *UseCase) SendEmail(notifyInfo models.NotifyInfo) error {
 	fmt.Println("Письмо доставлено")
 
 	return nil
+}
+
+func (uc *UseCase) putContext(tmp *pongo2.Template, notifyInfo models.NotifyInfo) (string, error) {
+	var ctx pongo2.Context
+
+	if notifyInfo.OrderStatus == "новый" {
+		ctx = pongo2.Context{"name" : notifyInfo.UserName, "order_id": notifyInfo.OrderId}
+	}
+	if notifyInfo.OrderStatus == "в обработке" {
+		ctx = pongo2.Context{"name" : notifyInfo.UserName, "order_id": notifyInfo.OrderId}
+	}
+	if notifyInfo.OrderStatus == "передан курьеру" {
+		ctx = pongo2.Context{"name" : notifyInfo.UserName, "order_id": notifyInfo.OrderId, "address": notifyInfo.Address}
+	}
+	out, err := tmp.Execute(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return out, nil
 }

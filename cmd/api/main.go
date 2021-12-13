@@ -36,6 +36,7 @@ import (
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
 	userUsecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/usecase"
+	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/repository/postgresql"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -144,7 +145,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	notifyUseCase := notificationUseCase.NewNotifyUseCase(notifyRepository, storage)
+
+	orderRepository, err := orderRepoPostgres.NewOrderRepository(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+	notifyUseCase := notificationUseCase.NewNotifyUseCase(notifyRepository, storage, orderRepository)
 	notifyD := notification.NewNotifier(notifyUseCase)
 
 	err = notifyD.Run()

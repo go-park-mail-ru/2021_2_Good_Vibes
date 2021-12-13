@@ -12,14 +12,15 @@ func NewNotifier(useCase UseCase) *Notifier {
 
 func (n *Notifier) Run() error {
 	go func() {
-		err := n.useCase.SearchStatusChanges()
-		if err != nil {
-			// TODO: -_-
-			panic(err)
+		for {
+			err := n.useCase.SearchStatusChanges()
+			if err != nil {
+				// TODO: -_-
+				panic(err)
+			}
+			time.Sleep(10 * time.Second)
 		}
-		time.Sleep(10 * time.Second)
 	}()
-
 
 	return nil
 }

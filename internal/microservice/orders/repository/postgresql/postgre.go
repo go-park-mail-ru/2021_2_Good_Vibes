@@ -205,6 +205,55 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	return orders, nil
 }
 
+
+func (so *OrderRepository) GetOrderById(orderId int) (models.Order, error) {
+	var order models.Order
+
+	err := tx(so.db, func(tx *sql.Tx) error {
+		err := so.db.QueryRow("select id, user_id, date, cost, status, email from orders where id = $1", orderId).
+			Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Status)
+
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		var products []models.OrderProducts
+		rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orderId)
+		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			product := models.OrderProducts{}
+
+			err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+			if err != nil {
+				return err
+			}
+
+			products = append(products, product)
+		}
+		order.Products = products
+
+		if rows.Err() != nil {
+			return nil
+		}
+
+		return nil
+	})
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	return order, nil
+}
+
 func makeSelectPricesQuery(products []models.OrderProducts) string {
 	query := strings.Builder{}
 	query.WriteString("select id, price from products where id in ")

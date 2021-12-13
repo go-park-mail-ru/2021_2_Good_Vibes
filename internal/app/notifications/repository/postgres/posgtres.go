@@ -3,6 +3,8 @@ package postgres
 import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"strconv"
+	"strings"
 )
 
 type StorageNotifyPostgres struct {
@@ -67,4 +69,31 @@ func (sn *StorageNotifyPostgres) GetAddressInfo(orderId int) (models.Address, er
 		return models.Address{}, err
 	}
 	return address, nil
+}
+
+func (sn *StorageNotifyPostgres) StableStatuses(changes []models.ChangedStatus) error {
+	if changes == nil {
+		return nil
+	}
+
+	orderIds := make([]interface{}, len(changes))
+	args := make([]string, len(changes))
+	for i, _ := range changes {
+		orderIds[i] = changes[i].OrderId
+		args[i] = "$" + strconv.Itoa(i + 1)
+	}
+
+	argsJoin := strings.Join(args, ", ")
+
+	var query strings.Builder
+	query.WriteString("update orders set status_meta='stable' where id in(")
+	query.WriteString(argsJoin)
+	query.WriteString(")")
+
+	_, err := sn.db.Exec(query.String(), orderIds...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

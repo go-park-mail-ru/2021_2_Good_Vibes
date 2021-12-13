@@ -23,6 +23,7 @@ require (
 require (
 	github.com/aws/aws-sdk-go v1.41.9
 	github.com/cockroachdb/apd v1.1.0 // indirect
+	github.com/flosch/pongo2/v4 v4.0.2
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/mock v1.6.0

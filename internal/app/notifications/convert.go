@@ -27,7 +27,7 @@ func FromModelAddressToString(address models.Address) string {
 		addressString.WriteString("квартира: " + address.Flat + ", ")
 	}
 	if address.Index != "" {
-		addressString.WriteString("индекс: " + address.Index + ".")
+		addressString.WriteString("индекс: " + address.Index)
 	}
 
 	return addressString.String()

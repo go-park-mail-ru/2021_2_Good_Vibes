@@ -10,6 +10,8 @@ type ChangedStatus struct {
 type NotifyInfo struct {
 	UserEmail string
 	OrderStatus string
+	OrderId int
 	Address string
 	UserName string
+	OrderData Order
 }
