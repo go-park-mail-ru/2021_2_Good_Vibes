@@ -10,6 +10,8 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders"
 	gomail "gopkg.in/mail.v2"
+	"log"
+	"sync"
 	"time"
 )
 
@@ -42,16 +44,23 @@ func (uc *UseCase) SearchStatusChanges() error {
 		return nil
 	}
 
+	wg := sync.WaitGroup{}
+	wg.Add(len(changes))
+
 	for _, change := range changes {
 		change := change
+
 		go func() {
 			err := uc.ServeStatus(change)
 			if err != nil {
-				// TODO: -_-
-				panic(err)
+				log.Printf("Cannot send email to %s, orderId: %d, userId: %d, error: %s",
+					change.Email, change.OrderId, change.UserId, err.Error())
 			}
+
+			wg.Done()
 		}()
 	}
+	wg.Wait()
 
 	err = uc.notifyRepository.StableStatuses(changes)
 	if err != nil {
@@ -68,11 +77,22 @@ func (uc *UseCase) ServeStatus(change models.ChangedStatus) error {
 	}
 
 	err = uc.SendEmail(notifyInfo)
+
+	tries := 0
 	for err != nil {
+		tries += 1
+
 		time.Sleep(10 * time.Second)
 		err = uc.SendEmail(notifyInfo)
+
+		if tries > 2 {
+			break
+		}
+		fmt.Println(tries)
 	}
-	fmt.Println("Письмо отослал")
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -134,8 +154,6 @@ func (uc *UseCase) SendEmail(notifyInfo models.NotifyInfo) error {
 	if err := dialer.DialAndSend(message); err != nil {
 		return err
 	}
-
-	fmt.Println("Письмо доставлено")
 
 	return nil
 }

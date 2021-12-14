@@ -1,6 +1,8 @@
 package notifications
 
-import "time"
+import (
+	"time"
+)
 
 type Notifier struct {
 	useCase UseCase
