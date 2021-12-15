@@ -122,7 +122,7 @@ func (rb *ReviewRepository) DeleteReview(userId int, productId int, productRatin
 }
 
 func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Review, error) {
-	rows, err := rb.db.Query("select c.name, r.rating, r.text, r.date from reviews as r "+
+	rows, err := rb.db.Query("select c.name, r.user_id, r.rating, r.text, r.date from reviews as r "+
 		"join customers c on c.id = r.user_id "+
 		"where r.product_id=$1", productId)
 	if err != nil {
@@ -132,7 +132,7 @@ func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Revie
 	var reviews []models.Review
 	for rows.Next() {
 		review := models.Review{}
-		err = rows.Scan(&review.UserName, &review.Rating, &review.Text, &review.Date)
+		err = rows.Scan(&review.UserName, &review.UserId, &review.Rating, &review.Text, &review.Date)
 		if err != nil {
 			return nil, err
 		}
@@ -146,7 +146,7 @@ func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Revie
 }
 
 func (rb *ReviewRepository) GetReviewsByUser(userName string) ([]models.Review, error) {
-	rows, err := rb.db.Query("select product_id, rating, text from reviews as r "+
+	rows, err := rb.db.Query("select product_id, rating, text, date from reviews as r "+
 		"join customers c on c.id = r.user_id "+
 		"where c.name=$1", userName)
 	if err != nil {
@@ -156,7 +156,7 @@ func (rb *ReviewRepository) GetReviewsByUser(userName string) ([]models.Review, 
 	var reviews []models.Review
 	for rows.Next() {
 		review := models.Review{}
-		err = rows.Scan(&review.ProductId, &review.Rating, &review.Text)
+		err = rows.Scan(&review.ProductId, &review.Rating, &review.Text, &review.Date)
 		if err != nil {
 			return nil, err
 		}
@@ -186,101 +186,6 @@ func (rb *ReviewRepository) GetReviewByUserAndProduct(userId int, productId int)
 	return review, nil
 }
 
-/*
-func (sb *BasketRepository) GetBasket(userId int) ([]models.BasketProduct, error) {
-	var basketProducts []models.BasketProduct
-	rows, err := sb.db.Query("select product_id, count from basket_products where user_id = $1 order by product_id", userId)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		product := models.BasketProduct{}
-
-		err := rows.Scan(&product.ProductId, &product.Number)
-		if err != nil {
-			return nil, err
-		}
-
-		basketProducts = append(basketProducts, product)
-	}
-
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	return basketProducts, nil
-}
-
-func (sb *BasketRepository) DropBasket(userId int) error {
-	err := tx(sb.db, func(tx *sql.Tx) error {
-		_, err := tx.Exec(`delete from basket where user_id=$1`, userId)
-		if err != nil {
-			return err
-		}
-
-		_, err = tx.Exec(`delete from basket_products where user_id=$1`, userId)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (sb *BasketRepository) DeleteProduct(product models.BasketProduct) error {
-	err := tx(sb.db, func(tx *sql.Tx) error {
-		_, err := tx.Exec(`delete from basket_products where user_id=$1 and product_id=$2`, product.UserId, product.ProductId)
-		if err != nil {
-			return err
-		}
-
-		rows, err := tx.Query(`select from basket_products where user_id=$1`, product.UserId)
-		if err != nil {
-			return err
-		}
-
-		defer rows.Close()
-		if !rows.Next() {
-			_, err := tx.Exec(`delete from basket where user_id=$1`, product.UserId)
-			if err != nil {
-				return err
-			}
-		}
-
-		if rows.Err() != nil {
-			return rows.Err()
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
-	trx, _ := db.Begin()
-	err := fb(trx)
-	if err != nil {
-		trx.Rollback()
-		return err
-	}
-	trx.Commit()
-	return nil
-}
-*/
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()
 	err := fb(trx)

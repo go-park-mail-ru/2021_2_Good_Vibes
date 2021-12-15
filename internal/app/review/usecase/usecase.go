@@ -5,20 +5,23 @@ import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"time"
 )
 
 type UseCase struct {
 	repositoryReview review.Repository
+	repositoryUser user.Repository
 }
 
-func NewReviewUseCase(repositoryReview review.Repository) *UseCase {
+func NewReviewUseCase(repositoryReview review.Repository, repositoryUser user.Repository) *UseCase {
 	return &UseCase{
 		repositoryReview: repositoryReview,
+		repositoryUser: repositoryUser,
 	}
 }
 
-func (uc *UseCase) AddReview(review models.Review) error {
+func (uc *UseCase) AddReview(review *models.Review) error {
 	review.Date = time.Now().Format(time.RFC3339)
 	oldReview, err := uc.repositoryReview.GetReviewByUserAndProduct(review.UserId, review.ProductId)
 	if err != nil {
@@ -42,11 +45,16 @@ func (uc *UseCase) AddReview(review models.Review) error {
 
 	productRating := float64(totalRating+review.Rating) / float64(ratingsCount+1)
 
-	err = uc.repositoryReview.AddReview(review, productRating)
+	err = uc.repositoryReview.AddReview(*review, productRating)
 	if err != nil {
 		return err
 	}
-
+	userGet, err := uc.repositoryUser.GetUserDataById(uint64(review.UserId))
+	if err != nil {
+		return err
+	}
+	review.Avatar = userGet.Avatar.String
+	review.UserName = userGet.Name
 	return nil
 }
 
@@ -120,6 +128,14 @@ func (uc *UseCase) GetReviewsByProductId(productId int) ([]models.Review, error)
 		return nil, err
 	}
 
+	for index, _ := range reviews {
+		userGet, err := uc.repositoryUser.GetUserDataById(uint64(reviews[index].UserId))
+		if err != nil {
+			return nil, err
+		}
+		reviews[index].Avatar = userGet.Avatar.String
+	}
+
 	return reviews, nil
 }
 
@@ -127,6 +143,13 @@ func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
 	reviews, err := uc.repositoryReview.GetReviewsByUser(userName)
 	if err != nil {
 		return nil, err
+	}
+	for index, _ := range reviews {
+		userGet, err := uc.repositoryUser.GetUserDataById(uint64(reviews[index].UserId))
+		if err != nil {
+			return nil, err
+		}
+		reviews[index].Avatar = userGet.Avatar.String
 	}
 
 	return reviews, nil

@@ -41,3 +41,8 @@ type ProductForSuggest struct {
 	Name  string `json:"name"`
 	Image string `json:"image"`
 }
+
+type ProductIdRecommendCount struct {
+	Id int
+	Counter int
+}

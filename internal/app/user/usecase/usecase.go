@@ -53,6 +53,10 @@ func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataProfile, error) {
 	userProfile.Name = userDataStorage.Name
 	userProfile.Email = userDataStorage.Email
 	userProfile.Avatar = userDataStorage.Avatar.String
+	userProfile.RealName = userDataStorage.RealName.String
+	userProfile.Sex = userDataStorage.Sex.String
+	userProfile.BirthDay = userDataStorage.BirthDay.String
+	userProfile.RealSurname = userDataStorage.RealSurname.String
 	return &userProfile, nil
 }
 

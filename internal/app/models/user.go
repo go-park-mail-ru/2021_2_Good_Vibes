@@ -16,6 +16,10 @@ type UserDataStorage struct {
 	Email    string         `json:"email"    validate:"required,email"`
 	Password string         `json:"password" validate:"required"`
 	Avatar   sql.NullString `json:"avatar"`
+	RealName sql.NullString			`json:"real_name,omitempty"`
+	RealSurname sql.NullString		`json:"real_surname,omitempty"`
+	Sex	 sql.NullString			`json:"sex,omitempty"`
+	BirthDay	sql.NullString	`json:"birth_day,omitempty"`
 }
 
 type UserDataForReg struct {
@@ -33,6 +37,10 @@ type UserDataProfile struct {
 	Name   string `json:"username"`
 	Email  string `json:"email" validate:"email"`
 	Avatar string `json:"avatar,omitempty"`
+	RealName string			`json:"real_name,omitempty"`
+	RealSurname string		`json:"real_surname,omitempty"`
+	Sex	 string			`json:"sex,omitempty"`
+	BirthDay	string	`json:"birthday,omitempty"`
 }
 
 type UserDataPassword struct {

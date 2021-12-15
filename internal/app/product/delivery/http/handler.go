@@ -196,6 +196,11 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
+	idNum, err := ph.SessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err == nil {
+		ph.useCase.ChangeRecommendUser(int(idNum), id, val.Get("search"))
+	}
+
 	answer, err := ph.useCase.GetProductById(id)
 	if err != nil {
 		logger.Error(err)

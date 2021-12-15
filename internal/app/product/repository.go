@@ -15,4 +15,5 @@ type Repository interface {
 	SaveProductImageName(productId int, fileName string) error
 	AddFavouriteProduct(product models.FavouriteProduct) error
 	DeleteFavouriteProduct(product models.FavouriteProduct) error
+	ChangeRecommendUser(userId int, ProductId int, isSearch string) error
 }

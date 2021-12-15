@@ -6,6 +6,7 @@ import (
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
 	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	handler2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
+	recommendation "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/recommendation/delivery/http"
 	reviewHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
 	searchHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/search/delivery/http"
 	userHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
@@ -21,6 +22,7 @@ type ServerConfigRouting struct {
 	CategoryHandler *categoryHttp.CategoryHandler
 	ReviewHandler   *reviewHttp.ReviewHandler
 	SearchHandler   *searchHttp.SearchHandler
+	RecommendHandler *recommendation.RecommendHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -30,10 +32,11 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("/upload/avatar", cr.UserHandler.UploadAvatar, middlewareAut.IsLogin)
 	router.GET("/profile", cr.UserHandler.Profile, middlewareAut.IsLogin)
 	router.POST("/profile", cr.UserHandler.UpdateProfile, middlewareAut.IsLogin)
+	router.GET("/profile/recommend", cr.RecommendHandler.GetRecommendation, middlewareAut.SetTokenIfIsLogin)
 	router.POST("/update/password", cr.UserHandler.UpdatePassword, middlewareAut.IsLogin)
 	router.GET("/logout", cr.UserHandler.Logout, middlewareAut.IsLogin)
 	router.GET("/homepage", cr.ProductHandler.GetAllProducts)
-	router.GET("/product", cr.ProductHandler.GetProductById)
+	router.GET("/product", cr.ProductHandler.GetProductById, middlewareAut.SetTokenIfIsLogin)
 	router.POST("/product/add", cr.ProductHandler.AddProduct, middlewareAut.IsLogin)
 	router.GET("/product/favorite/get", cr.ProductHandler.GetFavouriteProducts, middlewareAut.IsLogin)
 	router.POST("/product/favorite/add", cr.ProductHandler.AddFavouriteProduct, middlewareAut.IsLogin)

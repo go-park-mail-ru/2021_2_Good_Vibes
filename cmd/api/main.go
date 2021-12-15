@@ -19,6 +19,9 @@ import (
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
 	productRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/repository/postgresql"
 	productUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/usecase"
+	http3 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/recommendation/delivery/http"
+	postgresql2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/recommendation/repository/postgresql"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/recommendation/usecase"
 	reviewHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/delivery/http"
 	reviewRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/repository/postgresql"
 	reviewUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review/usecase"
@@ -49,7 +52,7 @@ var (
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig("/home/ubuntu/Ozon/2021_2_Good_Vibes")
+	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
@@ -135,8 +138,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	reviewHandler := reviewHandlerHttp.NewReviewHandler(reviewUseCase.NewReviewUseCase(storageReview),
+	reviewHandler := reviewHandlerHttp.NewReviewHandler(reviewUseCase.NewReviewUseCase(storageReview, storage),
 		sessionManager)
+
+	//------------------recommendation---------------
+	storageReccomend, err := postgresql2.NewRecommendationRepository(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+	recommendationHandler := http3.NewRecommendHandler(usecase.NewRecommendationUseCase(storageReccomend, storageProd), sessionManager)
 
 	m, err := metrics.CreateNewMetric("main")
 	if err != nil {
@@ -153,6 +163,7 @@ func main() {
 		CategoryHandler: categoryHandler,
 		ReviewHandler:   reviewHandler,
 		SearchHandler:   searchHandler,
+		RecommendHandler:recommendationHandler,
 	}
 
 	serverRouting.ConfigRouting(router)

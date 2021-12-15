@@ -16,7 +16,7 @@ const (
 	NamePriceMin  = "price_min"
 	NamePriceMax  = "price_max"
 	NameRatingMin = "rating_min"
-	NameRatingMax = "number"
+	NameRatingMax = "rating_max"
 	NameOrder     = "order"
 	NameOrderType = "order_type"
 	NameCategory  = "category"

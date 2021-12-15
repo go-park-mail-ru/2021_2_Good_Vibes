@@ -52,3 +52,11 @@ func (uc *UseCase) SaveProductImageName(productId int, fileName string) error {
 
 	return nil
 }
+
+func (uc *UseCase) ChangeRecommendUser (userId int, ProductId int, isSearch string) error {
+	err := uc.repository.ChangeRecommendUser(userId, ProductId, isSearch)
+	if err != nil {
+		return err
+	}
+	return nil
+}
