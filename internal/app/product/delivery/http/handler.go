@@ -16,7 +16,7 @@ import (
 	"strconv"
 )
 
-const BucketUrl = ""
+const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
 
 type ProductHandler struct {
 	useCase        product.UseCase
@@ -236,7 +236,7 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 
 	fileName := ph.useCase.GenerateProductImageName()
 
-	bucket := ""
+	bucket := "products-bucket-ozon-good-vibes"
 
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("eu-west-1")})
 	uploader := s3manager.NewUploader(sess)

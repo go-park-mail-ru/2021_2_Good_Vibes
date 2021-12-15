@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const BucketUrl = ""
+const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
 const CustomAvatar = BucketUrl + "29654677-7947-46d9-a2e5-1ca33223e30d"
 const trace = "UserHandler"
 
@@ -177,7 +177,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 
 	fileName := handler.Usecase.GenerateAvatarName()
 
-	bucket := ""
+	bucket := "products-bucket-ozon-good-vibes"
 
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("eu-west-1")})
 	uploader := s3manager.NewUploader(sess)
@@ -331,7 +331,7 @@ func (handler *UserHandler) setCookieValue(ctx echo.Context, value string) {
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 72),
 		SameSite: http.SameSiteNoneMode,
-		//Secure:   true,
+		Secure:   true,
 	}
 
 	ctx.SetCookie(cookie)
