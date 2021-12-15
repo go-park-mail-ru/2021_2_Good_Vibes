@@ -8,13 +8,13 @@ import (
 )
 
 type RecommendationUseCase struct {
-	repository recommendation.Repository
+	repository        recommendation.Repository
 	repositoryProduct product.Repository
 }
 
-func NewRecommendationUseCase (repository recommendation.Repository, repositoryProduct product.Repository) *RecommendationUseCase {
+func NewRecommendationUseCase(repository recommendation.Repository, repositoryProduct product.Repository) *RecommendationUseCase {
 	return &RecommendationUseCase{
-		repository: repository,
+		repository:        repository,
 		repositoryProduct: repositoryProduct,
 	}
 }

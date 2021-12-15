@@ -12,7 +12,7 @@ import (
 const trace = "RecommendationHandler"
 
 type RecommendHandler struct {
-	useCase recommendation.UseCase
+	useCase        recommendation.UseCase
 	SessionManager sessionJwt.TokenManager
 }
 

@@ -15,5 +15,12 @@
     "PASSWORD" : "123",
     "HOST" : "localhost",
     "PORT" : "5432"
+  },
+
+  "EMAIL_CONFIG": {
+    "EMAIL_SERVER" : "smtp.gmail.com",
+    "EMAIL_SERVER_PORT" : 587,
+    "EMAIL_ADDRESS" : "azot.good.vibes@gmail.com",
+    "EMAIL_ADDRESS_PASSWORD" : "qovtodujohangqgx"
   }
 }

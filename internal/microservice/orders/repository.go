@@ -8,4 +8,5 @@ type Repository interface {
 	GetAllOrders(user int) ([]models.Order, error)
 	CheckPromoCode(promoCode string) (*models.PromoCode, error)
 	GetProductCategory(productId int) (int, error)
+	GetOrderById(orderId int) (models.Order, error)
 }

@@ -19,8 +19,8 @@ func NewRecommendationRepository(db *sql.DB, err error) (*RecommendationReposito
 	}, nil
 }
 
-func (rr *RecommendationRepository) GetRecommendProductForUser (userId int) ([]models.ProductIdRecommendCount, error) {
-	rows, err := rr.db.Query("SELECT product_id, counter FROM recommendation " +
+func (rr *RecommendationRepository) GetRecommendProductForUser(userId int) ([]models.ProductIdRecommendCount, error) {
+	rows, err := rr.db.Query("SELECT product_id, counter FROM recommendation "+
 		"where user_id = $1 order by counter DESC LIMIT 10", userId)
 	if err != nil {
 		return nil, err

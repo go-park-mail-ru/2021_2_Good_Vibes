@@ -29,6 +29,7 @@ type Order struct {
 	Status    string          `json:"status,omitempty"`
 	Products  []OrderProducts `json:"products" validate:"required"`
 	Promocode string          `json:"promocode,omitempty"`
+	Email     string          `json:"email" validate:"required"`
 }
 
 func GrpcAddressToModel(grpcData *proto.Address) Address {
@@ -89,6 +90,7 @@ func GrpcOrderToModel(grpcData *proto.Order) Order {
 		Cost:      float64(grpcData.GetCost()),
 		Products:  productsModel,
 		Promocode: grpcData.GetPromocode(),
+		Email:     grpcData.GetEmail(),
 	}
 }
 
@@ -106,5 +108,6 @@ func ModelOrderToGrpc(model Order) *proto.Order {
 		Cost:      float32(model.Cost),
 		Products:  productsProto,
 		Promocode: model.Promocode,
+		Email:     model.Email,
 	}
 }

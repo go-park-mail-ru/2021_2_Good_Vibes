@@ -13,8 +13,8 @@ type Product struct {
 
 type ProductsCategory struct {
 	Products []Product `json:"products" validate:"required"`
-	MinPrice float64 `json:"min_price" validate:"required"`
-	MaxPrice float64 `json:"max_price" validate:"required"`
+	MinPrice float64   `json:"min_price" validate:"required"`
+	MaxPrice float64   `json:"max_price" validate:"required"`
 }
 
 type ProductPrice struct {
@@ -43,6 +43,6 @@ type ProductForSuggest struct {
 }
 
 type ProductIdRecommendCount struct {
-	Id int
+	Id      int
 	Counter int
 }

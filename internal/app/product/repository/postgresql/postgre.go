@@ -190,7 +190,7 @@ func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string
 	return nil
 }
 
-func (ph *StorageProductsDB) ChangeRecommendUser (userId int, ProductId int, isSearch string) error {
+func (ph *StorageProductsDB) ChangeRecommendUser(userId int, ProductId int, isSearch string) error {
 	var id, userIdGet, productId, counter, counterCurrent int
 
 	if isSearch == "true" {
@@ -199,12 +199,12 @@ func (ph *StorageProductsDB) ChangeRecommendUser (userId int, ProductId int, isS
 		counter = 1
 	}
 
-	row := ph.db.QueryRow("SELECT id, user_id, product_id, counter FROM recommendation" +
+	row := ph.db.QueryRow("SELECT id, user_id, product_id, counter FROM recommendation"+
 		" WHERE user_id = $1 and product_id = $2", userId, ProductId)
 	err := row.Scan(&id, &userIdGet, &productId, &counterCurrent)
 
 	if err == sql.ErrNoRows {
-		err = ph.db.QueryRow("INSERT INTO recommendation (user_id, product_id, counter) " +
+		err = ph.db.QueryRow("INSERT INTO recommendation (user_id, product_id, counter) "+
 			"values ($1, $2, $3) returning id", userId, ProductId, counter).Scan(&id)
 		if err != nil {
 			return err

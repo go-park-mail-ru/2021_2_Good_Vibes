@@ -23,6 +23,13 @@ type Config struct {
 		Host     string `mapstructure:"HOST"`
 		Port     string `mapstructure:"PORT"`
 	} `mapstructure:"DATA_BASE_CONFIG"`
+
+	Email struct {
+		Server     string `mapstructure:"EMAIL_SERVER"`
+		ServerPort int    `mapstructure:"EMAIL_SERVER_PORT"`
+		Address    string `mapstructure:"EMAIL_ADDRESS"`
+		Password   string `mapstructure:"EMAIL_ADDRESS_PASSWORD"`
+	} `mapstructure:"EMAIL_CONFIG"`
 }
 
 var ConfigApp Config

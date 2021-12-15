@@ -14,6 +14,9 @@ import (
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/metrics"
+	notification "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications"
+	notificationRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications/repository/postgres"
+	notificationUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/notifications/usecase"
 	orderHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
 	orderUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/usecase"
 	productHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/delivery/http"
@@ -36,6 +39,7 @@ import (
 	http2 "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/delivery/http"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
 	userUsecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/usecase"
+	orderRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/repository/postgresql"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -88,7 +92,6 @@ func main() {
 		sessionManager)
 
 	//------------------product--------------------
-
 	storageProd, err := productRepoPostgres.NewStorageProductsDB(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
@@ -98,7 +101,7 @@ func main() {
 
 	//------------------order--------------------
 	orderGrpcConn, err := grpc.Dial(
-		"localhost:8083",
+		"loca>>>>>>> origin/rk4-notificationslhost:8083",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -148,6 +151,24 @@ func main() {
 	}
 	recommendationHandler := http3.NewRecommendHandler(usecase.NewRecommendationUseCase(storageReccomend, storageProd), sessionManager)
 
+	//------------------notification---------------
+	notifyRepository, err := notificationRepoPostgres.NewStorageNotifyDB(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+
+	orderRepository, err := orderRepoPostgres.NewOrderRepository(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+	notifyUseCase := notificationUseCase.NewNotifyUseCase(notifyRepository, storage, orderRepository)
+	notifyD := notification.NewNotifier(notifyUseCase)
+
+	err = notifyD.Run()
+	if err != nil {
+		panic(err)
+	}
+
 	m, err := metrics.CreateNewMetric("main")
 	if err != nil {
 		panic(err)
@@ -156,14 +177,14 @@ func main() {
 	router.Use(m.CollectMetrics)
 
 	serverRouting := configRouting.ServerConfigRouting{
-		ProductHandler:  productHandler,
-		UserHandler:     userHandler,
-		OrderHandler:    orderHandler,
-		BasketHandler:   basketHandler,
-		CategoryHandler: categoryHandler,
-		ReviewHandler:   reviewHandler,
-		SearchHandler:   searchHandler,
-		RecommendHandler:recommendationHandler,
+		ProductHandler:   productHandler,
+		UserHandler:      userHandler,
+		OrderHandler:     orderHandler,
+		BasketHandler:    basketHandler,
+		CategoryHandler:  categoryHandler,
+		ReviewHandler:    reviewHandler,
+		SearchHandler:    searchHandler,
+		RecommendHandler: recommendationHandler,
 	}
 
 	serverRouting.ConfigRouting(router)

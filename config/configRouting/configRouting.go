@@ -15,13 +15,13 @@ import (
 )
 
 type ServerConfigRouting struct {
-	UserHandler     *userHttp.UserHandler
-	ProductHandler  *handler2.ProductHandler
-	OrderHandler    *orderHttp.OrderHandler
-	BasketHandler   *basketHttp.BasketHandler
-	CategoryHandler *categoryHttp.CategoryHandler
-	ReviewHandler   *reviewHttp.ReviewHandler
-	SearchHandler   *searchHttp.SearchHandler
+	UserHandler      *userHttp.UserHandler
+	ProductHandler   *handler2.ProductHandler
+	OrderHandler     *orderHttp.OrderHandler
+	BasketHandler    *basketHttp.BasketHandler
+	CategoryHandler  *categoryHttp.CategoryHandler
+	ReviewHandler    *reviewHttp.ReviewHandler
+	SearchHandler    *searchHttp.SearchHandler
 	RecommendHandler *recommendation.RecommendHandler
 }
 

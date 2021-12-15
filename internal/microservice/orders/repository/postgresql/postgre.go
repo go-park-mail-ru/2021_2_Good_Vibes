@@ -40,7 +40,7 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 			order.Date,
 			order.Cost,
 			order.Status,
-			"lol@mail.ru",
+			order.Email,
 		).Scan(&order.OrderId)
 
 		if err != nil {
@@ -127,7 +127,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	var orders []models.Order
 
 	err := tx(so.db, func(tx *sql.Tx) error {
-		rows, err := so.db.Query("select id, user_id, date, cost, status from orders where user_id = $1", user)
+		rows, err := so.db.Query("select id, user_id, date, cost, status, email from orders where user_id = $1", user)
 		if err != nil {
 			return err
 		}
@@ -137,7 +137,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 		for rows.Next() {
 			order := models.Order{}
 
-			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status)
+			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Email)
 			if err != nil {
 				return err
 			}
@@ -231,6 +231,54 @@ func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, 
 		return nil, err
 	}
 	return &promoReturn, nil
+}
+
+func (so *OrderRepository) GetOrderById(orderId int) (models.Order, error) {
+	var order models.Order
+
+	err := tx(so.db, func(tx *sql.Tx) error {
+		err := so.db.QueryRow("select id, user_id, date, cost, status, email from orders where id = $1", orderId).
+			Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Status)
+
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		var products []models.OrderProducts
+		rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orderId)
+		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			product := models.OrderProducts{}
+
+			err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+			if err != nil {
+				return err
+			}
+
+			products = append(products, product)
+		}
+		order.Products = products
+
+		if rows.Err() != nil {
+			return nil
+		}
+
+		return nil
+	})
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	return order, nil
 }
 
 func makeSelectPricesQuery(products []models.OrderProducts) string {

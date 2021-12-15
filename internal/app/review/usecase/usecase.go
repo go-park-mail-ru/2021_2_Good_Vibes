@@ -11,13 +11,13 @@ import (
 
 type UseCase struct {
 	repositoryReview review.Repository
-	repositoryUser user.Repository
+	repositoryUser   user.Repository
 }
 
 func NewReviewUseCase(repositoryReview review.Repository, repositoryUser user.Repository) *UseCase {
 	return &UseCase{
 		repositoryReview: repositoryReview,
-		repositoryUser: repositoryUser,
+		repositoryUser:   repositoryUser,
 	}
 }
 
