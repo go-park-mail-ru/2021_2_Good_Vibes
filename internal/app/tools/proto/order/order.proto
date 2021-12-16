@@ -29,7 +29,7 @@ message Order {
   string Date = 3;
   Address Address = 4;
   float Cost = 5;
-  string status = 6;
+  string Status = 6;
   string Promocode = 7;
   repeated OrderProducts Products = 8;
   string Email = 9;

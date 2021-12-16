@@ -56,7 +56,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 
 	newOrder.Status = NewOrder
 
-	if ctx.Request().RequestURI == "/cart/confirm" {
+	if ctx.Request().RequestURI == "/api/cart/confirm" {
 		orderId, orderCost, err := oh.useCase.PutOrder(newOrder)
 		if err != nil {
 			logger.Error(err, newOrder)
@@ -67,7 +67,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 		newOrder.OrderId = orderId
 		newOrder.Cost = orderCost
 	}
-	if ctx.Request().RequestURI == "/cart/check" {
+	if ctx.Request().RequestURI == "/api/cart/check" {
 		getOrder, err := oh.useCase.GetOrderPriceWithPromo(newOrder)
 		if err != nil {
 			logger.Error(err)

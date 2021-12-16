@@ -6,7 +6,7 @@ type OrderProducts struct {
 	OrderId        int     `json:"order_id,omitempty"`
 	ProductId      int     `json:"product_id" validate:"required"`
 	Number         int     `json:"number" validate:"required"`
-	Price          float64 `json:"price" validate:"required"`
+	Price          float64 `json:"price,omitempty"`
 	PriceWithPromo float64 `json:"price_with_promo,omitempty"`
 }
 
@@ -29,7 +29,7 @@ type Order struct {
 	Status    string          `json:"status,omitempty"`
 	Products  []OrderProducts `json:"products" validate:"required"`
 	Promocode string          `json:"promocode,omitempty"`
-	Email     string          `json:"email" validate:"required"`
+	Email     string          `json:"email"`
 }
 
 func GrpcAddressToModel(grpcData *proto.Address) Address {
@@ -91,6 +91,7 @@ func GrpcOrderToModel(grpcData *proto.Order) Order {
 		Products:  productsModel,
 		Promocode: grpcData.GetPromocode(),
 		Email:     grpcData.GetEmail(),
+		Status:    grpcData.GetStatus(),
 	}
 }
 
@@ -108,6 +109,7 @@ func ModelOrderToGrpc(model Order) *proto.Order {
 		Cost:      float32(model.Cost),
 		Products:  productsProto,
 		Promocode: model.Promocode,
+		Status: model.Status,
 		Email:     model.Email,
 	}
 }

@@ -101,7 +101,7 @@ func main() {
 
 	//------------------order--------------------
 	orderGrpcConn, err := grpc.Dial(
-		"loca>>>>>>> origin/rk4-notificationslhost:8083",
+		"localhost:8083",
 		grpc.WithInsecure(),
 	)
 	if err != nil {

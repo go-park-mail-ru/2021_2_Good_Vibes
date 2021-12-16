@@ -3,18 +3,22 @@ package usecase
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders"
 )
 
 type UseCase struct {
 	repositoryOrder orders.Repository
+	repositoryUser  user.Repository
 }
 
-func NewOrderUseCase(repositoryOrder orders.Repository) *UseCase {
+func NewOrderUseCase(repositoryOrder orders.Repository, repositoryUser user.Repository) *UseCase {
 	return &UseCase{
+		repositoryUser: repositoryUser,
 		repositoryOrder: repositoryOrder,
 	}
 }
+
 
 func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 	productPrices, err := uc.repositoryOrder.SelectPrices(order.Products)
@@ -50,8 +54,16 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		cost = 1
 	}
 	order.Cost = cost
-	fmt.Println("cost after promo", cost)
+        if order.Email == "" {
+                 orderUser, err := uc.repositoryUser.GetUserDataById(uint64(order.UserId))
+                if err != nil {
+                return 0, 0, err
+        }
+        order.Email = orderUser.Email
+        }
 
+	fmt.Println("cost after promo", cost)
+	order.Status = "новый"
 	orderId, err := uc.repositoryOrder.PutOrder(order)
 	if err != nil {
 		return 0, 0, err

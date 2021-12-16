@@ -19,9 +19,9 @@ var templateMap map[string]string
 
 func init() {
 	templateMap = make(map[string]string, 3)
-	templateMap["новый"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/new_status.html"
-	templateMap["в обработке"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/processing_status.html"
-	templateMap["передан курьеру"] = "/home/bush/GolangTP/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/courier_status.html"
+	templateMap["новый"] = "/home/ubuntu/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/new_status.html"
+	templateMap["в обработке"] = "/home/ubuntu/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/processing_status.html"
+	templateMap["передан курьеру"] = "/home/ubuntu/Ozon/2021_2_Good_Vibes/internal/app/notifications/templates/courier_status.html"
 }
 
 type UseCase struct {
