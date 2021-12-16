@@ -109,7 +109,7 @@ func ModelOrderToGrpc(model Order) *proto.Order {
 		Cost:      float32(model.Cost),
 		Products:  productsProto,
 		Promocode: model.Promocode,
-		Status: model.Status,
+		Status:    model.Status,
 		Email:     model.Email,
 	}
 }

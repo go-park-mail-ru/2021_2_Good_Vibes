@@ -14,11 +14,10 @@ type UseCase struct {
 
 func NewOrderUseCase(repositoryOrder orders.Repository, repositoryUser user.Repository) *UseCase {
 	return &UseCase{
-		repositoryUser: repositoryUser,
+		repositoryUser:  repositoryUser,
 		repositoryOrder: repositoryOrder,
 	}
 }
-
 
 func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 	productPrices, err := uc.repositoryOrder.SelectPrices(order.Products)
@@ -54,13 +53,13 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		cost = 1
 	}
 	order.Cost = cost
-        if order.Email == "" {
-                 orderUser, err := uc.repositoryUser.GetUserDataById(uint64(order.UserId))
-                if err != nil {
-                return 0, 0, err
-        }
-        order.Email = orderUser.Email
-        }
+	if order.Email == "" {
+		orderUser, err := uc.repositoryUser.GetUserDataById(uint64(order.UserId))
+		if err != nil {
+			return 0, 0, err
+		}
+		order.Email = orderUser.Email
+	}
 
 	fmt.Println("cost after promo", cost)
 	order.Status = "новый"
