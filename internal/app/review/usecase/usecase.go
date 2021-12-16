@@ -5,6 +5,7 @@ import (
 	customErrors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/review"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/parser"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user"
 	"time"
 )
@@ -134,6 +135,7 @@ func (uc *UseCase) GetReviewsByProductId(productId int) ([]models.Review, error)
 			return nil, err
 		}
 		reviews[index].Avatar = userGet.Avatar.String
+		reviews[index].Date = parser.ParseDateFromSql(reviews[index].Date)
 	}
 
 	return reviews, nil

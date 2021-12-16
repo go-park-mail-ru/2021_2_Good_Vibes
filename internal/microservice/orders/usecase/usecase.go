@@ -46,13 +46,13 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		order.Products[index].Price = TotalPriceProduct
 		cost += TotalPriceProduct
 	}
-
+	order.Cost = cost
 	fmt.Println("cost before promo", cost)
 	cost -= float64(changePriceAfterParcing)
 	if cost < 1 {
 		cost = 1
 	}
-	order.Cost = cost
+
 	if order.Email == "" {
 		orderUser, err := uc.repositoryUser.GetUserDataById(uint64(order.UserId))
 		if err != nil {
@@ -61,7 +61,7 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 		order.Email = orderUser.Email
 	}
 
-	fmt.Println("cost after promo", cost)
+	order.CostWithPromo = cost
 	order.Status = "новый"
 	orderId, err := uc.repositoryOrder.PutOrder(order)
 	if err != nil {

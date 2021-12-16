@@ -29,10 +29,11 @@ message Order {
   string Date = 3;
   Address Address = 4;
   float Cost = 5;
-  string Status = 6;
-  string Promocode = 7;
-  repeated OrderProducts Products = 8;
-  string Email = 9;
+  float CostWithPromo = 6;
+  string Status = 7;
+  string Promocode = 8;
+  repeated OrderProducts Products = 9;
+  string Email = 10;
 }
 
 message OrderCost {
