@@ -39,3 +39,26 @@ func (rr *RecommendationRepository) GetRecommendProductForUser(userId int) ([]mo
 
 	return productRecommend, nil
 }
+
+
+func (rr *RecommendationRepository) GetMostPopularProduct()([]models.Product, error) {
+	rows, err := rr.db.Query("select id, image, name, price, rating, category_id, count_in_stock, description from products order by rating desc Limit 20")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.Product
+	for rows.Next() {
+		product := models.Product{}
+		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
+}

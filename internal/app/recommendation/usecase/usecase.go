@@ -46,3 +46,19 @@ func (ru *RecommendationUseCase) GetRecommendForUser(userId int) ([]models.Produ
 	}
 	return recommendProductModels, nil
 }
+
+func (ru *RecommendationUseCase) GetMostPopularProduct() ([]models.Product, error) {
+	var fourMostPopularProduct []models.Product
+	MostPopularProducts, err := ru.repository.GetMostPopularProduct()
+	if err != nil {
+		return nil, err
+	}
+
+	randomArray := rand.Perm(len(MostPopularProducts))[:4]
+
+	for _, value := range randomArray {
+		fourMostPopularProduct = append(fourMostPopularProduct, MostPopularProducts[value])
+	}
+
+	return fourMostPopularProduct, nil
+}
