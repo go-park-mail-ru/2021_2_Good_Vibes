@@ -56,7 +56,7 @@ var (
 
 func main() {
 	logger.InitLogger()
-	err := configApp.LoadConfig("/home/ubuntu/Ozon/2021_2_Good_Vibes")
+	err := configApp.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}

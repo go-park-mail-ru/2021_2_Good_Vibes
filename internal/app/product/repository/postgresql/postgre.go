@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
+	"strings"
 )
 
 type StorageProductsDB struct {
@@ -223,6 +224,32 @@ func (ph *StorageProductsDB) ChangeRecommendUser(userId int, ProductId int, isSe
 	}
 
 	return nil
+}
+
+func (ph *StorageProductsDB)TryGetProductWithSimilarName(productName string) ([]models.Product, error) {
+	var searchStr strings.Builder
+	searchStr.WriteString(productName)
+	searchStr.WriteRune('%')
+	rows, err := ph.db.Query("select id, name from products where name ilike $1 " +
+		"order by rating desc limit 1", searchStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.Product
+	for rows.Next() {
+		product := models.Product{}
+		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
 }
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
