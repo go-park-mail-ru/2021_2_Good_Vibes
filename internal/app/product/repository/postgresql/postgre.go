@@ -22,7 +22,7 @@ func NewStorageProductsDB(db *sql.DB, err error) (*StorageProductsDB, error) {
 }
 
 func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
-	rows, err := ph.db.Query("select id, image, name, price, rating, category_id, count_in_stock, description from products")
+	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products`)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,65 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		product := models.Product{}
-		err = rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+		err = rows.Scan(&product.Id, &product.Image, &product.Name,
+			            &product.Price, &product.Rating, &product.Category,
+			            &product.CountInStock, &product.Description,
+			            &product.Sales, &product.SalesPrice)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
+}
+
+func (ph *StorageProductsDB) GetSalesProducts() ([]models.Product, error) {
+	rows, err := ph.db.Query("select id, image, name, price, rating, category_id, " +
+		                           "count_in_stock, description, sales, sales_price from products " +
+		                           "where sales = true")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.Product
+	for rows.Next() {
+		product := models.Product{}
+		err = rows.Scan(&product.Id, &product.Image, &product.Name,
+			&product.Price, &product.Rating, &product.Category,
+			&product.CountInStock, &product.Description,
+			&product.Sales, &product.SalesPrice)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
+}
+
+func (ph *StorageProductsDB) GetProductsByBrand(brandId int) ([]models.Product, error) {
+	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, p.category_id, " +
+		                           "p.count_in_stock, p.description, p.sales, p.sales_price from brands as b " +
+	                               "join products p on b.id = p.brand_id " +
+		                           "where b.id=$1", brandId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.Product
+	for rows.Next() {
+		product := models.Product{}
+		err = rows.Scan(&product.Id, &product.Image, &product.Name,
+			&product.Price, &product.Rating, &product.Category,
+			&product.CountInStock, &product.Description,
+			&product.Sales, &product.SalesPrice)
 		if err != nil {
 			return nil, err
 		}
@@ -46,9 +104,12 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 func (ph *StorageProductsDB) GetById(id int) (models.Product, error) {
 	product := models.Product{}
 
-	row := ph.db.QueryRow("select id, image, name, price, rating, category_id, count_in_stock, description from products where id=$1", id)
+	row := ph.db.QueryRow("select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where id=$1", id)
 
-	err := row.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+	err := row.Scan(&product.Id, &product.Image, &product.Name,
+		            &product.Price, &product.Rating, &product.Category,
+		            &product.CountInStock, &product.Description,
+	             	&product.Sales, &product.SalesPrice)
 	if err == sql.ErrNoRows {
 		return models.Product{}, nil
 	}
@@ -69,7 +130,7 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	}
 	filter.OrderBy = "p." + filter.OrderBy
 
-	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description from products as p "+
+	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, nc1.name, p.count_in_stock, p.description, p.sales, p.sales_price from products as p "+
 		"join categories as nc1 on p.category_id = nc1.id "+
 		"join categories as nc2 on nc1.lft >= nc2.lft AND "+
 		"nc1.rgt <= nc2.rgt "+
@@ -85,7 +146,10 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	for rows.Next() {
 		product := models.Product{}
 
-		err := rows.Scan(&product.Id, &product.Image, &product.Name, &product.Price, &product.Rating, &product.Category, &product.CountInStock, &product.Description)
+		err := rows.Scan(&product.Id, &product.Image, &product.Name,
+			             &product.Price, &product.Rating, &product.Category,
+			             &product.CountInStock, &product.Description,
+			             &product.Sales, &product.SalesPrice)
 		if err != nil {
 			return nil, err
 		}
@@ -98,6 +162,20 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	}
 
 	return products, nil
+}
+
+func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (bool, error) {
+	var productIDFromDB int
+	err := ph.db.QueryRow(`select product_id from favourite_prod where product_id=$1 and user_id=$2`, productID, userID).
+		Scan(&productIDFromDB)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return true,  nil
 }
 
 func (ph *StorageProductsDB) AddFavouriteProduct(product models.FavouriteProduct) error {
@@ -132,7 +210,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 	var products []models.Product
 
 	rows, err := ph.db.Query("select p.id, p.name, p.price, p.rating, p.category_id, "+
-		"p.count_in_stock, p.description, p.image from products as p "+
+		"p.count_in_stock, p.description, p.image, p.sales, p.sales_price from products as p "+
 		"join favourite_prod fp on p.id = fp.product_id "+
 		"where fp.user_id=$1 "+
 		"order by name", userId)
@@ -146,8 +224,10 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 	for rows.Next() {
 		product := models.Product{}
 
-		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Rating,
-			&product.Category, &product.CountInStock, &product.Description, &product.Image)
+		err := rows.Scan(&product.Id, &product.Name, &product.Price,
+						 &product.Rating, &product.Category, &product.CountInStock,
+						 &product.Description, &product.Image,
+						 &product.Sales, &product.SalesPrice)
 		if err != nil {
 			return nil, err
 		}
@@ -174,6 +254,7 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 		product.Category,
 		product.CountInStock,
 		product.Description,
+		//TODO: добавить новые поля в инзерт продукта
 	).Scan(&lastInsertId)
 
 	if err != nil {
@@ -185,6 +266,15 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 
 func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
 	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ph *StorageProductsDB) PutSalesProduct(sales models.SalesProduct) error {
+	_, err := ph.db.Exec(`update products set sales=true, sales_price=$2 where id = $1`,
+		sales.ProductId, sales.SalesPrice)
 	if err != nil {
 		return err
 	}

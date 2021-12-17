@@ -9,6 +9,9 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/config/configValidator"
 	basketHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
 	basketUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/usecase"
+	brandHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/brands/delivery/http"
+	brandRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/brands/repository/posgresql"
+	brandUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/brands/usecase"
 	categoryHandlerHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
 	categoryRepoPostgres "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/repository/posgresql"
 	categoryUseCase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/usecase"
@@ -136,6 +139,13 @@ func main() {
 	categoryHandler := categoryHandlerHttp.NewCategoryHandler(categoryUseCase.NewCategoryUseCase(storageCategory,
 		storageProd))
 
+	//-----------------brands----------------------
+	storageBrand, err := brandRepoPostgres.NewStorageBrandDB(dbConn, dbErr)
+	if err != nil {
+		panic(err)
+	}
+	brandHandler := brandHandlerHttp.NewBrandHandler(brandUseCase.NewBrandUseCase(storageBrand, storageProd), sessionManager)
+
 	//------------------reviews--------------------
 	storageReview, err := reviewRepoPostgres.NewReviewRepository(dbConn, dbErr)
 	if err != nil {
@@ -185,6 +195,7 @@ func main() {
 		ReviewHandler:    reviewHandler,
 		SearchHandler:    searchHandler,
 		RecommendHandler: recommendationHandler,
+		BrandHandler: brandHandler,
 	}
 
 	serverRouting.ConfigRouting(router)
