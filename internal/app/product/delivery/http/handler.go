@@ -150,6 +150,10 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
 	}
 
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
 	return ctx.JSON(http.StatusOK, products)
 }
 
@@ -166,6 +170,10 @@ func (ph *ProductHandler) GetSalesProducts(ctx echo.Context) error {
 
 	for i, _ := range products {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	if products == nil {
+		products = make([]models.Product, 0)
 	}
 
 	return ctx.JSON(http.StatusOK, products)
@@ -213,6 +221,28 @@ func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
 
 	for i, _ := range products {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	return ctx.JSON(http.StatusOK, products)
+}
+
+func (ph *ProductHandler) GetNewProducts(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + "GetNewProducts")
+
+	products, err := ph.useCase.GetNewProducts()
+	if err != nil {
+		logger.Error(err)
+		err := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	if products == nil {
+		products = make([]models.Product, 0)
 	}
 
 	return ctx.JSON(http.StatusOK, products)

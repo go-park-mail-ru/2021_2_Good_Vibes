@@ -10,6 +10,7 @@ type Repository interface {
 	Insert(prod models.Product) (int, error)
 	PutSalesProduct(sales models.SalesProduct) error
 	GetAll() ([]models.Product, error)
+	GetNewProducts() ([]models.Product, error)
 	GetSalesProducts() ([]models.Product, error)
 	GetProductsByBrand(brandId int) ([]models.Product, error)
 	GetFavouriteProducts(userId int) ([]models.Product, error)
