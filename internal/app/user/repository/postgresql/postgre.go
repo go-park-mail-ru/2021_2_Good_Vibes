@@ -5,7 +5,7 @@ import (
 	models "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
-const customAvatar = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/29654677-7947-46d9-a2e5-1ca33223e30"
+const customAvatar = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/29654677-7947-46d9-a2e5-1ca33223e30d"
 
 type StorageUserDB struct {
 	db *sql.DB
