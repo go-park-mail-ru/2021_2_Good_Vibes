@@ -40,6 +40,7 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/api/homepage", cr.ProductHandler.GetAllProducts)
 	router.GET("/api/product", cr.ProductHandler.GetProductById, middlewareAut.SetTokenIfIsLogin)
 	router.POST("/api/product/add", cr.ProductHandler.AddProduct, middlewareAut.IsLogin)
+	router.GET("/api/product/new/get", cr.ProductHandler.GetNewProducts)
 	router.GET("/api/product/favorite/get", cr.ProductHandler.GetFavouriteProducts, middlewareAut.IsLogin)
 	router.POST("/api/product/favorite/add", cr.ProductHandler.AddFavouriteProduct, middlewareAut.IsLogin)
 	router.POST("/api/product/favorite/delete", cr.ProductHandler.DeleteFavouriteProduct, middlewareAut.IsLogin)

@@ -2,9 +2,11 @@ package postgresql
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	"strings"
+	"time"
 )
 
 type StorageProductsDB struct {
@@ -34,6 +36,35 @@ func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
 			            &product.Price, &product.Rating, &product.Category,
 			            &product.CountInStock, &product.Description,
 			            &product.Sales, &product.SalesPrice)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	return products, nil
+}
+
+
+func (ph *StorageProductsDB) GetNewProducts() ([]models.Product, error) {
+	layoutISO := "2006-01-02"
+	date := time.Now().Format(layoutISO)
+	fmt.Println(date)
+	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where $1::date < '3 day'::interval + date_created`, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.Product
+	for rows.Next() {
+		product := models.Product{}
+		err = rows.Scan(&product.Id, &product.Image, &product.Name,
+			&product.Price, &product.Rating, &product.Category,
+			&product.CountInStock, &product.Description,
+			&product.Sales, &product.SalesPrice)
 		if err != nil {
 			return nil, err
 		}
