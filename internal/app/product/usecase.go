@@ -10,7 +10,7 @@ type UseCase interface {
 	PutSalesForProduct(sales models.SalesProduct) error
 	// GetProductsOnPage(page int) ([]product.Product, error)
 	GetFavouriteProducts(userId int) ([]models.Product, error)
-	GetProductById(id int) (models.Product, error)
+	GetProductById(id int, userID int64) (models.Product, error)
 	GenerateProductImageName() string
 	SaveProductImageName(productId int, fileName string) error
 	AddFavouriteProduct(product models.FavouriteProduct) error

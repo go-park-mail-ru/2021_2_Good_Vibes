@@ -238,11 +238,11 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	}
 
 	idNum, err := ph.SessionManager.ParseTokenFromContext(ctx.Request().Context())
-	if err == nil {
+	if err == nil && idNum != 0 {
 		ph.useCase.ChangeRecommendUser(int(idNum), id, val.Get("search"))
 	}
 
-	answer, err := ph.useCase.GetProductById(id)
+	answer, err := ph.useCase.GetProductById(id, int64(idNum))
 	if err != nil {
 		logger.Error(err)
 		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
@@ -250,6 +250,10 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	}
 
 	answer = sanitizer.SanitizeData(&answer).(models.Product)
+
+	if answer.Id == 0 {
+		return ctx.JSON(http.StatusOK, errors.NewError(errors.NO_PRODUCT_ERROR, errors.NO_PRODUCT_DESCR))
+	}
 
 	return ctx.JSON(http.StatusOK, answer)
 }

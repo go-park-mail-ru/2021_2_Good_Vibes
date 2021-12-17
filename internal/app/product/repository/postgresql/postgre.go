@@ -164,6 +164,20 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	return products, nil
 }
 
+func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (bool, error) {
+	var productIDFromDB int
+	err := ph.db.QueryRow(`select product_id from favourite_prod where product_id=$1 and user_id=$2`, productID, userID).
+		Scan(&productIDFromDB)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return true,  nil
+}
+
 func (ph *StorageProductsDB) AddFavouriteProduct(product models.FavouriteProduct) error {
 	_, err := ph.db.Exec(
 		`insert into favourite_prod (user_id, product_id) values ($1, $2)`,

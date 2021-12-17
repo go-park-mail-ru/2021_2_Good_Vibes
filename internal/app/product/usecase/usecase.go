@@ -44,8 +44,28 @@ func (uc *UseCase) GetFavouriteProducts(userId int) ([]models.Product, error) {
 	return uc.repository.GetFavouriteProducts(userId)
 }
 
-func (uc *UseCase) GetProductById(id int) (models.Product, error) {
-	return uc.repository.GetById(id)
+func (uc *UseCase) GetProductById(id int, userID int64) (models.Product, error) {
+	prod, err := uc.repository.GetById(id)
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	if prod.Id == 0 {
+		return models.Product{}, nil
+	}
+
+	if userID == 0 {
+		return prod, nil
+	}
+
+	isFavourite, err := uc.repository.IsFavourite(id, userID)
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	prod.IsFavourite = isFavourite
+
+	return  prod, nil
 }
 
 func (uc *UseCase) GenerateProductImageName() string {
