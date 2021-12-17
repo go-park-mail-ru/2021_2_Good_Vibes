@@ -2,6 +2,7 @@ package configRouting
 
 import (
 	basketHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/basket/delivery/http"
+	brandsHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/brands/delivery/http"
 	categoryHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/category/delivery/http"
 	middlewareAut "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/authentication"
 	orderHttp "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order/delivery/http"
@@ -23,6 +24,7 @@ type ServerConfigRouting struct {
 	ReviewHandler    *reviewHttp.ReviewHandler
 	SearchHandler    *searchHttp.SearchHandler
 	RecommendHandler *recommendation.RecommendHandler
+	BrandHandler    *brandsHttp.BrandHandler
 }
 
 func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -41,6 +43,10 @@ func (cr *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("/api/product/favorite/get", cr.ProductHandler.GetFavouriteProducts, middlewareAut.IsLogin)
 	router.POST("/api/product/favorite/add", cr.ProductHandler.AddFavouriteProduct, middlewareAut.IsLogin)
 	router.POST("/api/product/favorite/delete", cr.ProductHandler.DeleteFavouriteProduct, middlewareAut.IsLogin)
+	router.POST("/api/sales/put", cr.ProductHandler.PutSalesForProduct, middlewareAut.IsLogin)
+	router.GET("/api/sales", cr.ProductHandler.GetSalesProducts)
+	router.GET("api/brands/get", cr.BrandHandler.GetBrands)
+	router.GET("api/brand/products", cr.BrandHandler.GetProductsByBrand)
 	router.POST("/api/upload/product", cr.ProductHandler.UploadProduct, middlewareAut.IsLogin)
 	router.GET("/api/cart/get", cr.BasketHandler.GetBasket, middlewareAut.IsLogin)
 	router.POST("/api/cart/put", cr.BasketHandler.PutInBasket, middlewareAut.IsLogin)

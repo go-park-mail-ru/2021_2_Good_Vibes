@@ -20,8 +20,16 @@ func (uc *UseCase) AddProduct(product models.Product) (int, error) {
 	return uc.repository.Insert(product)
 }
 
+func (uc *UseCase) PutSalesForProduct(sales models.SalesProduct) error {
+	return uc.repository.PutSalesProduct(sales)
+}
+
 func (uc *UseCase) GetAllProducts() ([]models.Product, error) {
 	return uc.repository.GetAll()
+}
+
+func (uc *UseCase) GetSalesProducts() ([]models.Product, error) {
+	return uc.repository.GetSalesProducts()
 }
 
 func (uc *UseCase) AddFavouriteProduct(product models.FavouriteProduct) error {

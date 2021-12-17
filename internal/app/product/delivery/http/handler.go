@@ -139,18 +139,59 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetAllProducts")
 
-	answer, err := ph.useCase.GetAllProducts()
+	products, err := ph.useCase.GetAllProducts()
 	if err != nil {
 		logger.Error(err)
 		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 
-	for i, _ := range answer {
-		answer[i] = sanitizer.SanitizeData(&answer[i]).(models.Product)
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
 	}
 
-	return ctx.JSON(http.StatusOK, answer)
+	return ctx.JSON(http.StatusOK, products)
+}
+
+func (ph *ProductHandler) GetSalesProducts(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + "GetSalesProducts")
+
+	products, err := ph.useCase.GetSalesProducts()
+	if err != nil {
+		logger.Error(err)
+		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newProductError)
+	}
+
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	return ctx.JSON(http.StatusOK, products)
+}
+
+func (ph *ProductHandler) PutSalesForProduct(ctx echo.Context) error {
+	var newSale models.SalesProduct
+	if err := ctx.Bind(&newSale); err != nil {
+		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&newSale); err != nil {
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	newSale = sanitizer.SanitizeData(&newSale).(models.SalesProduct)
+
+	err := ph.useCase.PutSalesForProduct(newSale)
+	if err != nil {
+		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
+
+	return ctx.JSON(http.StatusOK, newSale)
 }
 
 func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {

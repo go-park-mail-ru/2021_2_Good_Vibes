@@ -9,12 +9,19 @@ type Product struct {
 	Category     string  `json:"category"`
 	CountInStock int     `json:"count_in_stock"`
 	Description  string  `json:"description"`
+	Sales        bool    `json:"sales"`
+	SalesPrice  float64  `json:"sales_price"`
 }
 
 type ProductsCategory struct {
 	Products []Product `json:"products" validate:"required"`
 	MinPrice float64   `json:"min_price" validate:"required"`
 	MaxPrice float64   `json:"max_price" validate:"required"`
+}
+
+type SalesProduct struct {
+	ProductId int `json:"product_id" validate:"required"`
+	SalesPrice float64 `json:"sales_price" validate:"required"`
 }
 
 type ProductPrice struct {
