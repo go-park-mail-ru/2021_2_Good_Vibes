@@ -97,5 +97,9 @@ func (oh *OrderHandler) GetAllOrders(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
+	if orders == nil {
+		orders = make([]models.Order, 0)
+	}
+
 	return ctx.JSON(http.StatusOK, orders)
 }

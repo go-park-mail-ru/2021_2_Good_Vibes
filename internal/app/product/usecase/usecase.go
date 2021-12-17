@@ -28,6 +28,10 @@ func (uc *UseCase) GetAllProducts() ([]models.Product, error) {
 	return uc.repository.GetAll()
 }
 
+func (uc *UseCase) GetNewProducts() ([]models.Product, error) {
+	return uc.repository.GetNewProducts()
+}
+
 func (uc *UseCase) GetSalesProducts() ([]models.Product, error) {
 	return uc.repository.GetSalesProducts()
 }
