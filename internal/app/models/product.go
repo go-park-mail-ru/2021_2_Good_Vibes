@@ -11,7 +11,7 @@ type Product struct {
 	Description  string  `json:"description"`
 	Sales        bool    `json:"sales"`
 	SalesPrice   float64 `json:"sales_price"`
-	IsFavourite  bool    `json:"is_favourite,omitempty"`
+	IsFavourite  *bool    `json:"is_favourite,omitempty"`
 	DateCreated  string  `json:"date_created,omitempty"`
 }
 

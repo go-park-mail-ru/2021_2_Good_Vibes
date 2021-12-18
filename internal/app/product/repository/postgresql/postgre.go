@@ -195,18 +195,22 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	return products, nil
 }
 
-func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (bool, error) {
+func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (*bool, error) {
 	var productIDFromDB int
+	boolPointer := new(bool)
+	*boolPointer = false
 	err := ph.db.QueryRow(`select product_id from favourite_prod where product_id=$1 and user_id=$2`, productID, userID).
 		Scan(&productIDFromDB)
 	if err == sql.ErrNoRows {
-		return false, nil
+		return boolPointer, nil
 	}
 	if err != nil {
-		return false, err
+		return boolPointer, err
 	}
 
-	return true,  nil
+	*boolPointer = true
+
+	return boolPointer,  nil
 }
 
 func (ph *StorageProductsDB) AddFavouriteProduct(product models.FavouriteProduct) error {

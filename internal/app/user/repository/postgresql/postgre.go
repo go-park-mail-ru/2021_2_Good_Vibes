@@ -22,9 +22,9 @@ func NewStorageUserDB(db *sql.DB, err error) (*StorageUserDB, error) {
 
 func (su *StorageUserDB) GetUserDataByName(name string) (*models.UserDataStorage, error) {
 	var tmp models.UserDataStorage
-	row := su.db.QueryRow("SELECT id, name, email, password, birthday, real_name, real_surname, sex FROM customers WHERE name=$1", name)
+	row := su.db.QueryRow("SELECT id, name, email, password, avatar, birthday, real_name, real_surname, sex FROM customers WHERE name=$1", name)
 
-	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password, &tmp.BirthDay, &tmp.RealName, &tmp.RealSurname, &tmp.Sex)
+	err := row.Scan(&tmp.Id, &tmp.Name, &tmp.Email, &tmp.Password, &tmp.Avatar, &tmp.BirthDay, &tmp.RealName, &tmp.RealSurname, &tmp.Sex)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
