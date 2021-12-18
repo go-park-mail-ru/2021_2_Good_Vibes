@@ -146,11 +146,13 @@ func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	userGet, err := uc.repositoryUser.GetUserDataByName(userName)
+	if err != nil {
+		return nil, err
+	}
+
 	for index, _ := range reviews {
-		userGet, err := uc.repositoryUser.GetUserDataById(uint64(reviews[index].UserId))
-		if err != nil {
-			return nil, err
-		}
 		reviews[index].Avatar = userGet.Avatar.String
 	}
 
