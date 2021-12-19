@@ -2,6 +2,7 @@ package posgresql
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 )
 
@@ -35,7 +36,7 @@ func (sc *StorageBrandPostgres) GetBrands() ([]models.Brand, error) {
 		if err != nil {
 			return nil, err
 		}
-
+		fmt.Println(brand.Image)
 		brands = append(brands, brand)
 	}
 

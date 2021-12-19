@@ -33,7 +33,7 @@ func (bh *BrandHandler) GetBrands(ctx echo.Context) error {
 	brands, err := bh.useCase.GetBrands()
 	if err != nil {
 		logger.Error(err)
-		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newBasketError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
@@ -66,7 +66,7 @@ func (bh *BrandHandler) GetProductsByBrand(ctx echo.Context) error {
 	products, err := bh.useCase.GetProductsByBrand(id)
 	if err != nil {
 		logger.Error(err)
-		err := errors.NewError(errors.DB_ERROR, err.Error())
+		err := errors.NewError(errors.DB_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 

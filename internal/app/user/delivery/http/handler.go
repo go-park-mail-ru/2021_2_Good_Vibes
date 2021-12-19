@@ -73,7 +73,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	userProfile, err := handler.Usecase.GetUserDataByID(uint64(id))
 
 	if err != nil {
-		newLoginError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newLoginError := errors.NewError(errors.SERVER_ERROR,errors.SERVER_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, newLoginError)
 	}
@@ -114,7 +114,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
-		newSignupError := errors.NewError(newId, err.Error())
+		newSignupError := errors.NewError(newId, errors.SERVER_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, newSignupError)
 	}

@@ -32,7 +32,7 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
 		logger.Error(err)
-		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
+		newCategoryError := errors.NewError(errors.DB_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newCategoryError)
 	}
 
@@ -57,7 +57,7 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	products, err := ch.useCase.GetProductsByCategory(*filter)
 	if err != nil {
 		logger.Error(err)
-		newCategoryError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 

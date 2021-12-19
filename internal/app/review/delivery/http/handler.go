@@ -59,7 +59,7 @@ func (rh *ReviewHandler) AddReview(ctx echo.Context) error {
 
 	if err != nil {
 		logger.Error(err, newReview)
-		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 
@@ -102,7 +102,7 @@ func (rh *ReviewHandler) UpdateReview(ctx echo.Context) error {
 
 	if err != nil {
 		logger.Error(err, newReview)
-		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 

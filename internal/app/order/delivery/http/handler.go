@@ -60,7 +60,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 		orderId, orderCost, err := oh.useCase.PutOrder(newOrder)
 		if err != nil {
 			logger.Error(err, newOrder)
-			newOrderError := errors.NewError(errors.SERVER_ERROR, err.Error())
+			newOrderError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 			return ctx.JSON(http.StatusInternalServerError, newOrderError)
 		}
 
