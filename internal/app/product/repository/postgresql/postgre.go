@@ -24,7 +24,7 @@ func NewStorageProductsDB(db *sql.DB, err error) (*StorageProductsDB, error) {
 }
 
 func (ph *StorageProductsDB) GetAll() ([]models.Product, error) {
-	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products`)
+	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products order by id`)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (ph *StorageProductsDB) GetNewProducts() ([]models.Product, error) {
 	layoutISO := "2006-01-02"
 	date := time.Now().Format(layoutISO)
 	fmt.Println(date)
-	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where $1::date < '3 day'::interval + date_created`, date)
+	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where $1::date < '3 day'::interval + date_created order by date desc`, date)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (ph *StorageProductsDB) GetNewProducts() ([]models.Product, error) {
 func (ph *StorageProductsDB) GetSalesProducts() ([]models.Product, error) {
 	rows, err := ph.db.Query("select id, image, name, price, rating, category_id, " +
 		                           "count_in_stock, description, sales, sales_price from products " +
-		                           "where sales = true")
+		                           "where sales = true order by id")
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (ph *StorageProductsDB) GetProductsByBrand(brandId int) ([]models.Product, 
 	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, p.category_id, " +
 		                           "p.count_in_stock, p.description, p.sales, p.sales_price from brands as b " +
 	                               "join products p on b.id = p.brand_id " +
-		                           "where b.id=$1", brandId)
+		                           "where b.id=$1 order by p.id", brandId)
 	if err != nil {
 		return nil, err
 	}
