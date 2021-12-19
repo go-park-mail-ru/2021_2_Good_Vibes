@@ -2,7 +2,6 @@ package http
 
 import (
 	"bytes"
-	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -64,15 +63,6 @@ func (ph *ProductHandler) AddProduct(ctx echo.Context) error {
 	}
 
 	newProduct.Id = productId
-
-	contx := context.WithValue(ctx.Request().Context(), "product_id", productId)
-	ctx.Request().WithContext(contx)
-
-	err = ph.UploadProduct(ctx)
-	if err != nil {
-		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
-		return ctx.JSON(http.StatusInternalServerError, newError)
-	}
 
 	return ctx.JSON(http.StatusOK, newProduct)
 }
