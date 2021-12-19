@@ -129,7 +129,7 @@ func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
 	err = ph.useCase.DeleteFavouriteProduct(deleteProduct)
 	if err != nil {
 		logger.Error(err, deleteProduct)
-		newProductError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newProductError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 
@@ -277,7 +277,7 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	answer, err := ph.useCase.GetProductById(id, int64(idNum))
 	if err != nil {
 		logger.Error(err)
-		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
+		newProductError := errors.NewError(errors.DB_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
@@ -338,7 +338,6 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 	}
 
 	productId, err := strconv.Atoi(ctx.FormValue("product_id"))
-
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

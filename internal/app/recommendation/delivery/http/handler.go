@@ -37,6 +37,7 @@ func (rh *RecommendHandler) GetRecommendation(ctx echo.Context) error {
 			return ctx.JSON(http.StatusUnauthorized,
 				errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 		}
+
 		if len(recommendProduct) < 4 {
 			diff := 4 - len(recommendProduct)
 			tempProducts, err := rh.useCase.GetMostPopularProduct()

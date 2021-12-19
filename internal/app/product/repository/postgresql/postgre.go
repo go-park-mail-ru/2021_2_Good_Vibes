@@ -278,8 +278,8 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 }
 
 func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
-	var lastInsertId int64
 	product.SalesPrice = product.Price
+	var lastInsertId int64
 
 	err := ph.db.QueryRow(
 		"with a(id) as (select id from categories where name=$4), "+

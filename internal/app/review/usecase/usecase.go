@@ -57,6 +57,7 @@ func (uc *UseCase) AddReview(review *models.Review) error {
 	review.Avatar = userGet.Avatar.String
 	review.UserName = userGet.Name
 	review.Date = parser.ParseDateFromSql(review.Date)
+
 	return nil
 }
 
@@ -149,6 +150,7 @@ func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
 	}
 
 	userGet, err := uc.repositoryUser.GetUserDataByName(userName)
+
         if err != nil {
 		return nil, err
 	}
