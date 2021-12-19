@@ -127,7 +127,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	var orders []models.Order
 
 	err := tx(so.db, func(tx *sql.Tx) error {
-		rows, err := so.db.Query("select id, user_id, date, cost, status, email from orders where user_id = $1", user)
+		rows, err := so.db.Query("select id, user_id, date, cost, status, email from orders where user_id = $1 order by date desc", user)
 		if err != nil {
 			return err
 		}

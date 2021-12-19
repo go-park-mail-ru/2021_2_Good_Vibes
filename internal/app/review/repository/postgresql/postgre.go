@@ -124,7 +124,7 @@ func (rb *ReviewRepository) DeleteReview(userId int, productId int, productRatin
 func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Review, error) {
 	rows, err := rb.db.Query("select c.name, r.user_id, r.rating, r.text, r.date from reviews as r "+
 		"join customers c on c.id = r.user_id "+
-		"where r.product_id=$1", productId)
+		"where r.product_id=$1 order by r.date desc", productId)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (rb *ReviewRepository) GetReviewsByProductId(productId int) ([]models.Revie
 func (rb *ReviewRepository) GetReviewsByUser(userName string) ([]models.Review, error) {
 	rows, err := rb.db.Query("select product_id, rating, text, date from reviews as r "+
 		"join customers c on c.id = r.user_id "+
-		"where c.name=$1", userName)
+		"where c.name=$1 order by date", userName)
 	if err != nil {
 		return nil, err
 	}

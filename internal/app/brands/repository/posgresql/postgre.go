@@ -22,7 +22,7 @@ func NewStorageBrandDB(db *sql.DB, err error) (*StorageBrandPostgres, error) {
 func (sc *StorageBrandPostgres) GetBrands() ([]models.Brand, error) {
 	var brands []models.Brand
 
-	rows, err := sc.db.Query(`select id, name, image from brands`)
+	rows, err := sc.db.Query(`select id, name, image from brands order by id`)
 
 	if err != nil {
 		return nil, err
