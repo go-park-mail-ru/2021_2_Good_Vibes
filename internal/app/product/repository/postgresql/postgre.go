@@ -195,18 +195,22 @@ func (ph *StorageProductsDB) GetByCategory(filter postgre.Filter) ([]models.Prod
 	return products, nil
 }
 
-func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (bool, error) {
+func (ph *StorageProductsDB) IsFavourite(productID int, userID int64) (*bool, error) {
 	var productIDFromDB int
+	boolPointer := new(bool)
+	*boolPointer = false
 	err := ph.db.QueryRow(`select product_id from favourite_prod where product_id=$1 and user_id=$2`, productID, userID).
 		Scan(&productIDFromDB)
 	if err == sql.ErrNoRows {
-		return false, nil
+		return boolPointer, nil
 	}
 	if err != nil {
-		return false, err
+		return boolPointer, err
 	}
 
-	return true,  nil
+	*boolPointer = true
+
+	return boolPointer,  nil
 }
 
 func (ph *StorageProductsDB) AddFavouriteProduct(product models.FavouriteProduct) error {
@@ -275,16 +279,22 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 
 func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 	var lastInsertId int64
+	product.SalesPrice = product.Price
 
 	err := ph.db.QueryRow(
-		"with a(id) as (select id from categories where name=$4) "+
-			"insert into products (name, price, rating, category_id, count_in_stock, description) values ($1, $2, $3, (select id from a), $5, $6) returning id",
-		product.Name,
-		product.Price,
-		product.Rating,
-		product.Category,
-		product.CountInStock,
-		product.Description,
+		"with a(id) as (select id from categories where name=$4), "+
+			"b(id) as (select id from brands where name=$7) " +
+			"insert into products (name, price, rating, category_id, " +
+			"count_in_stock, description, brand_id, date_created, sales_price) " +
+			"values ($1, $2, $3, (select id from a), $5, $6, (select id from b), now(), $8) returning id",
+		&product.Name,
+		&product.Price,
+		&product.Rating,
+		&product.Category,
+		&product.CountInStock,
+		&product.Description,
+		&product.BrandName,
+		&product.SalesPrice,
 		//TODO: добавить новые поля в инзерт продукта
 	).Scan(&lastInsertId)
 
@@ -296,7 +306,7 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 }
 
 func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
-	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
+	_, err := ph.db.Exec(`UPDATE products SET image = image || ';' || $2 WHERE id = $1`, productId, fileName)
 	if err != nil {
 		return err
 	}

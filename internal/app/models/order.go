@@ -11,20 +11,20 @@ type OrderProducts struct {
 }
 
 type Address struct {
-	Country string `json:"country" validate:"required"`
-	Region  string `json:"region" validate:"required"`
-	City    string `json:"city" validate:"required"`
-	Street  string `json:"street" validate:"required"`
-	House   string `json:"house" validate:"required"`
-	Flat    string `json:"flat" validate:"required"`
-	Index   string `json:"index" validate:"required"`
+	Country string `json:"country,omitempty"`
+	Region  string `json:"region,omitempty"`
+	City    string `json:"city,omitempty"`
+	Street  string `json:"street,omitempty"`
+	House   string `json:"house,omitempty"`
+	Flat    string `json:"flat,omitempty"`
+	Index   string `json:"index,omitempty"`
 }
 
 type Order struct {
 	OrderId   int             `json:"order_id,omitempty"`
 	UserId    int             `json:"user_id,omitempty"`
 	Date      string          `json:"date,omitempty"`
-	Address   Address         `json:"address" validate:"required"`
+	Address   Address         `json:"address,omitempty"`
 	Cost      float64         `json:"cost,omitempty"`
 	CostWithPromo float64	  `json:"cost_with_promo, omitempty"`
 	Status    string          `json:"status,omitempty"`

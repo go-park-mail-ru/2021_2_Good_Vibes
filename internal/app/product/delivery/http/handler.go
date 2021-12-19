@@ -8,12 +8,14 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/convert"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
@@ -285,7 +287,16 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		return ctx.JSON(http.StatusOK, errors.NewError(errors.NO_PRODUCT_ERROR, errors.NO_PRODUCT_DESCR))
 	}
 
-	return ctx.JSON(http.StatusOK, answer)
+	prod := convert.FromProductToOnePageProduct(answer)
+
+	imageSlice := strings.Split(answer.Image, ";")
+	prod.Images = make([]string, len(imageSlice))
+
+	for i, _ := range imageSlice {
+		prod.Images[i] = imageSlice[i]
+	}
+
+	return ctx.JSON(http.StatusOK, prod)
 }
 
 func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {

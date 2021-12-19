@@ -21,5 +21,5 @@ type Repository interface {
 	DeleteFavouriteProduct(product models.FavouriteProduct) error
 	ChangeRecommendUser(userId int, ProductId int, isSearch string) error
 	TryGetProductWithSimilarName(productName string) ([]models.Product, error)
-	IsFavourite(productID int, userID int64) (bool, error)
+	IsFavourite(productID int, userID int64) (*bool, error)
 }

@@ -1,6 +1,7 @@
 package models
 
 type Brand struct {
-	Id int
-	Name string
+	Id int `json:"id,omitempty"`
+	Name string `json:"name"`
+	Image string `json:"image,omitempty"`
 }

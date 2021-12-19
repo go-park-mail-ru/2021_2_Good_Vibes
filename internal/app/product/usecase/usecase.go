@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	guuid "github.com/google/uuid"
+	"strings"
 )
 
 type UseCase struct {
@@ -25,15 +26,45 @@ func (uc *UseCase) PutSalesForProduct(sales models.SalesProduct) error {
 }
 
 func (uc *UseCase) GetAllProducts() ([]models.Product, error) {
-	return uc.repository.GetAll()
+	products, err := uc.repository.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
+	return products, err
 }
 
 func (uc *UseCase) GetNewProducts() ([]models.Product, error) {
-	return uc.repository.GetNewProducts()
+	products, err := uc.repository.GetNewProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
+	return products, err
 }
 
 func (uc *UseCase) GetSalesProducts() ([]models.Product, error) {
-	return uc.repository.GetSalesProducts()
+	products, err := uc.repository.GetSalesProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
+	return products, err
 }
 
 func (uc *UseCase) AddFavouriteProduct(product models.FavouriteProduct) error {
@@ -45,7 +76,17 @@ func (uc *UseCase) DeleteFavouriteProduct(product models.FavouriteProduct) error
 }
 
 func (uc *UseCase) GetFavouriteProducts(userId int) ([]models.Product, error) {
-	return uc.repository.GetFavouriteProducts(userId)
+	products, err := uc.repository.GetFavouriteProducts(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
+	return products, err
 }
 
 func (uc *UseCase) GetProductById(id int, userID int64) (models.Product, error) {

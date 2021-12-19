@@ -11,8 +11,25 @@ type Product struct {
 	Description  string  `json:"description"`
 	Sales        bool    `json:"sales"`
 	SalesPrice   float64 `json:"sales_price"`
-	IsFavourite  bool    `json:"is_favourite,omitempty"`
+	IsFavourite  *bool    `json:"is_favourite,omitempty"`
 	DateCreated  string  `json:"date_created,omitempty"`
+	BrandName    string  `json:"brand_name,omitempty"`
+}
+
+type OnePageProduct struct {
+	Id           int     `json:"id,omitempty"`
+	Images       []string  `json:"image,omitempty"`
+	Name         string  `json:"name" validate:"required"`
+	Price        float64 `json:"price"`
+	Rating       float32 `json:"rating"`
+	Category     string  `json:"category"`
+	CountInStock int     `json:"count_in_stock"`
+	Description  string  `json:"description"`
+	Sales        bool    `json:"sales"`
+	SalesPrice   float64 `json:"sales_price"`
+	IsFavourite  *bool    `json:"is_favourite,omitempty"`
+	DateCreated  string  `json:"date_created,omitempty"`
+	BrandName    string  `json:"brand_name"`
 }
 
 type ProductsCategory struct {

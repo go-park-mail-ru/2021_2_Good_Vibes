@@ -100,11 +100,12 @@ func (uc *UseCase) CheckOrder(order models.Order) (*models.Order, error) {
 	}
 
 	fmt.Println("cost before promo", cost)
+	order.Cost = cost
 	cost -= float64(changePriceAfterParcing)
 	if cost < 1 {
 		cost = 1
 	}
-	order.Cost = cost
+	order.CostWithPromo = cost
 	fmt.Println("cost after promo", cost)
 
 	return &order, nil

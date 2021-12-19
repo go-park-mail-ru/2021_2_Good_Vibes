@@ -37,6 +37,20 @@ func (rh *RecommendHandler) GetRecommendation(ctx echo.Context) error {
 			return ctx.JSON(http.StatusUnauthorized,
 				errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 		}
+		if len(recommendProduct) < 4 {
+			diff := 4 - len(recommendProduct)
+			tempProducts, err := rh.useCase.GetMostPopularProduct()
+			tempProducts = tempProducts[:diff]
+			for i := 0; i < diff; i++ {
+				recommendProduct = append(recommendProduct, tempProducts[i])
+			}
+			if err != nil {
+				logger.Error(err)
+				return ctx.JSON(http.StatusBadRequest,
+					errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
+			}
+
+		}
 	} else {
 		recommendProduct, err = rh.useCase.GetMostPopularProduct()
 		if err != nil {
@@ -44,6 +58,10 @@ func (rh *RecommendHandler) GetRecommendation(ctx echo.Context) error {
 			return ctx.JSON(http.StatusUnauthorized,
 				errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 		}
+	}
+
+	if recommendProduct == nil {
+		recommendProduct = make([]models.Product, 0)
 	}
 
 	return ctx.JSON(http.StatusOK, recommendProduct)
