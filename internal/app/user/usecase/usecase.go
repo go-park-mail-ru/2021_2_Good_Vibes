@@ -83,6 +83,25 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 		return customErrors.USER_EXISTS_ERROR, nil
 	}
 
+	if newData.Name == "" {
+		newData.Name = userFromDb.Name
+	}
+	if newData.BirthDay == "" {
+		newData.BirthDay = userFromDb.BirthDay.String
+	}
+	if newData.RealName == "" {
+		newData.RealName = userFromDb.RealName.String
+	}
+	if newData.RealSurname == "" {
+		newData.RealSurname = userFromDb.RealSurname.String
+	}
+	if newData.Sex == "" {
+		newData.Sex = userFromDb.Sex.String
+	}
+	if newData.Email == "" {
+		newData.Email = userFromDb.Email
+	}
+
 	return 0, us.repository.UpdateUser(newData)
 }
 
