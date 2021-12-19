@@ -278,21 +278,30 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 }
 
 func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
+	product.SalesPrice = product.Price
 	var lastInsertId int64
-
+	fmt.Println("OKOKOKOKd")
+	fmt.Println("%+v\n", product)
+	fmt.Println("OKOKOKOKd")
 	err := ph.db.QueryRow(
-		"with a(id) as (select id from categories where name=$4) "+
-			"insert into products (name, price, rating, category_id, count_in_stock, description) values ($1, $2, $3, (select id from a), $5, $6) returning id",
-		product.Name,
-		product.Price,
-		product.Rating,
-		product.Category,
-		product.CountInStock,
-		product.Description,
+		"with a(id) as (select id from categories where name=$4), "+
+			"b(id) as (select id from brands where name=$7) " +
+			"insert into products (name, price, rating, category_id, " +
+			"count_in_stock, description, brand_id, date_created, sales_price) " +
+			"values ($1, $2, $3, (select id from a), $5, $6, (select id from b), now(), $8) returning id",
+		&product.Name,
+		&product.Price,
+		&product.Rating,
+		&product.Category,
+		&product.CountInStock,
+		&product.Description,
+		&product.BrandName,
+		&product.SalesPrice,
 		//TODO: добавить новые поля в инзерт продукта
 	).Scan(&lastInsertId)
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return 0, err
 	}
 
@@ -300,7 +309,7 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 }
 
 func (ph *StorageProductsDB) SaveProductImageName(productId int, fileName string) error {
-	_, err := ph.db.Exec(`UPDATE products SET image = $2 WHERE id = $1`, productId, fileName)
+	_, err := ph.db.Exec(`UPDATE products SET image = image || ';' || $2 WHERE id = $1`, productId, fileName)
 	if err != nil {
 		return err
 	}

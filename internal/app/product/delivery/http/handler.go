@@ -2,18 +2,21 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/convert"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
@@ -61,6 +64,15 @@ func (ph *ProductHandler) AddProduct(ctx echo.Context) error {
 	}
 
 	newProduct.Id = productId
+
+	contx := context.WithValue(ctx.Request().Context(), "product_id", productId)
+	ctx.Request().WithContext(contx)
+
+	err = ph.UploadProduct(ctx)
+	if err != nil {
+		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
 
 	return ctx.JSON(http.StatusOK, newProduct)
 }
@@ -285,6 +297,15 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		return ctx.JSON(http.StatusOK, errors.NewError(errors.NO_PRODUCT_ERROR, errors.NO_PRODUCT_DESCR))
 	}
 
+	prod := convert.FromProductToOnePageProduct(answer)
+
+	imageSlice := strings.Split(answer.Image, ";")
+	prod.Images = make([]string, len(imageSlice))
+
+	for i, _ := range imageSlice {
+		prod.Images[i] = imageSlice[i]
+	}
+
 	return ctx.JSON(http.StatusOK, answer)
 }
 
@@ -327,7 +348,6 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 	}
 
 	productId, err := strconv.Atoi(ctx.FormValue("product_id"))
-
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
