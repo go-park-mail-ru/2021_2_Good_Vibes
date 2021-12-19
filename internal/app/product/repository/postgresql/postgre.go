@@ -301,7 +301,6 @@ func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 	).Scan(&lastInsertId)
 
 	if err != nil {
-		fmt.Println(err.Error())
 		return 0, err
 	}
 

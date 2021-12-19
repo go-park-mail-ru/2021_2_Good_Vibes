@@ -24,7 +24,7 @@ type Order struct {
 	OrderId   int             `json:"order_id,omitempty"`
 	UserId    int             `json:"user_id,omitempty"`
 	Date      string          `json:"date,omitempty"`
-	Address   Address         `json:"address" validate:"required"`
+	Address   Address         `json:"address,omitempty"`
 	Cost      float64         `json:"cost,omitempty"`
 	CostWithPromo float64	  `json:"cost_with_promo, omitempty"`
 	Status    string          `json:"status,omitempty"`

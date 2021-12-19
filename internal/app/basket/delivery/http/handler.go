@@ -52,7 +52,7 @@ func (bh *BasketHandler) PutInBasket(ctx echo.Context) error {
 	err = bh.useCase.PutInBasket(newProduct)
 	if err != nil {
 		logger.Error(err, newProduct)
-		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newBasketError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
@@ -79,7 +79,7 @@ func (bh *BasketHandler) GetBasket(ctx echo.Context) error {
 	basketProducts, err = bh.useCase.GetBasket(user.UserId)
 	if err != nil {
 		logger.Error(err)
-		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newBasketError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
@@ -120,7 +120,7 @@ func (bh *BasketHandler) DropBasket(ctx echo.Context) error {
 	err = bh.useCase.DropBasket(user.UserId)
 	if err != nil {
 		logger.Error(err, user)
-		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newBasketError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
@@ -157,7 +157,7 @@ func (bh *BasketHandler) DeleteProduct(ctx echo.Context) error {
 	err = bh.useCase.DeleteProduct(product)
 	if err != nil {
 		logger.Error(err, product)
-		newBasketError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newBasketError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newBasketError)
 	}
 
