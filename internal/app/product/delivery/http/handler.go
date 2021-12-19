@@ -296,7 +296,7 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		prod.Images[i] = imageSlice[i]
 	}
 
-	return ctx.JSON(http.StatusOK, answer)
+	return ctx.JSON(http.StatusOK, prod)
 }
 
 func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
