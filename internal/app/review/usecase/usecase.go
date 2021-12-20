@@ -150,7 +150,8 @@ func (uc *UseCase) GetReviewsByUser(userName string) ([]models.Review, error) {
 	}
 
 	userGet, err := uc.repositoryUser.GetUserDataByName(userName)
-	if err != nil {
+
+        if err != nil {
 		return nil, err
 	}
 

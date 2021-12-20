@@ -53,7 +53,7 @@ func (ph *StorageProductsDB) GetNewProducts() ([]models.Product, error) {
 	layoutISO := "2006-01-02"
 	date := time.Now().Format(layoutISO)
 	fmt.Println(date)
-	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where $1::date < '3 day'::interval + date_created order by date desc`, date)
+	rows, err := ph.db.Query(`select id, image, name, price, rating, category_id, count_in_stock, description, sales, sales_price from products where $1::date < '3 day'::interval + date_created order by id desc`, date)
 	if err != nil {
 		return nil, err
 	}
@@ -280,9 +280,7 @@ func (ph *StorageProductsDB) GetFavouriteProducts(userId int) ([]models.Product,
 func (ph *StorageProductsDB) Insert(product models.Product) (int, error) {
 	product.SalesPrice = product.Price
 	var lastInsertId int64
-	fmt.Println("OKOKOKOKd")
-	fmt.Println("%+v\n", product)
-	fmt.Println("OKOKOKOKd")
+
 	err := ph.db.QueryRow(
 		"with a(id) as (select id from categories where name=$4), "+
 			"b(id) as (select id from brands where name=$7) " +

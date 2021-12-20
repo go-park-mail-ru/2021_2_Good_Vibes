@@ -40,7 +40,7 @@ type UserDataProfile struct {
 	RealName    string `json:"real_name,omitempty"`
 	RealSurname string `json:"real_surname,omitempty"`
 	Sex         string `json:"sex,omitempty"`
-	BirthDay    string `json:"birthday,omitempty"`
+	BirthDay    string `json:"birth_day,omitempty"`
 }
 
 type UserDataPassword struct {
