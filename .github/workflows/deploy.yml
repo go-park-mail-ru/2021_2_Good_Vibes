@@ -1,5 +1,4 @@
 name: Deploy
-
 on:
   push:
     branches: [rk4]
@@ -24,7 +23,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: bin
-          path: ./build/api
+          path: ./api
 
   deploy:
     runs-on: ubuntu-latest
@@ -36,17 +35,13 @@ jobs:
           name: bin
 
       - name: Transfer bin file to server
-        uses: alinz/ssh-scp-action@master
+        uses: appleboy/scp-action@v0.0.10
         with:
           host: 37.139.33.76
           usrname: ubuntu
           key: ${{ secrets.PRIVATE_KEY }}
           source: "bin/api"
           targer: "/home/ubuntu/test"
-          ssh_before: |
-            echo $HELLO
-            echo $MESSAGE
-
       - name: chmod
         uses: appleboy/ssh-action@master
         with:
