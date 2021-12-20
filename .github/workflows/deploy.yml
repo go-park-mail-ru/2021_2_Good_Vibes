@@ -35,13 +35,16 @@ jobs:
           name: bin
 
       - name: Transfer bin file to server
-        uses: appleboy/scp-action@v0.0.10
+        uses: alinz/ssh-scp-action@master
         with:
           host: 37.139.33.76
           usrname: ubuntu
           key: ${{ secrets.PRIVATE_KEY }}
           source: "bin/api"
           targer: "/home/ubuntu/test"
+          ssh_before: |
+            echo $HELLO
+            echo $MESSAGE
       - name: chmod
         uses: appleboy/ssh-action@master
         with:
