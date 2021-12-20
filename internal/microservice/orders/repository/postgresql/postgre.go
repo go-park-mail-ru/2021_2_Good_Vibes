@@ -151,7 +151,10 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 
 		for i, _ := range orders {
 			var products []models.OrderProducts
-			rows, err := so.db.Query("select order_id, product_id, count, price from order_products where order_id = $1", orders[i].OrderId)
+			rows, err := so.db.Query("select o.order_id, o.product_id, o.count, o.price, p.image, p.name, " +
+				                           "p.rating, p.description, p.sales from order_products as o " +
+				                           "join products p on o.product_id = p.id where order_id = $1",
+				                          orders[i].OrderId)
 			if err != nil {
 				return err
 			}
@@ -161,7 +164,9 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 			for rows.Next() {
 				product := models.OrderProducts{}
 
-				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number, &product.Price)
+				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number, &product.Price,
+				                 &product.Image, &product.Name, &product.Rating, &product.Description,
+				                 &product.Sales)
 				if err != nil {
 					return err
 				}

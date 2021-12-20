@@ -8,6 +8,11 @@ type OrderProducts struct {
 	Number         int     `json:"number" validate:"required"`
 	Price          float64 `json:"price,omitempty"`
 	PriceWithPromo float64 `json:"price_with_promo,omitempty"`
+	Image          string  `json:"image,omitempty"`
+	Name           string  `json:"name,omitempty"`
+	Rating         float64 `json:"rating,omitempty"`
+	Description    string  `json:"description,omitempty"`
+	Sales          bool    `json:"sales,omitempty"`
 }
 
 type Address struct {
@@ -64,6 +69,11 @@ func GrpcOrderProductsToModel(grpcData *proto.OrderProducts) OrderProducts {
 		Number:         int(grpcData.GetNumber()),
 		Price:          float64(grpcData.GetPrice()),
 		PriceWithPromo: float64(grpcData.GetPriceWithPromo()),
+		Image:          grpcData.GetImage(),
+		Name:           grpcData.GetName(),
+		Rating:         float64(grpcData.GetRating()),
+		Description:    grpcData.GetDescription(),
+		Sales:          grpcData.GetSales(),
 	}
 }
 
@@ -74,6 +84,11 @@ func ModelOrderProductsToGrpc(model OrderProducts) *proto.OrderProducts {
 		Number:         int64(model.Number),
 		Price:          float32(model.Price),
 		PriceWithPromo: float32(model.PriceWithPromo),
+		Image:          model.Image,
+		Name:           model.Image,
+		Rating:         float32(model.Rating),
+		Description:    model.Description,
+		Sales:          model.Sales,
 	}
 }
 
