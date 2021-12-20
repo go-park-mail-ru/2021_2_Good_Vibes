@@ -1,0 +1,51 @@
+name: Deploy
+  on:
+    push:
+      branches: [rk4]
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Install Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: 1.17.x
+
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Build
+          run: make build
+
+        - name: Upload build result
+          uses: actions/upload-artifact@v1
+          with:
+            name: bin
+            path: ./api
+
+    deploy:
+      runs-on: ubuntu-latest
+      needs: build
+      steps:
+        - name: Download bin file
+          uses: actions/download-artifact@v1
+          with:
+            name: bin
+
+        - name: Transfer bin file to server
+          uses: appleboy/scp-action@v0.0.10
+          with:
+            host: 37.139.33.76
+            usrname: ubuntu
+            key: ${{ secrets.PRIVATE_KEY }}
+            source: "bin/api"
+            targer: "/home/ubuntu/test"
+        - name: chmod
+          uses: appleboy/ssh-action@master
+          with:
+            host: 37.139.33.76
+            usrname: ubuntu
+            key: ${{ secrets.PRIVATE_KEY }}
+            script: chmod 755 /home/ubuntu/bin/api
