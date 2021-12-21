@@ -68,6 +68,7 @@ func (oh *OrderHandler) PutOrder(ctx echo.Context) error {
 		newOrder.OrderId = orderId
 		newOrder.Cost = orderCost
 	}
+
 	if ctx.Request().RequestURI == "/api/cart/check" {
 		getOrder, err := oh.useCase.GetOrderPriceWithPromo(newOrder)
 		if err != nil {
