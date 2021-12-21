@@ -114,4 +114,5 @@ jobs:
           host: 37.139.33.76
           username: ubuntu
           password: ${{ secrets.PASSWORD }}
-          script: chmod 755 /home/ubuntu/test
+          script:
+            chmod 755 ~/Ozon/2021_2_Good_Vibes/build
