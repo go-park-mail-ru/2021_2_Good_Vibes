@@ -114,5 +114,9 @@ jobs:
           host: 37.139.33.76
           username: ubuntu
           password: ${{ secrets.PASSWORD }}
-          script:
+          script: |
             chmod -R 755 ~/Ozon/2021_2_Good_Vibes/build
+            sudo service azot_api restart
+            sudo service azot_auth restart
+            sudo service azot_order restart
+            sudo service azot_basket restart
