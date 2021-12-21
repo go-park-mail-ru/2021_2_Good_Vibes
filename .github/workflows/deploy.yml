@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: order
-          path: ./build/order
+          path: ./build/order/main
 
       - name: Upload build result auth
         uses: actions/upload-artifact@v1
@@ -73,7 +73,7 @@ jobs:
           source: "build/auth"
           target: "/home/ubuntu/test"
 
-      - name: Transfer bin auth file to server
+      - name: Transfer bin order file to server
         uses: appleboy/scp-action@master
         with:
           port: 22
@@ -83,7 +83,7 @@ jobs:
           source: "build/order"
           target: "/home/ubuntu/test"
 
-      - name: Transfer bin auth file to server
+      - name: Transfer bin basket file to server
         uses: appleboy/scp-action@master
         with:
           port: 22
