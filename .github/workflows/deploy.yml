@@ -113,5 +113,5 @@ jobs:
         with:
           host: 37.139.33.76
           username: ubuntu
-          key: ${{ secrets.PASSWORD }}
-          script: chmod 755 /home/ubuntu/bin/api
+          password: ${{ secrets.PASSWORD }}
+          script: chmod 755 /home/ubuntu/test
