@@ -235,7 +235,6 @@ func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", promoReturn)
 	return &promoReturn, nil
 }
 

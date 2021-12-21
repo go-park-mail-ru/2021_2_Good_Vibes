@@ -8,6 +8,7 @@ import (
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strings"
 )
 
 const trace = "RecommendationHandler"
@@ -63,6 +64,11 @@ func (rh *RecommendHandler) GetRecommendation(ctx echo.Context) error {
 
 	if recommendProduct == nil {
 		recommendProduct = make([]models.Product, 0)
+	}
+
+	for i, _ := range recommendProduct {
+		imageSlice := strings.Split(recommendProduct[i].Image, ";")
+		recommendProduct[i].Image = imageSlice[0]
 	}
 
 	return ctx.JSON(http.StatusOK, recommendProduct)
