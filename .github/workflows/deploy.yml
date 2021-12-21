@@ -115,4 +115,4 @@ jobs:
           username: ubuntu
           password: ${{ secrets.PASSWORD }}
           script:
-            chmod 755 ~/Ozon/2021_2_Good_Vibes/build
+            chmod -R 755 ~/Ozon/2021_2_Good_Vibes/build
