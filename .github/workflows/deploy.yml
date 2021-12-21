@@ -73,11 +73,7 @@ jobs:
           source: "build/auth"
           target: "/home/ubuntu/test"
 
-<<<<<<< HEAD
-      - name: Transfer bin auth file to server
-=======
       - name: Transfer bin order file to server
->>>>>>> 40fbdbbe2b5c64d4426509b2a6236edda7bdd36e
         uses: appleboy/scp-action@master
         with:
           port: 22
@@ -87,11 +83,7 @@ jobs:
           source: "build/order"
           target: "/home/ubuntu/test"
 
-<<<<<<< HEAD
-      - name: Transfer bin auth file to server
-=======
       - name: Transfer bin basket file to server
->>>>>>> 40fbdbbe2b5c64d4426509b2a6236edda7bdd36e
         uses: appleboy/scp-action@master
         with:
           port: 22
