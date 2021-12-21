@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	SecretKey     string `mapstructure:"SECRET_KEY"`
+	 SecretKey     string `mapstructure:"SECRET_KEY"`
 	ServerAddress string `mapstructure:"ADDRESS_SERVER"`
 	DataBaseURL   string `mapstructure:"DATABASE_URL"`
 	AwsAccessKey  string `mapstructure:"AWS_ACCESS_KEY"`
