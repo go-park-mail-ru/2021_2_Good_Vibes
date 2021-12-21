@@ -40,7 +40,7 @@ jobs:
         with:
           host: 37.139.33.76
           usrname: ubuntu
-          key: ${{ secrets.PRIVATE_KEY }}
+          password: ${{ secrets.PASSWORD }}
           source: "bin/api"
           targer: "/home/ubuntu/test"
       - name: chmod
