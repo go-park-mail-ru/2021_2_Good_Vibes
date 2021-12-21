@@ -20,7 +20,11 @@ func NewBrandUseCase(repositoryBrand brands.Repository, repositoryProduct produc
 }
 
 func (uc *UseCase) GetBrands() ([]models.Brand, error) {
-	products, err := uc.repositoryBrand.GetBrands()
+	return uc.repositoryBrand.GetBrands()
+}
+
+func (uc *UseCase) GetProductsByBrand(id int) ([]models.Product, error) {
+	products, err := uc.repositoryProduct.GetProductsByBrand(id)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +35,4 @@ func (uc *UseCase) GetBrands() ([]models.Brand, error) {
 	}
 
 	return products, err
-}
-
-func (uc *UseCase) GetProductsByBrand(id int) ([]models.Product, error) {
-	return uc.repositoryProduct.GetProductsByBrand(id)
 }
