@@ -23,25 +23,25 @@ jobs:
       - name: Upload build result api
         uses: actions/upload-artifact@v1
         with:
-          name: build/api
+          name: api
           path: ./build/api
 
       - name: Upload build result order
         uses: actions/upload-artifact@v1
         with:
-          name: build/order
+          name: order
           path: ./build/order
 
       - name: Upload build result auth
         uses: actions/upload-artifact@v1
         with:
-          name: build/auth
+          name: auth
           path: ./build/auth
 
       - name: Upload build result basket
         uses: actions/upload-artifact@v1
         with:
-          name: build/basket
+          name: basket
           path: ./build/basket
 
   deploy:
