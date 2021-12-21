@@ -8,6 +8,11 @@ message OrderProducts {
   int64 Number = 3;
   float Price = 4;
   float PriceWithPromo = 5;
+  string Image = 6;
+  string Name = 7;
+  float Rating = 8;
+  string Description = 9;
+  bool  Sales = 10;
 }
 
 message ArrayOrderProducts {

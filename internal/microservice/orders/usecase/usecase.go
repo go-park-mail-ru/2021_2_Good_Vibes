@@ -77,10 +77,18 @@ func (uc *UseCase) CheckOrder(order models.Order) (*models.Order, error) {
 		return nil, err
 	}
 
+
 	productPricesMap := make(map[int]float64, len(productPrices))
 	for index, productPrice := range productPrices {
 		productPricesMap[productPrice.Id] = productPrice.Price
 		order.Products[index].Price = productPrice.Price
+	}
+
+	var costBeforePromocode float64
+	for index, product := range order.Products {
+		TotalPriceProduct := float64(product.Number) * productPricesMap[product.ProductId]
+		order.Products[index].PriceWithPromo = TotalPriceProduct
+		costBeforePromocode += TotalPriceProduct
 	}
 
 	changePriceAfterParcing := 0
@@ -100,12 +108,16 @@ func (uc *UseCase) CheckOrder(order models.Order) (*models.Order, error) {
 	}
 
 	fmt.Println("cost before promo", cost)
-	order.Cost = cost
-	cost -= float64(changePriceAfterParcing)
+	order.Cost = costBeforePromocode
+	if changePriceAfterParcing != -1 {
+		cost -= float64(changePriceAfterParcing)
+	}
+
 	if cost < 1 {
 		cost = 1
 	}
 	order.CostWithPromo = cost
+	fmt.Println(cost)
 	fmt.Println("cost after promo", cost)
 
 	return &order, nil

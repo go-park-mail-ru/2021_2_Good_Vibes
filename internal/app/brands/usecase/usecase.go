@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/brands"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	"strings"
 )
 
 type UseCase struct {
@@ -23,5 +24,15 @@ func (uc *UseCase) GetBrands() ([]models.Brand, error) {
 }
 
 func (uc *UseCase) GetProductsByBrand(id int) ([]models.Product, error) {
-	return uc.repositoryProduct.GetProductsByBrand(id)
+	products, err := uc.repositoryProduct.GetProductsByBrand(id)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
+	return products, err
 }
