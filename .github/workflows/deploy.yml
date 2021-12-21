@@ -75,7 +75,37 @@ jobs:
           host: 37.139.33.76
           username: ubuntu
           password: ${{ secrets.PASSWORD }}
-          source: "build/*"
+          source: "api"
+          target: "/home/ubuntu/test"
+
+      - name: Transfer bin order file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "order"
+          target: "/home/ubuntu/test"
+
+      - name: Transfer bin basket file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "basket"
+          target: "/home/ubuntu/test"
+
+      - name: Transfer bin auth file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "auth"
           target: "/home/ubuntu/test"
 
       - name: chmod
