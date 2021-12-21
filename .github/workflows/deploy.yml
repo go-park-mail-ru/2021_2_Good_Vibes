@@ -40,7 +40,6 @@ jobs:
         with:
           host: 37.139.33.76
           usrname: ubuntu
-          port: 22
           password: ${{ secrets.PASSWORD }}
           source: "bin/api"
           targer: "/home/ubuntu/test"
