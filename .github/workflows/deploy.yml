@@ -23,25 +23,25 @@ jobs:
       - name: Upload build result api
         uses: actions/upload-artifact@v1
         with:
-          name: build
+          name: build/api
           path: ./build/api
 
       - name: Upload build result order
         uses: actions/upload-artifact@v1
         with:
-          name: build
+          name: build/order
           path: ./build/order
 
       - name: Upload build result auth
         uses: actions/upload-artifact@v1
         with:
-          name: build
+          name: build/auth
           path: ./build/auth
 
       - name: Upload build result basket
         uses: actions/upload-artifact@v1
         with:
-          name: build
+          name: build/basket
           path: ./build/basket
 
   deploy:
@@ -62,7 +62,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "build/api"
           target: "/home/ubuntu/test"
-          
+
       - name: Transfer bin auth file to server
         uses: appleboy/scp-action@master
         with:
@@ -72,7 +72,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "build/auth"
           target: "/home/ubuntu/test"
-          
+
       - name: Transfer bin auth file to server
         uses: appleboy/scp-action@master
         with:
@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "build/order"
           target: "/home/ubuntu/test"
-          
+
       - name: Transfer bin auth file to server
         uses: appleboy/scp-action@master
         with:
@@ -92,7 +92,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "build/basket"
           target: "/home/ubuntu/test"
-          
+
       - name: chmod
         uses: appleboy/ssh-action@master
         with:
