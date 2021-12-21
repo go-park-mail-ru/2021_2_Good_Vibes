@@ -1,7 +1,7 @@
 package configMiddleware
 
 import (
-	middlewareCors "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/cors"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/cors"
 	middlewareLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/logger"
 	middlewarePanic "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/panic"
 	middlewareRequestId "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/middleware/requestId"
@@ -25,7 +25,7 @@ func ConfigMiddleware(router *echo.Echo) {
 		middlewarePanic.Recover,
 		middlewareRequestId.RequestId,
 		middlewareLogger.AccessLog,
-		middleware.CORSWithConfig(middlewareCors.GetCORSConfigStruct()),
+		middleware.CORSWithConfig(cors.GetCORSConfigStruct()),
 		middleware.CSRFWithConfig(middleware.CSRFConfig{
 			Skipper: func(context echo.Context) bool {
 				if context.Request().RequestURI == "/login" ||
