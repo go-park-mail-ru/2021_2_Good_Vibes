@@ -40,10 +40,10 @@ jobs:
         with:
           port: 22
           host: 37.139.33.76
-          usrname: ubuntu
+          username: ubuntu
           password: ${{ secrets.PASSWORD }}
           source: "bin/api"
-          targer: "/home/ubuntu/test"
+          target: "/home/ubuntu/test"
       - name: chmod
         uses: appleboy/ssh-action@master
         with:
