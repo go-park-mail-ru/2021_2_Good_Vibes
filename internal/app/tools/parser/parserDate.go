@@ -26,3 +26,30 @@ func ParseDateFromSql(date string) string {
 	}
 	return answer
 }
+
+func ParseDateFromSql2(date string) string {
+	// TODO: разобраться с ParseDateFromSql и сделать одну функу
+	var answer string
+	counterDoubleTwoPoints := 0
+	for _, value := range date {
+		if value == '+' {
+			break
+		}
+		if value == '-' {
+			answer += "."
+			continue
+		}
+		if value == ':' {
+			counterDoubleTwoPoints++
+			if counterDoubleTwoPoints == 2 {
+				break
+			}
+		}
+		if value != 'T' {
+			answer += string(value)
+		} else {
+			break
+		}
+	}
+	return answer
+}

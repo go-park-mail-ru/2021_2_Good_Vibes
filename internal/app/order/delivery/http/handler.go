@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/order"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/parser"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -99,6 +100,10 @@ func (oh *OrderHandler) GetAllOrders(ctx echo.Context) error {
 
 	if orders == nil {
 		orders = make([]models.Order, 0)
+	}
+
+	for index, _ := range orders {
+		orders[index].Date = parser.ParseDateFromSql2(orders[index].Date)
 	}
 
 	return ctx.JSON(http.StatusOK, orders)
