@@ -10,6 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strings"
 )
 
 const NewOrder = "новый"
@@ -105,6 +106,13 @@ func (oh *OrderHandler) GetAllOrders(ctx echo.Context) error {
 
 	for index, _ := range orders {
 		orders[index].Date = parser.ParseDateFromSql2(orders[index].Date)
+	}
+
+	for i, _ := range orders {
+		for j, _ := range orders[i].Products {
+			imageSlice := strings.Split(orders[i].Products[j].Image, ";")
+			orders[i].Products[j].Image = imageSlice[0]
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, orders)
