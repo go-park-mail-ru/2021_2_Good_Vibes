@@ -78,6 +78,11 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 		suggests = make([]models.Product, 0)
 	}
 
+	for i, _ := range suggests {
+		imageSlice := strings.Split(suggests[i].Image, ";")
+		suggests[i].Image = imageSlice[0]
+	}
+
 	logger.Trace(trace + " success GetSearchResults")
 	return ctx.JSON(http.StatusOK, suggests)
 }
