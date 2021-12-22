@@ -225,6 +225,10 @@ func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
 		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
 	}
 
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
 	return ctx.JSON(http.StatusOK, products)
 }
 
