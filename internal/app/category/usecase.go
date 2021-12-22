@@ -8,6 +8,6 @@ import (
 //go:generate mockgen -source=usecase.go -destination=mocks/usecase_mock.go
 type UseCase interface {
 	GetAllCategories() (models.CategoryNode, error)
-	GetProductsByCategory(filter postgre.Filter) ([]models.Product, error)
+	GetProductsByCategory(filter postgre.Filter) (*models.ProductsCategory, error)
 	CreateCategory(category models.CreateCategory) error
 }

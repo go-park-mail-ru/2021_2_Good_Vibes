@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const BucketUrl = ""
+const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
 const CustomAvatar = BucketUrl + "29654677-7947-46d9-a2e5-1ca33223e30d"
 const trace = "UserHandler"
 
@@ -73,7 +73,7 @@ func (handler *UserHandler) Login(ctx echo.Context) error {
 	userProfile, err := handler.Usecase.GetUserDataByID(uint64(id))
 
 	if err != nil {
-		newLoginError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newLoginError := errors.NewError(errors.SERVER_ERROR,errors.SERVER_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, newLoginError)
 	}
@@ -114,7 +114,7 @@ func (handler *UserHandler) SignUp(ctx echo.Context) error {
 
 	newId, err := handler.Usecase.AddUser(newUser)
 	if err != nil {
-		newSignupError := errors.NewError(newId, err.Error())
+		newSignupError := errors.NewError(newId, errors.SERVER_ERROR_DESCR)
 		logger.Error(err)
 		return ctx.JSON(http.StatusInternalServerError, newSignupError)
 	}
@@ -177,7 +177,7 @@ func (handler *UserHandler) UploadAvatar(ctx echo.Context) error {
 
 	fileName := handler.Usecase.GenerateAvatarName()
 
-	bucket := ""
+	bucket := "products-bucket-ozon-good-vibes"
 
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("eu-west-1")})
 	uploader := s3manager.NewUploader(sess)

@@ -40,3 +40,11 @@ func (handler *grpcOrderHandler) GetAllOrders(ctx context.Context, userId *proto
 		Orders: ordersGrpc,
 	}, nil
 }
+
+func (handler *grpcOrderHandler) GetProductsPriceWithPromo(ctx context.Context, order *proto.Order) (*proto.Order, error) {
+	orderGet, err := handler.orderUseCase.CheckOrder(models.GrpcOrderToModel(order))
+	if err != nil {
+		return nil, err
+	}
+	return models.ModelOrderToGrpc(*orderGet), nil
+}

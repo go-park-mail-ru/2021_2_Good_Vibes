@@ -40,7 +40,7 @@ func (m *Manager) ParseTokenFromContext(ctx context.Context) (uint64, error) {
 	token, ok := ctx.Value("token").(*jwt.Token)
 	if !ok {
 		fmt.Println(token)
-		return customErrors.TOKEN_ERROR, errors.New(customErrors.TOKEN_ERROR_DESCR)
+		return 0, nil
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)

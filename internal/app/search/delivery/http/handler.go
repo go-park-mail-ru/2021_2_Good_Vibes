@@ -32,7 +32,7 @@ func (sh *SearchHandler) GetSuggests(ctx echo.Context) error {
 	suggests, err := sh.useCase.GetSuggests(searchString)
 	if err != nil {
 		logger.Error(err)
-		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
@@ -70,7 +70,7 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 	suggests, err := sh.useCase.GetSearchResults(searchArray, *filter)
 	if err != nil {
 		logger.Error(err)
-		newError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 

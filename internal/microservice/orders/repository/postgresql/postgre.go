@@ -3,13 +3,14 @@ package postgresql
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"strconv"
 	"strings"
 )
 
 const (
-	FieldsNum = 3
+	FieldsNum = 4
 )
 
 type OrderRepository struct {
@@ -34,11 +35,12 @@ func (so *OrderRepository) PutOrder(order models.Order) (int, error) {
 
 	err := tx(so.db, func(tx *sql.Tx) error {
 		err := tx.QueryRow(
-			`insert into orders (user_id, date, cost, status) values ($1, $2, $3, $4) returning id`,
+			`insert into orders (user_id, date, cost, status, email) values ($1, $2, $3, $4, $5) returning id`,
 			order.UserId,
 			order.Date,
 			order.Cost,
 			order.Status,
+			order.Email,
 		).Scan(&order.OrderId)
 
 		if err != nil {
@@ -117,7 +119,7 @@ func (so *OrderRepository) SelectPrices(products []models.OrderProducts) ([]mode
 	if rows.Err() != nil {
 		return nil, rows.Err()
 	}
-
+	fmt.Println(productPrices)
 	return productPrices, nil
 }
 
@@ -125,7 +127,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	var orders []models.Order
 
 	err := tx(so.db, func(tx *sql.Tx) error {
-		rows, err := so.db.Query("select id, user_id, date, cost, status from orders where user_id = $1", user)
+		rows, err := so.db.Query("select id, user_id, date, cost, status, email from orders where user_id = $1 order by date desc", user)
 		if err != nil {
 			return err
 		}
@@ -135,7 +137,7 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 		for rows.Next() {
 			order := models.Order{}
 
-			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status)
+			err := rows.Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Email)
 			if err != nil {
 				return err
 			}
@@ -149,7 +151,10 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 
 		for i, _ := range orders {
 			var products []models.OrderProducts
-			rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orders[i].OrderId)
+			rows, err := so.db.Query("select o.order_id, o.product_id, o.count, o.price, p.image, p.name, " +
+				                           "p.rating, p.description, p.sales from order_products as o " +
+				                           "join products p on o.product_id = p.id where order_id = $1",
+				                          orders[i].OrderId)
 			if err != nil {
 				return err
 			}
@@ -159,7 +164,9 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 			for rows.Next() {
 				product := models.OrderProducts{}
 
-				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+				err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number, &product.Price,
+				                 &product.Image, &product.Name, &product.Rating, &product.Description,
+				                 &product.Sales)
 				if err != nil {
 					return err
 				}
@@ -204,6 +211,81 @@ func (so *OrderRepository) GetAllOrders(user int) ([]models.Order, error) {
 	return orders, nil
 }
 
+func (so *OrderRepository) CheckPromoCode(promoCode string) (*models.PromoCode, error) {
+	var promoReturn models.PromoCode
+
+	row := so.db.QueryRow("select type, code, value, category_id, product_id, uses_left"+
+		" from promocode where code = $1", promoCode)
+	var categoryId, productId sql.NullInt32
+	err := row.Scan(&promoReturn.Type, &promoReturn.Code, &promoReturn.Value,
+		&categoryId, &productId, &promoReturn.UsesLeft)
+
+	promoReturn.ProductId = -1
+	promoReturn.CategoryId = -1
+	if productId.Valid {
+		promoReturn.ProductId = int(productId.Int32)
+	}
+	if categoryId.Valid {
+		promoReturn.CategoryId = int(categoryId.Int32)
+	}
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &promoReturn, nil
+}
+
+func (so *OrderRepository) GetOrderById(orderId int) (models.Order, error) {
+	var order models.Order
+
+	err := tx(so.db, func(tx *sql.Tx) error {
+		err := so.db.QueryRow("select id, user_id, date, cost, status, email from orders where id = $1", orderId).
+			Scan(&order.OrderId, &order.UserId, &order.Date, &order.Cost, &order.Status, &order.Status)
+
+		if err == sql.ErrNoRows {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		var products []models.OrderProducts
+		rows, err := so.db.Query("select order_id, product_id, count from order_products where order_id = $1", orderId)
+		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			product := models.OrderProducts{}
+
+			err := rows.Scan(&product.OrderId, &product.ProductId, &product.Number)
+			if err != nil {
+				return err
+			}
+
+			products = append(products, product)
+		}
+		order.Products = products
+
+		if rows.Err() != nil {
+			return nil
+		}
+
+		return nil
+	})
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	return order, nil
+}
+
 func makeSelectPricesQuery(products []models.OrderProducts) string {
 	query := strings.Builder{}
 	query.WriteString("select id, price from products where id in ")
@@ -223,14 +305,15 @@ func makeSelectPricesQuery(products []models.OrderProducts) string {
 
 func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 	query := strings.Builder{}
-	query.WriteString("insert into order_products (order_id, product_id, count) values")
+	query.WriteString("insert into order_products (order_id, product_id, count, price) values")
 
 	values := make([]interface{}, FieldsNum*len(order.Products))
 	for i, s := range order.Products {
 		values[i*FieldsNum] = s.OrderId
 		values[i*FieldsNum+1] = s.ProductId
 		values[i*FieldsNum+2] = s.Number
-
+		values[i*FieldsNum+3] = s.Price
+		fmt.Println(s.Price)
 		n := i * FieldsNum
 
 		query.WriteString(`(`)
@@ -246,6 +329,14 @@ func makeOrderProductsInsertQuery(order models.Order) (string, []interface{}) {
 	str := query.String()
 
 	return str[:len(str)-1], values
+}
+
+func (so *OrderRepository) GetProductCategory(productId int) (int, error) {
+	row := so.db.QueryRow("select category_id "+
+		" from products where id = $1", productId)
+	var categoryId int
+	err := row.Scan(&categoryId)
+	return categoryId, err
 }
 
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {

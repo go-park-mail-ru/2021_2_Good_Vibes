@@ -1,0 +1,122 @@
+name: Deploy
+
+on:
+  push:
+    branches: [rk4]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.x
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: make build
+
+      - name: Upload build result api
+        uses: actions/upload-artifact@v1
+        with:
+          name: api
+          path: ./build/api
+
+      - name: Upload build result order
+        uses: actions/upload-artifact@v1
+        with:
+          name: order
+          path: ./build/order
+
+      - name: Upload build result auth
+        uses: actions/upload-artifact@v1
+        with:
+          name: auth
+          path: ./build/auth
+
+      - name: Upload build result basket
+        uses: actions/upload-artifact@v1
+        with:
+          name: basket
+          path: ./build/basket
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download bin file api
+        uses: actions/download-artifact@v1
+        with:
+          name: api
+
+      - name: Download bin file order
+        uses: actions/download-artifact@v1
+        with:
+          name: order
+
+      - name: Download bin file basket
+        uses: actions/download-artifact@v1
+        with:
+          name: basket
+
+      - name: Download bin file auth
+        uses: actions/download-artifact@v1
+        with:
+          name: auth
+
+      - name: Transfer bin api file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "api"
+          target: "~/Ozon/2021_2_Good_Vibes/build"
+
+      - name: Transfer bin order file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "order"
+          target: "~/Ozon/2021_2_Good_Vibes/build"
+
+      - name: Transfer bin basket file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "basket"
+          target: "~/Ozon/2021_2_Good_Vibes/build"
+
+      - name: Transfer bin auth file to server
+        uses: appleboy/scp-action@master
+        with:
+          port: 22
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          source: "auth"
+          target: "~/Ozon/2021_2_Good_Vibes/build"
+
+      - name: chmod
+        uses: appleboy/ssh-action@master
+        with:
+          host: 37.139.33.76
+          username: ubuntu
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            chmod -R 755 ~/Ozon/2021_2_Good_Vibes/build
+            sudo service azot_api restart
+            sudo service azot_auth restart
+            sudo service azot_order restart
+            sudo service azot_basket restart

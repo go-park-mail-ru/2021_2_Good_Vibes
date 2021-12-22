@@ -50,7 +50,7 @@ func (rh *ReviewHandler) AddReview(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
-	err = rh.useCase.AddReview(newReview)
+	err = rh.useCase.AddReview(&newReview)
 	if err != nil && err.Error() == customErrors.REVIEW_EXISTS_DESCR {
 		logger.Error(err, newReview)
 		newError := customErrors.NewError(customErrors.REVIEW_EXISTS_ERROR, customErrors.REVIEW_EXISTS_DESCR)
@@ -59,7 +59,7 @@ func (rh *ReviewHandler) AddReview(ctx echo.Context) error {
 
 	if err != nil {
 		logger.Error(err, newReview)
-		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 
@@ -102,7 +102,7 @@ func (rh *ReviewHandler) UpdateReview(ctx echo.Context) error {
 
 	if err != nil {
 		logger.Error(err, newReview)
-		newError := customErrors.NewError(customErrors.SERVER_ERROR, err.Error())
+		newError := customErrors.NewError(customErrors.SERVER_ERROR, customErrors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 

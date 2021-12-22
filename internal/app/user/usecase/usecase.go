@@ -53,6 +53,10 @@ func (us *usecase) GetUserDataByID(id uint64) (*models.UserDataProfile, error) {
 	userProfile.Name = userDataStorage.Name
 	userProfile.Email = userDataStorage.Email
 	userProfile.Avatar = userDataStorage.Avatar.String
+	userProfile.RealName = userDataStorage.RealName.String
+	userProfile.Sex = userDataStorage.Sex.String
+	userProfile.BirthDay = userDataStorage.BirthDay.String
+	userProfile.RealSurname = userDataStorage.RealSurname.String
 	return &userProfile, nil
 }
 
@@ -77,6 +81,25 @@ func (us *usecase) UpdateProfile(newData models.UserDataProfile) (int, error) {
 
 	if userFromDb != nil && userFromDb.Id != int(newData.Id) {
 		return customErrors.USER_EXISTS_ERROR, nil
+	}
+
+	if newData.Name == "" {
+		newData.Name = userFromDb.Name
+	}
+	if newData.BirthDay == "" {
+		newData.BirthDay = userFromDb.BirthDay.String
+	}
+	if newData.RealName == "" {
+		newData.RealName = userFromDb.RealName.String
+	}
+	if newData.RealSurname == "" {
+		newData.RealSurname = userFromDb.RealSurname.String
+	}
+	if newData.Sex == "" {
+		newData.Sex = userFromDb.Sex.String
+	}
+	if newData.Email == "" {
+		newData.Email = userFromDb.Email
 	}
 
 	return 0, us.repository.UpdateUser(newData)

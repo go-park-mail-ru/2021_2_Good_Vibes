@@ -11,11 +11,15 @@ type UserDataForInput struct {
 }
 
 type UserDataStorage struct {
-	Id       int            `json:"id"`
-	Name     string         `json:"username" validate:"required"`
-	Email    string         `json:"email"    validate:"required,email"`
-	Password string         `json:"password" validate:"required"`
-	Avatar   sql.NullString `json:"avatar"`
+	Id          int            `json:"id"`
+	Name        string         `json:"username" validate:"required"`
+	Email       string         `json:"email"    validate:"required,email"`
+	Password    string         `json:"password" validate:"required"`
+	Avatar      sql.NullString `json:"avatar"`
+	RealName    sql.NullString `json:"real_name,omitempty"`
+	RealSurname sql.NullString `json:"real_surname,omitempty"`
+	Sex         sql.NullString `json:"sex,omitempty"`
+	BirthDay    sql.NullString `json:"birth_day,omitempty"`
 }
 
 type UserDataForReg struct {
@@ -29,10 +33,14 @@ type UserID struct {
 }
 
 type UserDataProfile struct {
-	Id     uint64 `json:"id,omitempty"`
-	Name   string `json:"username"`
-	Email  string `json:"email" validate:"email"`
-	Avatar string `json:"avatar,omitempty"`
+	Id          uint64 `json:"id,omitempty"`
+	Name        string `json:"username"`
+	Email       string `json:"email" validate:"email"`
+	Avatar      string `json:"avatar,omitempty"`
+	RealName    string `json:"real_name,omitempty"`
+	RealSurname string `json:"real_surname,omitempty"`
+	Sex         string `json:"sex,omitempty"`
+	BirthDay    string `json:"birth_day,omitempty"`
 }
 
 type UserDataPassword struct {

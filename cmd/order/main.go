@@ -6,9 +6,10 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
 	proto "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/proto/order"
+	userRepo "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/user/repository/postgresql"
 	handler "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/handler/grpc"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/repository/postgresql"
-	usecase "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/usecase"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/microservice/orders/usecase"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/labstack/echo/v4"
@@ -24,13 +25,18 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load config", err)
 	}
-
-	storage, err := postgresql.NewOrderRepository(postgre.GetPostgres())
+	dbConn, dbErr := postgre.GetPostgres()
+	storage, err := postgresql.NewOrderRepository(dbConn, dbErr)
 	if err != nil {
 		log.Fatal("cannot connect data base", err)
 	}
 
-	handler := handler.NewGrpcOrderHandler(usecase.NewOrderUseCase(storage))
+	userStorage, err := userRepo.NewStorageUserDB(dbConn, dbErr)
+	if err != nil {
+		log.Fatal("cannot connect data base", err)
+	}
+
+	handler := handler.NewGrpcOrderHandler(usecase.NewOrderUseCase(storage, userStorage))
 	m, err := metrics.CreateNewMetric("order")
 	if err != nil {
 		log.Fatal("create metric error", err)

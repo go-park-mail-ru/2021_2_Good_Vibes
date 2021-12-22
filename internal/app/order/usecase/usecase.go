@@ -31,6 +31,7 @@ func (uc *UseCase) PutOrder(order models.Order) (int, float64, error) {
 
 func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
 	ordersGrpc, err := uc.orderServiceClient.GetAllOrders(context.Background(), &proto.UserIdOrder{UserId: int64(user)})
+
 	if err != nil {
 		return nil, err
 	}
@@ -39,5 +40,17 @@ func (uc *UseCase) GetAllOrders(user int) ([]models.Order, error) {
 	for _, element := range ordersGrpc.GetOrders() {
 		ordersModel = append(ordersModel, models.GrpcOrderToModel(element))
 	}
+
 	return ordersModel, nil
+}
+
+func (uc *UseCase) GetOrderPriceWithPromo(order models.Order) (*models.Order, error) {
+	orderGrpc, err := uc.orderServiceClient.GetProductsPriceWithPromo(context.Background(),
+		models.ModelOrderToGrpc(order))
+
+	if err != nil {
+		return nil, err
+	}
+	result := models.GrpcOrderToModel(orderGrpc)
+	return &result, nil
 }

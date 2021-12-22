@@ -32,7 +32,7 @@ func (ch *CategoryHandler) GetCategories(ctx echo.Context) error {
 	categories, err := ch.useCase.GetAllCategories()
 	if err != nil {
 		logger.Error(err)
-		newCategoryError := errors.NewError(errors.DB_ERROR, err.Error())
+		newCategoryError := errors.NewError(errors.DB_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newCategoryError)
 	}
 
@@ -57,16 +57,16 @@ func (ch *CategoryHandler) GetCategoryProducts(ctx echo.Context) error {
 	products, err := ch.useCase.GetProductsByCategory(*filter)
 	if err != nil {
 		logger.Error(err)
-		newCategoryError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newCategoryError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newCategoryError)
 	}
 
-	for i, _ := range products {
-		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	for i, _ := range products.Products {
+		products.Products[i] = sanitizer.SanitizeData(&products.Products[i]).(models.Product)
 	}
 
-	if products == nil {
-		products = make([]models.Product, 0)
+	if products.Products == nil {
+		products.Products = make([]models.Product, 0)
 	}
 
 	logger.Debug(products)

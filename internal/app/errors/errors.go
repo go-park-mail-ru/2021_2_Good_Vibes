@@ -12,6 +12,7 @@ const (
 	NO_REVIEW_ERROR      = -60
 	REVIEW_EXISTS_ERROR  = -62
 	BAD_QUERY_PARAM      = -5
+	NO_PRODUCT_ERROR     = -70
 )
 
 const (
@@ -19,8 +20,10 @@ const (
 	VALIDATION_DESCR      = "Неправильный формат данных"
 	TOKEN_ERROR_DESCR     = "can not get token"
 	NO_USER_DESCR         = "Пользователя не существует"
+	NO_PRODUCT_DESCR      = "Продукта не существует"
 	USER_EXISTS_DESCR     = "Пользователь уже существует"
 	WRONG_PASSWORD_DESCR  = "Неверный пароль"
+	SERVER_ERROR_DESCR    = "Неизвестная ошибка сервера"
 	BD_ERROR_DESCR        = "bd error"
 	BAD_INIT_SECRET_KEY   = "bad init secret key"
 	HASHER_ERROR_DESCR    = "error hash password"
@@ -40,6 +43,7 @@ var ErrorsMap = map[string]int{
 	NO_REVIEW_DESCR:       NO_REVIEW_ERROR,
 	REVIEW_EXISTS_DESCR:   REVIEW_EXISTS_ERROR,
 	BAD_QUERY_PARAM_DESCR: BAD_QUERY_PARAM,
+	SERVER_ERROR_DESCR: SERVER_ERROR,
 }
 
 type Error struct {

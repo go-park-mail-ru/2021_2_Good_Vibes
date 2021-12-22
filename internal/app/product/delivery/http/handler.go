@@ -8,15 +8,17 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/errors"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
+	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product/convert"
 	sessionJwt "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/session/jwt"
 	customLogger "github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/logger"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/sanitizer"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
-const BucketUrl = ""
+const BucketUrl = "https://products-bucket-ozon-good-vibes.s3.eu-west-1.amazonaws.com/"
 
 type ProductHandler struct {
 	useCase        product.UseCase
@@ -127,7 +129,7 @@ func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
 	err = ph.useCase.DeleteFavouriteProduct(deleteProduct)
 	if err != nil {
 		logger.Error(err, deleteProduct)
-		newProductError := errors.NewError(errors.SERVER_ERROR, err.Error())
+		newProductError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 
@@ -139,18 +141,67 @@ func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetAllProducts")
 
-	answer, err := ph.useCase.GetAllProducts()
+	products, err := ph.useCase.GetAllProducts()
 	if err != nil {
 		logger.Error(err)
 		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newProductError)
 	}
 
-	for i, _ := range answer {
-		answer[i] = sanitizer.SanitizeData(&answer[i]).(models.Product)
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
 	}
 
-	return ctx.JSON(http.StatusOK, answer)
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
+	return ctx.JSON(http.StatusOK, products)
+}
+
+func (ph *ProductHandler) GetSalesProducts(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + "GetSalesProducts")
+
+	products, err := ph.useCase.GetSalesProducts()
+	if err != nil {
+		logger.Error(err)
+		newProductError := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newProductError)
+	}
+
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
+	return ctx.JSON(http.StatusOK, products)
+}
+
+func (ph *ProductHandler) PutSalesForProduct(ctx echo.Context) error {
+	var newSale models.SalesProduct
+	if err := ctx.Bind(&newSale); err != nil {
+		newError := errors.NewError(errors.BIND_ERROR, errors.BIND_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	if err := ctx.Validate(&newSale); err != nil {
+		newError := errors.NewError(errors.VALIDATION_ERROR, errors.VALIDATION_DESCR)
+		return ctx.JSON(http.StatusBadRequest, newError)
+	}
+
+	newSale = sanitizer.SanitizeData(&newSale).(models.SalesProduct)
+
+	err := ph.useCase.PutSalesForProduct(newSale)
+	if err != nil {
+		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, newError)
+	}
+
+	return ctx.JSON(http.StatusOK, newSale)
 }
 
 func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
@@ -177,6 +228,28 @@ func (ph *ProductHandler) GetFavouriteProducts(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, products)
 }
 
+func (ph *ProductHandler) GetNewProducts(ctx echo.Context) error {
+	logger := customLogger.TryGetLoggerFromContext(ctx)
+	logger.Trace(trace + "GetNewProducts")
+
+	products, err := ph.useCase.GetNewProducts()
+	if err != nil {
+		logger.Error(err)
+		err := errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	for i, _ := range products {
+		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	}
+
+	if products == nil {
+		products = make([]models.Product, 0)
+	}
+
+	return ctx.JSON(http.StatusOK, products)
+}
+
 func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 	logger := customLogger.TryGetLoggerFromContext(ctx)
 	logger.Trace(trace + "GetProductById")
@@ -196,16 +269,34 @@ func (ph *ProductHandler) GetProductById(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
-	answer, err := ph.useCase.GetProductById(id)
+	idNum, err := ph.SessionManager.ParseTokenFromContext(ctx.Request().Context())
+	if err == nil && idNum != 0 {
+		ph.useCase.ChangeRecommendUser(int(idNum), id, val.Get("search"))
+	}
+
+	answer, err := ph.useCase.GetProductById(id, int64(idNum))
 	if err != nil {
 		logger.Error(err)
-		newProductError := errors.NewError(errors.DB_ERROR, err.Error())
+		newProductError := errors.NewError(errors.DB_ERROR, errors.SERVER_ERROR_DESCR)
 		return ctx.JSON(http.StatusBadRequest, newProductError)
 	}
 
 	answer = sanitizer.SanitizeData(&answer).(models.Product)
 
-	return ctx.JSON(http.StatusOK, answer)
+	if answer.Id == 0 {
+		return ctx.JSON(http.StatusOK, errors.NewError(errors.NO_PRODUCT_ERROR, errors.NO_PRODUCT_DESCR))
+	}
+
+	prod := convert.FromProductToOnePageProduct(answer)
+
+	imageSlice := strings.Split(answer.Image, ";")
+	prod.Images = make([]string, len(imageSlice))
+
+	for i, _ := range imageSlice {
+		prod.Images[i] = imageSlice[i]
+	}
+
+	return ctx.JSON(http.StatusOK, prod)
 }
 
 func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
@@ -231,7 +322,7 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 
 	fileName := ph.useCase.GenerateProductImageName()
 
-	bucket := ""
+	bucket := "products-bucket-ozon-good-vibes"
 
 	sess, _ := session.NewSession(&aws.Config{Region: aws.String("eu-west-1")})
 	uploader := s3manager.NewUploader(sess)
@@ -247,7 +338,6 @@ func (ph *ProductHandler) UploadProduct(ctx echo.Context) error {
 	}
 
 	productId, err := strconv.Atoi(ctx.FormValue("product_id"))
-
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

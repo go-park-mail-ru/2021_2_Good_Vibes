@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	SecretKey     string `mapstructure:"SECRET_KEY"`
+	 SecretKey     string `mapstructure:"SECRET_KEY"`
 	ServerAddress string `mapstructure:"ADDRESS_SERVER"`
 	DataBaseURL   string `mapstructure:"DATABASE_URL"`
 	AwsAccessKey  string `mapstructure:"AWS_ACCESS_KEY"`
@@ -23,6 +23,13 @@ type Config struct {
 		Host     string `mapstructure:"HOST"`
 		Port     string `mapstructure:"PORT"`
 	} `mapstructure:"DATA_BASE_CONFIG"`
+
+	Email struct {
+		Server     string `mapstructure:"EMAIL_SERVER"`
+		ServerPort int    `mapstructure:"EMAIL_SERVER_PORT"`
+		Address    string `mapstructure:"EMAIL_ADDRESS"`
+		Password   string `mapstructure:"EMAIL_ADDRESS_PASSWORD"`
+	} `mapstructure:"EMAIL_CONFIG"`
 }
 
 var ConfigApp Config
