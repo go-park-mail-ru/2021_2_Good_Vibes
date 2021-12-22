@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/models"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/product"
 	"github.com/go-park-mail-ru/2021_2_Good_Vibes/internal/app/tools/postgre"
+	"strings"
 )
 
 type UseCase struct {
@@ -27,6 +28,12 @@ func (uc *UseCase) GetProductsByCategory(filter postgre.Filter) (*models.Product
 	if err != nil {
 		return nil, err
 	}
+
+	for i, _ := range products {
+		imageSlice := strings.Split(products[i].Image, ";")
+		products[i].Image = imageSlice[0]
+	}
+
 	result.Products = products
 
 	minPrice, maxPrice, err := uc.repositoryCategory.GetMinMaxPriceCategory(filter.NameCategory)
