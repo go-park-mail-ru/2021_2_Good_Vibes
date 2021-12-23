@@ -14,7 +14,7 @@ type UseCase interface {
 	GetProductById(id int, userID int64) (models.Product, error)
 	GenerateProductImageName() string
 	SaveProductImageName(productId int, fileName string) error
-	AddFavouriteProduct(product models.FavouriteProduct) error
+	AddFavouriteProduct(product models.FavouriteProduct) (models.Product, error)
 	DeleteFavouriteProduct(product models.FavouriteProduct) error
 	ChangeRecommendUser(userId int, ProductId int, isSearch string) error
 }

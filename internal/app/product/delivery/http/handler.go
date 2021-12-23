@@ -91,13 +91,13 @@ func (ph *ProductHandler) AddFavouriteProduct(ctx echo.Context) error {
 	newProduct = sanitizer.SanitizeData(&newProduct).(models.FavouriteProduct)
 	newProduct.UserId = int(idNum)
 
-	err = ph.useCase.AddFavouriteProduct(newProduct)
+	productInfo, err := ph.useCase.AddFavouriteProduct(newProduct)
 	if err != nil {
 		newError := errors.NewError(errors.SERVER_ERROR, errors.BD_ERROR_DESCR)
 		return ctx.JSON(http.StatusInternalServerError, newError)
 	}
 
-	return ctx.JSON(http.StatusOK, newProduct)
+	return ctx.JSON(http.StatusOK, productInfo)
 }
 
 func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
