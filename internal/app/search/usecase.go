@@ -7,5 +7,5 @@ import (
 
 type UseCase interface {
 	GetSuggests(str string) (models.Suggest, error)
-	GetSearchResults(searchString []string, filter postgre.Filter) ([]models.Product, error)
+	GetSearchResults(searchString []string, filter postgre.Filter) (models.ProductsCategory, error)
 }

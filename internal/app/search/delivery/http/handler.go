@@ -74,13 +74,13 @@ func (sh *SearchHandler) GetSearchResults(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, newError)
 	}
 
-	if suggests == nil {
-		suggests = make([]models.Product, 0)
+	if suggests.Products == nil {
+		suggests.Products = make([]models.Product, 0)
 	}
 
-	for i, _ := range suggests {
-		imageSlice := strings.Split(suggests[i].Image, ";")
-		suggests[i].Image = imageSlice[0]
+	for i, _ := range suggests.Products {
+		imageSlice := strings.Split(suggests.Products[i].Image, ";")
+		suggests.Products[i].Image = imageSlice[0]
 	}
 
 	logger.Trace(trace + " success GetSearchResults")

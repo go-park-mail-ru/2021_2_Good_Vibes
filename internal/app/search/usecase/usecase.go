@@ -27,7 +27,7 @@ func (uc *UseCase) GetSuggests(str string) (models.Suggest, error) {
 	return suggests, nil
 }
 
-func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter) ([]models.Product, error) {
+func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter) (models.ProductsCategory, error) {
 	var products []models.Product
 
 	productMap := make(map[models.Product]int)
@@ -35,7 +35,7 @@ func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter
 	resultProducts, err := uc.repositorySearch.GetSearchResults(searchString, filter)
 
 	if err != nil {
-		return nil, err
+		return models.ProductsCategory{}, err
 	}
 
 	for _, products := range resultProducts {
@@ -59,5 +59,21 @@ func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter
 		}
 	}
 
-	return products, nil
+	var maxPrice int
+	for _, product := range products {
+		maxPrice = int(math.Max(float64(maxPrice), product.Price))
+	}
+
+	var minPrice int
+	for _, product := range products {
+		minPrice = int(math.Min(float64(minPrice), product.Price))
+	}
+
+	productWithPrices := models.ProductsCategory{
+		Products: products,
+		MinPrice: float64(minPrice),
+		MaxPrice: float64(maxPrice),
+	}
+
+	return productWithPrices, nil
 }
