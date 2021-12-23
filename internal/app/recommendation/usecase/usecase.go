@@ -24,12 +24,12 @@ func (ru *RecommendationUseCase) GetRecommendForUser(userId int) ([]models.Produ
 	recommendProductsAll, err := ru.repository.GetRecommendProductForUser(userId)
 
 	var randomArray []int
-	if len(recommendProductsAll) < 4 {
+	if len(recommendProductsAll) < 5 {
 		for index, _ := range recommendProductsAll {
 			randomArray = append(randomArray, index)
 		}
 	} else {
-		randomArray = rand.Perm(len(recommendProductsAll))[:4]
+		randomArray = rand.Perm(len(recommendProductsAll))[:5]
 	}
 
 	for _, value := range randomArray {
@@ -54,7 +54,7 @@ func (ru *RecommendationUseCase) GetMostPopularProduct() ([]models.Product, erro
 		return nil, err
 	}
 
-	randomArray := rand.Perm(len(MostPopularProducts))[:4]
+	randomArray := rand.Perm(len(MostPopularProducts))[:5]
 
 	for _, value := range randomArray {
 		fourMostPopularProduct = append(fourMostPopularProduct, MostPopularProducts[value])
