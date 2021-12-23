@@ -87,7 +87,7 @@ func (uc *UseCase) CheckOrder(order models.Order) (*models.Order, error) {
 	var costBeforePromocode float64
 	for index, product := range order.Products {
 		TotalPriceProduct := float64(product.Number) * productPricesMap[product.ProductId]
-		order.Products[index].PriceWithPromo = TotalPriceProduct
+		order.Products[index].Price = productPricesMap[product.ProductId]
 		costBeforePromocode += TotalPriceProduct
 	}
 
@@ -102,9 +102,8 @@ func (uc *UseCase) CheckOrder(order models.Order) (*models.Order, error) {
 
 	var cost float64
 	for index, product := range order.Products {
-		PriceProduct := productPricesMap[product.ProductId]
 		TotalPriceProduct := float64(product.Number) * productPricesMap[product.ProductId]
-		order.Products[index].PriceWithPromo = PriceProduct
+		order.Products[index].PriceWithPromo = productPricesMap[product.ProductId]
 		cost += TotalPriceProduct
 	}
 
