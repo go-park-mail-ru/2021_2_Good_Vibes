@@ -84,8 +84,20 @@ func (uc *UseCase) AddFavouriteProduct(product models.FavouriteProduct) (models.
 	return productInfo, nil
 }
 
-func (uc *UseCase) DeleteFavouriteProduct(product models.FavouriteProduct) error {
-	return uc.repository.DeleteFavouriteProduct(product)
+func (uc *UseCase) DeleteFavouriteProduct(product models.FavouriteProduct) (models.Product, error) {
+	err := uc.repository.DeleteFavouriteProduct(product)
+	if err != nil {
+		return models.Product{}, err
+	}
+	productInfo, err := uc.repository.GetById(product.Id)
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	imageSlice := strings.Split(productInfo.Image, ";")
+	productInfo.Image = imageSlice[0]
+
+	return productInfo, nil
 }
 
 func (uc *UseCase) GetFavouriteProducts(userId int) ([]models.Product, error) {

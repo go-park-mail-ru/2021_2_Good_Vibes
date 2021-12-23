@@ -126,7 +126,7 @@ func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
 
 	deleteProduct.UserId = int(userId)
 
-	err = ph.useCase.DeleteFavouriteProduct(deleteProduct)
+	productInfo, err := ph.useCase.DeleteFavouriteProduct(deleteProduct)
 	if err != nil {
 		logger.Error(err, deleteProduct)
 		newProductError := errors.NewError(errors.SERVER_ERROR, errors.SERVER_ERROR_DESCR)
@@ -134,7 +134,7 @@ func (ph *ProductHandler) DeleteFavouriteProduct(ctx echo.Context) error {
 	}
 
 	logger.Trace(trace + " success DeleteFavouriteProduct")
-	return ctx.JSON(http.StatusOK, deleteProduct)
+	return ctx.JSON(http.StatusOK, productInfo)
 }
 
 func (ph *ProductHandler) GetAllProducts(ctx echo.Context) error {
