@@ -69,6 +69,10 @@ func (uc *UseCase) GetSearchResults(searchString []string, filter postgre.Filter
 		minPrice = int(math.Min(float64(minPrice), product.Price))
 	}
 
+	if minPrice == 0 {
+		minPrice = maxPrice
+	}
+
 	productWithPrices := models.ProductsCategory{
 		Products: products,
 		MinPrice: float64(minPrice),
