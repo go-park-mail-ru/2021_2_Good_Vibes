@@ -106,7 +106,7 @@ func (ph *StorageProductsDB) GetSalesProducts() ([]models.Product, error) {
 
 func (ph *StorageProductsDB) GetProductsByBrand(brandId int) ([]models.Product, error) {
 	rows, err := ph.db.Query("select p.id, p.image, p.name, p.price, p.rating, p.category_id, " +
-		                           "p.count_in_stock, p.description, p.sales, p.sales_price from brands as b " +
+		                           "p.count_in_stock, p.description, p.sales, p.sales_price, b.name from brands as b " +
 	                               "join products p on b.id = p.brand_id " +
 		                           "where b.id=$1 order by p.id", brandId)
 	if err != nil {
@@ -119,7 +119,7 @@ func (ph *StorageProductsDB) GetProductsByBrand(brandId int) ([]models.Product, 
 		err = rows.Scan(&product.Id, &product.Image, &product.Name,
 			&product.Price, &product.Rating, &product.Category,
 			&product.CountInStock, &product.Description,
-			&product.Sales, &product.SalesPrice)
+			&product.Sales, &product.SalesPrice, &product.BrandName)
 		if err != nil {
 			return nil, err
 		}

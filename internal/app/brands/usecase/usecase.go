@@ -23,16 +23,20 @@ func (uc *UseCase) GetBrands() ([]models.Brand, error) {
 	return uc.repositoryBrand.GetBrands()
 }
 
-func (uc *UseCase) GetProductsByBrand(id int) ([]models.Product, error) {
+func (uc *UseCase) GetProductsByBrand(id int) (models.ProductsBrand, error) {
+	var result models.ProductsBrand
 	products, err := uc.repositoryProduct.GetProductsByBrand(id)
+	if len(products) != 0 {
+		result.BrandName = products[0].BrandName
+	}
 	if err != nil {
-		return nil, err
+		return models.ProductsBrand{}, err
 	}
 
 	for i, _ := range products {
 		imageSlice := strings.Split(products[i].Image, ";")
 		products[i].Image = imageSlice[0]
 	}
-
-	return products, err
+	result.Products = products
+	return result, err
 }

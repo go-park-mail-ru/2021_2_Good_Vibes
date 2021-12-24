@@ -72,3 +72,8 @@ type ProductIdRecommendCount struct {
 	Id      int
 	Counter int
 }
+
+type ProductsBrand struct {
+	Products []Product
+	BrandName string
+}

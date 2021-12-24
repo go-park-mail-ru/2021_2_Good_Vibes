@@ -70,8 +70,8 @@ func (bh *BrandHandler) GetProductsByBrand(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	for i, _ := range products {
-		products[i] = sanitizer.SanitizeData(&products[i]).(models.Product)
+	for i, _ := range products.Products {
+		products.Products[i] = sanitizer.SanitizeData(&products.Products[i]).(models.Product)
 	}
 
 	return ctx.JSON(http.StatusOK, products)

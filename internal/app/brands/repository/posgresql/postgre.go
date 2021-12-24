@@ -47,6 +47,7 @@ func (sc *StorageBrandPostgres) GetBrands() ([]models.Brand, error) {
 	return brands, nil
 }
 
+
 func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx, _ := db.Begin()
 	err := fb(trx)
@@ -57,3 +58,5 @@ func tx(db *sql.DB, fb func(tx *sql.Tx) error) error {
 	trx.Commit()
 	return nil
 }
+
+
