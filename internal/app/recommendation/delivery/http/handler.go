@@ -39,8 +39,8 @@ func (rh *RecommendHandler) GetRecommendation(ctx echo.Context) error {
 				errors.NewError(errors.DB_ERROR, errors.BD_ERROR_DESCR))
 		}
 
-		if len(recommendProduct) < 5 {
-			diff := 5 - len(recommendProduct)
+		if len(recommendProduct) < 4 {
+			diff := 4 - len(recommendProduct)
 			tempProducts, err := rh.useCase.GetMostPopularProduct()
 			tempProducts = tempProducts[:diff]
 			for i := 0; i < diff; i++ {
